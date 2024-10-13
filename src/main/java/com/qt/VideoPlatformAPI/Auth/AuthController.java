@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.ExecutionException;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @AllArgsConstructor
@@ -23,17 +25,17 @@ public class AuthController {
     }
 
     @PostMapping("/signIn")
-    public AuthenticationResponse  signIn(@RequestBody UserProfile userReq) {
-        return authService.signIn(userReq);
+    public AuthenticationResponse  signIn() {
+        return new AuthenticationResponse("testing message");
     }
 
     @PostMapping("/OTPVerification")
-    public ResponseEntity<APIResponse> otpVerification(@RequestBody UserVerification userVerificationReq) {
+    public APIResponse otpVerification(@RequestBody UserVerification userVerificationReq) {
         return authService.otpVerification(userVerificationReq);
     }
 
     @PostMapping("/VerifyAccount")
     public ResponseEntity<APIResponse> verifyAccount(@RequestBody UserProfile userReq) {
-        return null;
+        return authService.verifyAccount(userReq);
     }
 }

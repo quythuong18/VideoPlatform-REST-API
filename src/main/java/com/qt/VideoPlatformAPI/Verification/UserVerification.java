@@ -17,6 +17,7 @@ import java.time.Instant;
 @NoArgsConstructor
 public class UserVerification extends TimeAudit {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @OneToOne()

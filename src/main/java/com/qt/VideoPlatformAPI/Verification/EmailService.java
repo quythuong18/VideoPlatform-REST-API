@@ -13,13 +13,19 @@ public class EmailService {
 
     private JavaMailSender emailSender;
 
-    public void send(String to, String subject, String text) throws MailException {
+    public void send(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("noreply@videoplatform.com");
         message.setTo(to);
         message.setSubject(subject);
         message.setText(text);
-
-        emailSender.send(message);
+        try {
+            emailSender.send(message);
+            System.out.println("Email sent successfully to " + to);
+        }
+        catch(MailException e) {
+            System.out.println("Error sending email: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

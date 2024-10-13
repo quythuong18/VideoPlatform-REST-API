@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
@@ -26,4 +25,9 @@ public class APIResponse {
 
     @JsonIgnore
     private HttpStatus httpStatus;
+
+    public APIResponse(Boolean success, String message) {
+        this.success = success;
+        this.message = message;
+    }
 }

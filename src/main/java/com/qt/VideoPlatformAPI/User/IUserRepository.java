@@ -1,6 +1,7 @@
 package com.qt.VideoPlatformAPI.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
@@ -19,5 +20,6 @@ public interface IUserRepository extends JpaRepository<UserProfile, Long> {
     Boolean existByUsername(String username);
 
     @Query("UPDATE UserProfile SET isVerified = true WHERE username = ?1")
+    @Modifying
     void activateAccount(String username);
 }
