@@ -1,9 +1,7 @@
 package com.qt.VideoPlatformAPI.User;
 
 import lombok.AllArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +17,11 @@ public class UserController {
 
     @GetMapping("/checkUsernameAvailability")
     ResponseEntity<Boolean> checkUsernameAvailability(@RequestParam(value = "username") String username) {
+        return null;
+    }
+
+    @GetMapping("/checkEmailAvailability")
+    ResponseEntity<Boolean> checkEmailAvailability(@RequestParam(value = "username") String username) {
         return null;
     }
 

@@ -7,12 +7,12 @@ import com.qt.VideoPlatformAPI.Verification.OTPGenerator;
 import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 @AllArgsConstructor
@@ -41,10 +41,12 @@ public class UserService {
             throw new IllegalArgumentException("The username exists");
 
         // Email check
-        if(user.getEmail().isEmpty())
+        if(user.getEmail().isEmpty()){
             throw new IllegalArgumentException("Email cant not be empty");
-        if(iUserRepository.existByEmail(user.getEmail()))
+        }
+        if(iUserRepository.existByEmail(user.getEmail())) {
             throw new IllegalArgumentException("The email exists");
+        }
 
         user.setIsVerified(Boolean.FALSE);
         user.setIsPrivate(Boolean.FALSE);
@@ -52,7 +54,11 @@ public class UserService {
         UserProfile userProfile = null;
         try {
             userProfile = iUserRepository.save(user);
-            OTPGeneration(user);
+            // this task below can be done asynchronously
+            CompletableFuture<Boolean> sendEmailCF = CompletableFuture.supplyAsync(() -> {
+                OTPGenerationAndSendEmail(user);
+                return true;
+            });
         }
         catch (Exception e) {
             System.out.println(e);
@@ -61,21 +67,8 @@ public class UserService {
         return userProfile;
     }
 
-    public ResponseEntity<APIResponse> verifyUserAccount(UserVerification userVerificationReq) {
-        Optional<UserVerification> userVerification = iUserVerificationRepository.findByUsername(userVerificationReq.getUser().getUsername());
-        if(userVerification.isEmpty()) {
-            throw new IllegalArgumentException("Account doesn't exist");
-        }
 
-        String requestOTP = userVerificationReq.getOtpCode();
-        if(requestOTP.equals(userVerification.get().getOtpCode())) {
-            // activate the account
-            iUserRepository.activateAccount(userVerificationReq.getUser().getUsername());
-        }
-            return new ResponseEntity<>(new APIResponse(Boolean.TRUE,"Account verified successfully", HttpStatus.OK).getHttpStatus());
-    }
-
-    public void OTPGeneration(UserProfile user) {
+    public void OTPGenerationAndSendEmail(UserProfile user) {
 
         //generate OTP and send it to user
         String otpVerification = OTPGenerator.generate(6);
