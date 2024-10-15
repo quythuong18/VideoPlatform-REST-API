@@ -1,5 +1,6 @@
 package com.qt.VideoPlatformAPI.User;
 
+import com.qt.VideoPlatformAPI.Response.APIResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,17 +17,17 @@ public class UserController {
     }
 
     @GetMapping("/checkUsernameAvailability")
-    ResponseEntity<Boolean> checkUsernameAvailability(@RequestParam(value = "username") String username) {
-        return null;
+    APIResponse checkUsernameAvailability(@RequestParam(value = "username") String username) {
+        return userService.checkUsernameAvailability(username);
     }
 
     @GetMapping("/checkEmailAvailability")
-    ResponseEntity<Boolean> checkEmailAvailability(@RequestParam(value = "username") String username) {
-        return null;
+    APIResponse checkEmailAvailability(@RequestParam(value = "email") String email) {
+        return userService.checkEmailAvailability(email);
     }
 
     @PutMapping("/{username}")
-    ResponseEntity<UserProfile> updateUser(@RequestBody UserProfile user, @PathVariable(value = "username") String username) {
+    APIResponse updateUser(@RequestBody UserProfile user, @PathVariable(value = "username") String username) {
         return null;
     }
 

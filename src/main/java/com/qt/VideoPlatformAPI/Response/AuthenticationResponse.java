@@ -1,4 +1,4 @@
-package com.qt.VideoPlatformAPI.Utils;
+package com.qt.VideoPlatformAPI.Response;
 
 import lombok.*;
 

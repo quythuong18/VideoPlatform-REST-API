@@ -1,17 +1,14 @@
 package com.qt.VideoPlatformAPI.User;
 
-import com.qt.VideoPlatformAPI.Verification.EmailService;
+import com.qt.VideoPlatformAPI.Response.APIResponse;
+import com.qt.VideoPlatformAPI.Response.AvailabilityResponse;
 import com.qt.VideoPlatformAPI.Verification.IUserVerificationRepository;
-import com.qt.VideoPlatformAPI.Verification.OTPGenerator;
-import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 @Component
 @AllArgsConstructor
@@ -54,4 +51,17 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.CREATED).body(userRepository.save(user));
     }
 
+    public AvailabilityResponse checkUsernameAvailability(String username) {
+         Boolean isExisted = userRepository.existByUsername(username);
+         if(isExisted)
+             return new AvailabilityResponse(Boolean.TRUE, "username " + username + " exists", HttpStatus.OK,Boolean.TRUE);
+        return new AvailabilityResponse(Boolean.TRUE, "username " + username + " does not exist", HttpStatus.OK,Boolean.FALSE);
+    }
+
+    public AvailabilityResponse checkEmailAvailability(String email) {
+        Boolean isExisted = userRepository.existByEmail(email);
+        if(isExisted)
+            return new AvailabilityResponse(Boolean.TRUE, "email " + email + " exists", HttpStatus.OK,Boolean.TRUE);
+        return new AvailabilityResponse(Boolean.TRUE, "email " + email + " does not exist", HttpStatus.OK,Boolean.FALSE);
+    }
 }

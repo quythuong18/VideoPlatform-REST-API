@@ -1,12 +1,15 @@
-package com.qt.VideoPlatformAPI.Utils;
+package com.qt.VideoPlatformAPI.Response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.persistence.Inheritance;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
+
+import java.lang.annotation.Inherited;
 
 
 @Data
@@ -23,11 +26,7 @@ public class APIResponse {
     @JsonProperty("message")
     private String message;
 
-    @JsonIgnore
+    @JsonProperty("httpStatus")
     private HttpStatus httpStatus;
 
-    public APIResponse(Boolean success, String message) {
-        this.success = success;
-        this.message = message;
-    }
 }

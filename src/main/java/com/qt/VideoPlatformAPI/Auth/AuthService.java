@@ -3,8 +3,8 @@ package com.qt.VideoPlatformAPI.Auth;
 import com.qt.VideoPlatformAPI.User.IUserRepository;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
-import com.qt.VideoPlatformAPI.Utils.APIResponse;
-import com.qt.VideoPlatformAPI.Utils.AuthenticationResponse;
+import com.qt.VideoPlatformAPI.Response.APIResponse;
+import com.qt.VideoPlatformAPI.Response.AuthenticationResponse;
 import com.qt.VideoPlatformAPI.Verification.EmailService;
 import com.qt.VideoPlatformAPI.Verification.IUserVerificationRepository;
 import com.qt.VideoPlatformAPI.Verification.OTPGenerator;
@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -58,13 +57,13 @@ public class AuthService {
     public APIResponse otpVerification(UserVerification userVerificationReq) {
         Optional<UserVerification> userVerificationInDB = userVerificationRepository.findByUsername(userVerificationReq.getUser().getUsername());
         if(userVerificationInDB.isEmpty()) {
-            return new APIResponse(Boolean.FALSE,"Account verification doesn't exist");
+            return new APIResponse(Boolean.FALSE,"Account verification doesn't exist", HttpStatus.OK);
         }
 
         String requestOTP = userVerificationReq.getOtpCode();
         if(requestOTP.equals(userVerificationInDB.get().getOtpCode())) {
             if(userVerificationInDB.get().getExpirationTime().isBefore(Instant.now().minusSeconds(2))) {
-                return new APIResponse(Boolean.FALSE,"OTP code expire");
+                return new APIResponse(Boolean.FALSE,"OTP code expire", HttpStatus.OK);
             }
             // activate the account
             try {
@@ -74,12 +73,12 @@ public class AuthService {
             catch (Exception e) {
                 System.out.println("Account activation can not update in DB: " + e.getMessage());
                 e.printStackTrace();
-                return new APIResponse(Boolean.FALSE,"Account verified failed");
+                return new APIResponse(Boolean.FALSE,"Account verified failed", HttpStatus.OK);
             }
 
-            return new APIResponse(Boolean.TRUE,"Account verified successfully");
+            return new APIResponse(Boolean.TRUE,"Account verified successfully", HttpStatus.OK);
         }
-        return new APIResponse(Boolean.FALSE,"OTP doesn't match");
+        return new APIResponse(Boolean.FALSE,"OTP doesn't match", HttpStatus.OK);
     }
 
     @Transactional

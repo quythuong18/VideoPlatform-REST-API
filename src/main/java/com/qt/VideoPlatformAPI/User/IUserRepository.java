@@ -13,13 +13,14 @@ public interface IUserRepository extends JpaRepository<UserProfile, Long> {
     @Query("SELECT p FROM UserProfile p WHERE p.email = ?1")
     Optional<UserProfile> findByEmail(String email);
 
+    @Query("UPDATE UserProfile SET isVerified = true WHERE username = ?1")
+    @Modifying
+    void activateAccount(String username);
+
     @Query("SELECT COUNT(u) > 0 FROM UserProfile u WHERE u.email = ?1")
     Boolean existByEmail(String email);
 
     @Query("SELECT COUNT(u) > 0 FROM UserProfile u WHERE u.username = ?1")
     Boolean existByUsername(String username);
 
-    @Query("UPDATE UserProfile SET isVerified = true WHERE username = ?1")
-    @Modifying
-    void activateAccount(String username);
 }

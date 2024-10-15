@@ -1,8 +1,8 @@
 package com.qt.VideoPlatformAPI.Auth;
 
 import com.qt.VideoPlatformAPI.User.UserProfile;
-import com.qt.VideoPlatformAPI.Utils.APIResponse;
-import com.qt.VideoPlatformAPI.Utils.AuthenticationResponse;
+import com.qt.VideoPlatformAPI.Response.APIResponse;
+import com.qt.VideoPlatformAPI.Response.AuthenticationResponse;
 import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/v1/auth")
