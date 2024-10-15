@@ -1,7 +1,6 @@
 package com.qt.VideoPlatformAPI.User;
 
-import com.qt.VideoPlatformAPI.Response.APIResponse;
-import com.qt.VideoPlatformAPI.Response.AvailabilityResponse;
+import com.qt.VideoPlatformAPI.Responses.AvailabilityResponse;
 import com.qt.VideoPlatformAPI.Verification.IUserVerificationRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

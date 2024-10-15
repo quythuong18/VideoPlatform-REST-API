@@ -6,7 +6,12 @@ import com.qt.VideoPlatformAPI.Utils.TimeAudit;
 import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 
 @Entity

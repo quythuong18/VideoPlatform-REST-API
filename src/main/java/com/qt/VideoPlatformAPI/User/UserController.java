@@ -1,6 +1,6 @@
 package com.qt.VideoPlatformAPI.User;
 
-import com.qt.VideoPlatformAPI.Response.APIResponse;
+import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

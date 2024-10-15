@@ -3,16 +3,20 @@ package com.qt.VideoPlatformAPI.Auth;
 import com.qt.VideoPlatformAPI.User.IUserRepository;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
-import com.qt.VideoPlatformAPI.Response.APIResponse;
-import com.qt.VideoPlatformAPI.Response.AuthenticationResponse;
+import com.qt.VideoPlatformAPI.Responses.APIResponse;
+import com.qt.VideoPlatformAPI.Responses.AuthenticationResponse;
 import com.qt.VideoPlatformAPI.Verification.EmailService;
 import com.qt.VideoPlatformAPI.Verification.IUserVerificationRepository;
 import com.qt.VideoPlatformAPI.Verification.OTPGenerator;
 import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +32,8 @@ public class AuthService {
     private final IUserRepository userRepository;
     private final IUserVerificationRepository userVerificationRepository;
     private final EmailService emailService;
+    private final AuthenticationManager authenticationManager;
+    private final JWTService jwtService;
 
     public ResponseEntity<UserProfile> register(UserProfile userReq) {
         //hashing password
@@ -38,8 +44,21 @@ public class AuthService {
         return ResponseEntity.ok(user);
     }
 
-    public AuthenticationResponse signIn(UserProfile userProfileReq) {
-        return null;
+    public AuthenticationResponse authenticate(UserProfile userReq) {
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
+                = new UsernamePasswordAuthenticationToken(userReq.getUsername(), userReq.getPassword());
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+        System.out.println(userReq.getPassword());
+//        authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+
+        Optional<UserProfile> user = userRepository.findByUsername(userReq.getUsername());
+
+        if(user.isEmpty()) {
+            throw new IllegalArgumentException("The username does not exist");
+        }
+
+        String token = jwtService.generateToken(user.get());
+        return new AuthenticationResponse(Boolean.TRUE, "authenticated", HttpStatus.OK, token);
     }
 
     public ResponseEntity<APIResponse> verifyAccount(UserProfile userReq) {

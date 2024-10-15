@@ -1,14 +1,10 @@
-package com.qt.VideoPlatformAPI.Response;
+package com.qt.VideoPlatformAPI.Responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Inheritance;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
-
-import javax.swing.text.StyledEditorKit;
-import java.lang.annotation.Inherited;
 
 @Getter
 @Setter
