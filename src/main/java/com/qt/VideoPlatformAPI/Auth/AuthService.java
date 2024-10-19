@@ -41,6 +41,9 @@ public class AuthService {
         // save user
         UserProfile user = userService.addUser(userReq).getBody();
 
+        // call the verify account function here
+        verifyAccount(userReq);
+
         return ResponseEntity.ok(user);
     }
 
@@ -63,11 +66,10 @@ public class AuthService {
 
     public ResponseEntity<APIResponse> verifyAccount(UserProfile userReq) {
 
-
         // Generating OTP and sending email task below can be done asynchronously
         CompletableFuture.runAsync(() -> {
             OTPGenerationAndSendEmail(userReq);
-        });
+        }).thenAccept(System.out::println);
 
         return new ResponseEntity<>(new APIResponse(Boolean.TRUE,"OTP has been sent to your email!", HttpStatus.OK).getHttpStatus());
     }
@@ -109,6 +111,8 @@ public class AuthService {
                             "It will expire in 60 seconds\n" +
                             otpVerification;
 
+        System.out.println(textMessage);
+        System.out.println("sending email...");
         emailService.send(user.getEmail(), "Account verification", textMessage);
 
         // save OTP to database and set time
@@ -120,7 +124,7 @@ public class AuthService {
 //        userVerificationRepository.save(userVerification);
         try {
             userVerificationRepository.save(userVerification);
-            System.out.println("OTP saved to DB");
+            System.out.println("OTP has been saved to DB");
         } catch (Exception e) {
             System.err.println("Error saving OTP: " + e.getMessage());
             e.printStackTrace();

@@ -59,7 +59,7 @@ public class UserProfile extends TimeAudit {
     private Boolean isVerified;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserVerification> userVerifications;
 
     @JsonIgnore
