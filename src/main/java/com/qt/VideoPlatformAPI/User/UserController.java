@@ -1,7 +1,10 @@
 package com.qt.VideoPlatformAPI.User;
 
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
+import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
+import com.qt.VideoPlatformAPI.Responses.AvailabilityResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,18 +14,18 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/{username}/profile")
-    ResponseEntity<UserProfile> getUserProfile(@PathVariable(value = "username") String username) {
-        return ResponseEntity.ok(userService.getUserProfile(username));
-    }
+//    @GetMapping("/{username}/profile")
+//    ResponseEntity<APIResponseWithData<UserProfile>> getUserProfile(@PathVariable(value = "username") String username) {
+//        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "get user successfully", HttpStatus.OK, userService.loadUserByUsername(username)));
+//    }
 
     @GetMapping("/checkUsernameAvailability")
-    APIResponse checkUsernameAvailability(@RequestParam(value = "username") String username) {
+    ResponseEntity<AvailabilityResponse> checkUsernameAvailability(@RequestParam(value = "username") String username) {
         return userService.checkUsernameAvailability(username);
     }
 
     @GetMapping("/checkEmailAvailability")
-    APIResponse checkEmailAvailability(@RequestParam(value = "email") String email) {
+    ResponseEntity<AvailabilityResponse> checkEmailAvailability(@RequestParam(value = "email") String email) {
         return userService.checkEmailAvailability(email);
     }
 

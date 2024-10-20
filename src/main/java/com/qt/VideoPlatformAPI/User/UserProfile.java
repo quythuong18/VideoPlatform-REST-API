@@ -19,7 +19,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserProfile extends TimeAudit {
+@ToString
+public class UserProfile extends TimeAudit implements UserDetails {
 
     @Id
     @SequenceGenerator(
@@ -76,4 +77,8 @@ public class UserProfile extends TimeAudit {
     @Column(name = "following_count")
     private Long followingCount;
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
 }

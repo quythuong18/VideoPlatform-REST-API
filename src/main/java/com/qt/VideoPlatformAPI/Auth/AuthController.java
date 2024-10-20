@@ -1,10 +1,12 @@
 package com.qt.VideoPlatformAPI.Auth;
 
+import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.AuthenticationResponse;
 import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import lombok.AllArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,12 +20,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserProfile>  register(@RequestBody UserProfile userReq) {
+    public ResponseEntity<APIResponseWithData<UserProfile>>  register(@RequestBody UserProfile userReq) {
         return authService.register(userReq);
     }
 
     @PostMapping("/signIn")
-    public AuthenticationResponse signIn(@RequestBody UserProfile userReq) {
+    public ResponseEntity<AuthenticationResponse> signIn(@RequestBody UserProfile userReq) {
         return authService.authenticate(userReq);
     }
 

@@ -1,11 +1,14 @@
 package com.qt.VideoPlatformAPI.Config;
 
 import com.qt.VideoPlatformAPI.Auth.JWTAuthenticationFilter;
+import com.qt.VideoPlatformAPI.User.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,16 +26,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @AllArgsConstructor
 public class SecurityConfig {
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
+    private final UserService userService;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        req->req.requestMatchers("**/users/checkUsernameAvailability").permitAll().
-                                requestMatchers("**/users/checkEmailAvailability").permitAll().
-                                requestMatchers(HttpMethod.GET,"**/users/{username}/profile").authenticated().
-                                requestMatchers("**/auth/**").permitAll()
+                        req->req.
+                                requestMatchers("**/auth/**").permitAll().
+                                requestMatchers("**/users/checkUsernameAvailability").permitAll().
+                                requestMatchers("**/users/checkEmailAvailability").permitAll()
+//                                requestMatchers(HttpMethod.GET,"**/users/{username}/profile").permitAll()
+
                 )
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -42,6 +48,15 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userService::loadUserByUsername);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();

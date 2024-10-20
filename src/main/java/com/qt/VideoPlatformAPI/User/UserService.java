@@ -1,21 +1,23 @@
 package com.qt.VideoPlatformAPI.User;
 
+import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
 import com.qt.VideoPlatformAPI.Responses.AvailabilityResponse;
 import com.qt.VideoPlatformAPI.Verification.IUserVerificationRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
 @AllArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
     private final IUserRepository userRepository;
-    private final IUserVerificationRepository userVerificationRepository;
 
-    public UserProfile getUserProfile(String username) {
+    @Override
+    public UserProfile loadUserByUsername(String username) {
         if(username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Username can not be null or empty");
         }
@@ -27,40 +29,17 @@ public class UserService {
         return optionalUser.get();
     }
 
-    public ResponseEntity<UserProfile> addUser(UserProfile user) {
-        // Username check
-        if(user.getUsername().isEmpty()) {
-            throw new IllegalArgumentException("Username cant not be empty");
-        }
-        if(userRepository.existByUsername(user.getUsername())) {
-            throw new IllegalArgumentException("The username exists");
-        }
-
-        // Email check
-        if(user.getEmail().isEmpty()){
-            throw new IllegalArgumentException("Email cant not be empty");
-        }
-        if(userRepository.existByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("The email exists");
-        }
-
-        user.setIsVerified(Boolean.FALSE);
-        user.setIsPrivate(Boolean.FALSE);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(userRepository.save(user));
-    }
-
-    public AvailabilityResponse checkUsernameAvailability(String username) {
+    public ResponseEntity<AvailabilityResponse> checkUsernameAvailability(String username) {
          Boolean isExisted = userRepository.existByUsername(username);
          if(isExisted)
-             return new AvailabilityResponse(Boolean.TRUE, "username " + username + " exists", HttpStatus.OK,Boolean.TRUE);
-        return new AvailabilityResponse(Boolean.TRUE, "username " + username + " does not exist", HttpStatus.OK,Boolean.FALSE);
+             return ResponseEntity.ok(new AvailabilityResponse(Boolean.TRUE, "username " + username + " exists", HttpStatus.OK,Boolean.TRUE));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AvailabilityResponse(Boolean.FALSE, "username " + username + " does not exist", HttpStatus.NOT_FOUND, Boolean.FALSE));
     }
 
-    public AvailabilityResponse checkEmailAvailability(String email) {
+    public ResponseEntity<AvailabilityResponse> checkEmailAvailability(String email) {
         Boolean isExisted = userRepository.existByEmail(email);
         if(isExisted)
-            return new AvailabilityResponse(Boolean.TRUE, "email " + email + " exists", HttpStatus.OK,Boolean.TRUE);
-        return new AvailabilityResponse(Boolean.TRUE, "email " + email + " does not exist", HttpStatus.OK,Boolean.FALSE);
+            return ResponseEntity.ok(new AvailabilityResponse(Boolean.TRUE, "email " + email + " exists", HttpStatus.OK,Boolean.TRUE));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AvailabilityResponse(Boolean.FALSE, "email " + email + " does not exist", HttpStatus.NOT_FOUND,Boolean.FALSE));
     }
 }

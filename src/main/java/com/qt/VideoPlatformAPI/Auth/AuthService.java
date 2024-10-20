@@ -1,8 +1,8 @@
 package com.qt.VideoPlatformAPI.Auth;
 
+import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
 import com.qt.VideoPlatformAPI.User.IUserRepository;
 import com.qt.VideoPlatformAPI.User.UserProfile;
-import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.AuthenticationResponse;
 import com.qt.VideoPlatformAPI.Verification.EmailService;
@@ -11,12 +11,14 @@ import com.qt.VideoPlatformAPI.Verification.OTPGenerator;
 import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -28,40 +30,62 @@ import java.util.concurrent.CompletableFuture;
 @AllArgsConstructor
 public class AuthService {
     private final PasswordEncoder passwordEncoder;
-    private final UserService userService;
     private final IUserRepository userRepository;
     private final IUserVerificationRepository userVerificationRepository;
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
 
-    public ResponseEntity<UserProfile> register(UserProfile userReq) {
+    public ResponseEntity<APIResponseWithData<UserProfile>> register(UserProfile userReq) {
+
         //hashing password
         userReq.setPassword(passwordEncoder.encode(userReq.getPassword()));
-        // save user
-        UserProfile user = userService.addUser(userReq).getBody();
+        // Username check
+        if(userReq.getUsername().isEmpty()) {
+            throw new IllegalArgumentException("Username cant not be empty");
+        }
+        if(userRepository.existByUsername(userReq.getUsername())) {
+            throw new IllegalArgumentException("The username exists");
+        }
+
+        // Email check
+        if(userReq.getEmail().isEmpty()){
+            throw new IllegalArgumentException("Email cant not be empty");
+        }
+        if(userRepository.existByEmail(userReq.getEmail())) {
+            throw new IllegalArgumentException("The email exists");
+        }
+
+        userReq.setIsVerified(Boolean.FALSE);
+        userReq.setIsPrivate(Boolean.FALSE);
+        UserProfile user = userRepository.save(userReq);
 
         // call the verify account function here
         verifyAccount(userReq);
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Register successfully", HttpStatus.OK, user));
     }
 
-    public AuthenticationResponse authenticate(UserProfile userReq) {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
-                = new UsernamePasswordAuthenticationToken(userReq.getUsername(), userReq.getPassword());
-        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-        System.out.println(userReq.getPassword());
-//        authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-
+    public ResponseEntity<AuthenticationResponse> authenticate(UserProfile userReq) {
+        // find the user in db
         Optional<UserProfile> user = userRepository.findByUsername(userReq.getUsername());
-
         if(user.isEmpty()) {
             throw new IllegalArgumentException("The username does not exist");
         }
 
+        Authentication authentication;
+        try {
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
+            = new UsernamePasswordAuthenticationToken(userReq.getUsername(), userReq.getPassword(), null);
+            authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        }
+        catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthenticationResponse(Boolean.FALSE, "Invalid username or password", HttpStatus.UNAUTHORIZED, null));
+        }
+
+        // generate toke to send
         String token = jwtService.generateToken(user.get());
-        return new AuthenticationResponse(Boolean.TRUE, "authenticated", HttpStatus.OK, token);
+        return ResponseEntity.ok(new AuthenticationResponse(Boolean.TRUE, "authenticated", HttpStatus.OK, token));
     }
 
     public ResponseEntity<APIResponse> verifyAccount(UserProfile userReq) {
@@ -94,7 +118,7 @@ public class AuthService {
             catch (Exception e) {
                 System.out.println("Account activation can not update in DB: " + e.getMessage());
                 e.printStackTrace();
-                return new APIResponse(Boolean.FALSE,"Account verified failed", HttpStatus.OK);
+                return new APIResponse(Boolean.FALSE,"Account verified failed", HttpStatus.UNAUTHORIZED);
             }
 
             return new APIResponse(Boolean.TRUE,"Account verified successfully", HttpStatus.OK);
