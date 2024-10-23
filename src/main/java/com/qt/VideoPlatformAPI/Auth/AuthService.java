@@ -83,6 +83,12 @@ public class AuthService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthenticationResponse(Boolean.FALSE, "Invalid username or password", HttpStatus.UNAUTHORIZED, null));
         }
 
+        // if the account has not been verified yet
+        if(!user.get().getIsVerified()) {
+            verifyAccount(user.get());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthenticationResponse(Boolean.TRUE, "Verifying you account, please check you email inbox!", HttpStatus.UNAUTHORIZED, null));
+        }
+
         // generate toke to send
         String token = jwtService.generateToken(user.get());
         return ResponseEntity.ok(new AuthenticationResponse(Boolean.TRUE, "authenticated", HttpStatus.OK, token));
