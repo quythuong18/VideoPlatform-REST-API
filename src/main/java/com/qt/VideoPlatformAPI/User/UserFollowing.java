@@ -12,11 +12,7 @@ public class UserFollowing {
     private Long id;
 
 
-    @OneToOne()
+    @ManyToOne()
     @JoinColumn(name = "fk_user_profile_id")
-    private UserProfile user;
-
-    @OneToMany()
-    @JoinColumn(name = "fk_user_profile_id")
-    private List<UserProfile> userFollowingList;
+    private UserProfile userProfile;
 }

@@ -1,7 +1,6 @@
 package com.qt.VideoPlatformAPI.Verification;
 
 import com.qt.VideoPlatformAPI.User.UserProfile;
-import com.qt.VideoPlatformAPI.Utils.TimeAudit;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,12 +14,12 @@ import java.time.Instant;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserVerification extends TimeAudit {
+public class UserVerification {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToOne()
+    @ManyToOne()
     @JoinColumn(name = "fk_user_profile_id")
     private UserProfile user;
 

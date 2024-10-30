@@ -32,12 +32,13 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(
-                        req->req.
-                                requestMatchers("**/auth/**").permitAll().
-                                requestMatchers("**/users/checkUsernameAvailability").permitAll().
-                                requestMatchers("**/users/checkEmailAvailability").permitAll()
-//                                requestMatchers(HttpMethod.GET,"**/users/{username}/profile").permitAll()
+                .authorizeHttpRequests(req->req.
+                    requestMatchers("**/auth/**").permitAll().
+                    requestMatchers("**/users/checkUsernameAvailability").permitAll().
+                    requestMatchers("**/users/checkEmailAvailability").permitAll().
+                    requestMatchers(HttpMethod.GET,"**/users/{username}/profile").authenticated().
+                    requestMatchers(HttpMethod.POST,"**/videos/new/").authenticated().
+                    requestMatchers(HttpMethod.POST,"**/file/video").authenticated()
 
                 )
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -52,7 +53,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userService::loadUserByUsername);
+        authProvider.setUserDetailsService(userService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

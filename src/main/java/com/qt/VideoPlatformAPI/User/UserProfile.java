@@ -7,7 +7,6 @@ import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
@@ -19,7 +18,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class UserProfile extends TimeAudit implements UserDetails {
 
     @Id
@@ -60,19 +58,20 @@ public class UserProfile extends TimeAudit implements UserDetails {
     private Boolean isVerified;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true,
+    fetch = FetchType.EAGER)
     private List<UserVerification> userVerifications;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "user")
-    private UserFollower userFollower;
+    @OneToMany(mappedBy = "userProfile", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<UserFollower> userFollower;
 
     @Column(name = "follower_count")
     private Long followerCount;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "user")
-    private UserFollowing userFollowing;
+    @OneToMany(mappedBy = "userProfile", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<UserFollowing> userFollowing;
 
     @Column(name = "following_count")
     private Long followingCount;

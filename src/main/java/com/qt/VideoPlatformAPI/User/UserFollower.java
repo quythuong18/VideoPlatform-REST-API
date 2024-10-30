@@ -10,11 +10,7 @@ public class UserFollower {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne()
+    @ManyToOne()
     @JoinColumn(name = "fk_user_profile_id")
-    private UserProfile user;
-
-    @OneToMany()
-    @JoinColumn(name = "fk_user_profile_id")
-    private List<UserProfile> userFollowerList;
+    private UserProfile userProfile;
 }

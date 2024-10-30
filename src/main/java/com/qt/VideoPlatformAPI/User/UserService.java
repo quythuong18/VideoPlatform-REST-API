@@ -1,12 +1,11 @@
 package com.qt.VideoPlatformAPI.User;
 
-import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
 import com.qt.VideoPlatformAPI.Responses.AvailabilityResponse;
-import com.qt.VideoPlatformAPI.Verification.IUserVerificationRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -22,11 +21,18 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("Username can not be null or empty");
         }
 
-        Optional<UserProfile> optionalUser = userRepository.findByUsername(username);
-        if(optionalUser.isEmpty()) {
-            throw new IllegalArgumentException("The username does not exists");
+        try {
+            Optional<UserProfile> optionalUserProfile = userRepository.findByUsername(username);
+
+            if(optionalUserProfile.isEmpty()) {
+                throw new UsernameNotFoundException("The username does not exist");
+            }
+            UserProfile user = optionalUserProfile.get();
+            return user;
+
+        } catch (Exception e) {
+            throw new UsernameNotFoundException("Error loading user", e);
         }
-        return optionalUser.get();
     }
 
     public ResponseEntity<AvailabilityResponse> checkUsernameAvailability(String username) {
@@ -42,4 +48,5 @@ public class UserService implements UserDetailsService {
             return ResponseEntity.ok(new AvailabilityResponse(Boolean.TRUE, "email " + email + " exists", HttpStatus.OK,Boolean.TRUE));
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AvailabilityResponse(Boolean.FALSE, "email " + email + " does not exist", HttpStatus.NOT_FOUND,Boolean.FALSE));
     }
+
 }

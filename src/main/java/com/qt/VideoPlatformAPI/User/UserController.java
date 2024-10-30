@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-//    @GetMapping("/{username}/profile")
-//    ResponseEntity<APIResponseWithData<UserProfile>> getUserProfile(@PathVariable(value = "username") String username) {
-//        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "get user successfully", HttpStatus.OK, userService.loadUserByUsername(username)));
-//    }
+    @GetMapping("/{username}/profile")
+    ResponseEntity<APIResponseWithData<UserProfile>> getCurrentUserProfile(@PathVariable(name = "username") String username) {
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "get profile successfully", HttpStatus.OK, userService.loadUserByUsername(username)));
+    }
 
     @GetMapping("/checkUsernameAvailability")
     ResponseEntity<AvailabilityResponse> checkUsernameAvailability(@RequestParam(value = "username") String username) {

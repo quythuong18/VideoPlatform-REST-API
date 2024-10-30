@@ -27,11 +27,11 @@ public class JWTService {
     }
 
     public boolean isValid(String token, UserProfile user) {
-        String userName = extracUsername(token);
+        String userName = extractUsername(token);
         return userName.equals(user.getUsername()) && !isTokenExpired(token);
     }
 
-    public String extracUsername(String token) {
+    public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 

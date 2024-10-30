@@ -1,47 +1,28 @@
 package com.qt.VideoPlatformAPI.Video;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 import java.util.List;
 
-@Entity
+@Document("video")
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString
 public class Video {
     @Id
-    private Long id;
-
-    @Column
+    private String id;
+    private Long userId;
     private String title;
-
-    @Column
-    private String desc;
-
-    @Column
+    private String description;
     private List<String> tags;
-
-    @Column
     private String url;
-
-    @Column
     private Long duration;
-
-    @Column
     private Instant uploadDate;
-
-    @Column
     private Long viewsCount;
-
-    @Column
     private Long likesCount;
-
-    @Column
     private Boolean isPrivate;
 }
