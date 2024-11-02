@@ -13,7 +13,8 @@ import org.springframework.http.HttpStatus;
 @NoArgsConstructor
 @JsonPropertyOrder({
         "success",
-        "message"
+        "message",
+        "httpStatus"
 })
 public class APIResponse {
     @JsonProperty("success")

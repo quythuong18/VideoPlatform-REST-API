@@ -25,4 +25,6 @@ public class Video {
     private Long viewsCount;
     private Long likesCount;
     private Boolean isPrivate;
+    private Boolean isUploaded;
+    private Boolean isProcessed;
 }

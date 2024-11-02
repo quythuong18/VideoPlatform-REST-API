@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/{username}/profile")
+    @GetMapping("/{username}")
     ResponseEntity<APIResponseWithData<UserProfile>> getCurrentUserProfile(@PathVariable(name = "username") String username) {
-        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "get profile successfully", HttpStatus.OK, userService.loadUserByUsername(username)));
+        UserProfile user = userService.loadUserByUsername(username);
+        user.setPassword(null);
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "get profile successfully", HttpStatus.OK, user));
     }
 
     @GetMapping("/checkUsernameAvailability")

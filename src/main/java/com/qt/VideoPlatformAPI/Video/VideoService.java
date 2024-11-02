@@ -16,10 +16,12 @@ public class VideoService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserProfile user = userService.loadUserByUsername(username);
 
-        // set more information for the
+        // set more information for the video
         video.setUserId(user.getId());
         video.setLikesCount(0L);
         video.setViewsCount(0L);
+        video.setIsUploaded(false);
+        video.setIsProcessed(false);
 
         return iVideoRepository.save(video);
     }

@@ -19,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -70,7 +71,7 @@ public class AuthService {
         // find the user in db
         Optional<UserProfile> user = userRepository.findByUsername(userReq.getUsername());
         if(user.isEmpty()) {
-            throw new IllegalArgumentException("The username does not exist");
+            throw new UsernameNotFoundException("The username does not exist");
         }
 
         Authentication authentication;
@@ -80,13 +81,13 @@ public class AuthService {
             authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
         }
         catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthenticationResponse(Boolean.FALSE, "Invalid username or password", HttpStatus.UNAUTHORIZED, null));
+            throw new UsernameNotFoundException("Invalid password");
         }
 
         // if the account has not been verified yet
         if(!user.get().getIsVerified()) {
             verifyAccount(user.get());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthenticationResponse(Boolean.TRUE, "Verifying you account, please check you email inbox!", HttpStatus.UNAUTHORIZED, null));
+            throw new UsernameNotFoundException("Verifying you account, please check you email inbox!");
         }
 
         // generate toke to send

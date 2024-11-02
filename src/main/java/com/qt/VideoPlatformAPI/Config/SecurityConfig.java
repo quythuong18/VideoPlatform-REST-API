@@ -36,7 +36,7 @@ public class SecurityConfig {
                     requestMatchers("**/auth/**").permitAll().
                     requestMatchers("**/users/checkUsernameAvailability").permitAll().
                     requestMatchers("**/users/checkEmailAvailability").permitAll().
-                    requestMatchers(HttpMethod.GET,"**/users/{username}/profile").authenticated().
+                    requestMatchers(HttpMethod.GET,"**/users/{username}").authenticated().
                     requestMatchers(HttpMethod.POST,"**/videos/new/").authenticated().
                     requestMatchers(HttpMethod.POST,"**/file/video").authenticated()
 
