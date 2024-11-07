@@ -38,7 +38,7 @@ public class SecurityConfig {
                     requestMatchers("**/users/checkEmailAvailability").permitAll().
                     requestMatchers(HttpMethod.GET,"**/users/{username}").authenticated().
                     requestMatchers(HttpMethod.POST,"**/videos/new/").authenticated().
-                    requestMatchers(HttpMethod.POST,"**/file/video").authenticated()
+                    requestMatchers(HttpMethod.POST,"**/file/video/{id}").authenticated()
 
                 )
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

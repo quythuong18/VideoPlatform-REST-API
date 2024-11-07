@@ -14,11 +14,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -62,7 +60,7 @@ public class AuthService {
         UserProfile user = userRepository.save(userReq);
 
         // call the verify account function here
-        verifyAccount(userReq);
+        verifyAccountAsync(userReq);
 
         return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Register successfully", HttpStatus.OK, user));
     }
@@ -86,7 +84,7 @@ public class AuthService {
 
         // if the account has not been verified yet
         if(!user.get().getIsVerified()) {
-            verifyAccount(user.get());
+            verifyAccountAsync(user.get());
             throw new UsernameNotFoundException("Verifying you account, please check you email inbox!");
         }
 
@@ -95,7 +93,7 @@ public class AuthService {
         return ResponseEntity.ok(new AuthenticationResponse(Boolean.TRUE, "authenticated", HttpStatus.OK, token));
     }
 
-    public ResponseEntity<APIResponse> verifyAccount(UserProfile userReq) {
+    public ResponseEntity<APIResponse> verifyAccountAsync(UserProfile userReq) {
 
         // Generating OTP and sending email task below can be done asynchronously
         CompletableFuture.runAsync(() -> {

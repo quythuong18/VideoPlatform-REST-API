@@ -1,6 +1,7 @@
 package com.qt.VideoPlatformAPI.Exception;
 
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
+import org.apache.commons.fileupload.FileUploadException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,6 +33,15 @@ public class ExceptionHandlerController {
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     public ResponseEntity<APIResponse> resolveIllegalException(IllegalArgumentException exception) {
+        String message = exception.getMessage();
+        APIResponse response = new APIResponse(Boolean.FALSE, message, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(FileUploadException.class)
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public ResponseEntity<APIResponse> resolveFileUploadException(FileUploadException exception) {
         String message = exception.getMessage();
         APIResponse response = new APIResponse(Boolean.FALSE, message, HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);

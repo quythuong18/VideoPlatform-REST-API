@@ -36,8 +36,7 @@ public class FileSystemStorageService {
             Path destinationFile = this.rootLocation.resolve(Paths.get(Objects.requireNonNull(file.getOriginalFilename()))).normalize().toAbsolutePath();
             if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
                 // this is a security check
-                throw new StorageException(
-                        "cannot store file outside current directory.");
+                throw new StorageException("cannot store file outside current directory.");
             }
             try (InputStream inputstream = file.getInputStream()) {
                 Files.copy(inputstream, destinationFile, StandardCopyOption.REPLACE_EXISTING);

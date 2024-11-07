@@ -28,8 +28,8 @@ public class VideoController {
     }
 
     @GetMapping("/{videoid}") // get video metadata
-    public ResponseEntity<APIResponseWithData<Video>> getOneVideo(@PathVariable(value = "videoid") Long videoId) {
-        return null;
+    public ResponseEntity<APIResponseWithData<Video>> getOneVideo(@PathVariable(value = "videoid") String id) {
+        return ResponseEntity.ok(new APIResponseWithData<>(true, "add video metadata successfully", HttpStatus.OK, videoService.getVideoById(id)));
     }
 
     @GetMapping("/{videoid}/watch")

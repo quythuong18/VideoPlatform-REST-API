@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @AllArgsConstructor
 public class VideoService {
@@ -20,9 +22,28 @@ public class VideoService {
         video.setUserId(user.getId());
         video.setLikesCount(0L);
         video.setViewsCount(0L);
+
         video.setIsUploaded(false);
         video.setIsProcessed(false);
 
         return iVideoRepository.save(video);
+    }
+
+    public Video updateVideoUploadedStatus(Video video) {
+        video.setIsUploaded(true);
+        return iVideoRepository.save(video);
+    }
+
+    public Video updateVideoProcessedStatus(Video video) {
+        video.setIsProcessed(true);
+        return iVideoRepository.save(video);
+    }
+
+    public Video getVideoById(String id) {
+        Optional<Video> video = iVideoRepository.findById(id);
+        if(video.isEmpty())
+            throw new IllegalArgumentException("Video data with id = " + id + "does not exist");
+
+        return video.get();
     }
 }

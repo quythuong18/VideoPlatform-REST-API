@@ -6,7 +6,6 @@ import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.AuthenticationResponse;
 import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import lombok.AllArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +35,6 @@ public class AuthController {
 
     @PostMapping("/VerifyAccount")
     public ResponseEntity<APIResponse> verifyAccount(@RequestBody UserProfile userReq) {
-        return authService.verifyAccount(userReq);
+        return authService.verifyAccountAsync(userReq);
     }
 }
