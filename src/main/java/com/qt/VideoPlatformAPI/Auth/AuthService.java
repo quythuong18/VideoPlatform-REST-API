@@ -65,6 +65,22 @@ public class AuthService {
         return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Register successfully", HttpStatus.OK, user));
     }
 
+    @Transactional
+    public APIResponse activateAccount(UserVerification userVerification) {
+        if(otpVerification(userVerification)) {
+            try {
+                userRepository.activateAccount(userVerification.getUser().getUsername());
+                return new APIResponse(Boolean.FALSE,"Account activated successfully", HttpStatus.OK);
+            }
+            catch (Exception e) {
+                System.out.println("Account verification can not update in DB: " + e.getMessage());
+                e.printStackTrace();
+                return new APIResponse(Boolean.FALSE,"Account activated failed", HttpStatus.BAD_REQUEST);
+            }
+        }
+        return new APIResponse(Boolean.FALSE,"Account activated failed", HttpStatus.BAD_REQUEST);
+    }
+
     public ResponseEntity<AuthenticationResponse> authenticate(UserProfile userReq) {
         // find the user in db
         Optional<UserProfile> user = userRepository.findByUsername(userReq.getUsername());
@@ -93,6 +109,16 @@ public class AuthService {
         return ResponseEntity.ok(new AuthenticationResponse(Boolean.TRUE, "authenticated", HttpStatus.OK, token));
     }
 
+    public void resetPassword(UserVerification userVerificationReq) {
+        if(userVerificationReq.getUser().getEmail().isEmpty()) {
+            throw new IllegalArgumentException("Email cant not be empty");
+        }
+        if(userVerificationReq.getUser().getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Password cant not be empty");
+        }
+        otpVerification(userVerificationReq);
+    }
+
     public ResponseEntity<APIResponse> verifyAccountAsync(UserProfile userReq) {
 
         // Generating OTP and sending email task below can be done asynchronously
@@ -103,32 +129,20 @@ public class AuthService {
         return new ResponseEntity<>(new APIResponse(Boolean.TRUE,"OTP has been sent to your email!", HttpStatus.OK).getHttpStatus());
     }
 
-    @Transactional
-    public APIResponse otpVerification(UserVerification userVerificationReq) {
+    public Boolean otpVerification(UserVerification userVerificationReq) {
         Optional<UserVerification> userVerificationInDB = userVerificationRepository.findByUsername(userVerificationReq.getUser().getUsername());
         if(userVerificationInDB.isEmpty()) {
-            return new APIResponse(Boolean.FALSE,"Account verification doesn't exist", HttpStatus.OK);
+            throw new IllegalArgumentException("Account verification doesn't exist");
         }
 
         String requestOTP = userVerificationReq.getOtpCode();
         if(requestOTP.equals(userVerificationInDB.get().getOtpCode())) {
             if(userVerificationInDB.get().getExpirationTime().isBefore(Instant.now().minusSeconds(2))) {
-                return new APIResponse(Boolean.FALSE,"OTP code expire", HttpStatus.OK);
+                throw new IllegalArgumentException("OTP code expire");
             }
-            // activate the account
-            try {
-                userRepository.activateAccount(userVerificationReq.getUser().getUsername());
-                System.out.println("Account activated successfully");
-            }
-            catch (Exception e) {
-                System.out.println("Account activation can not update in DB: " + e.getMessage());
-                e.printStackTrace();
-                return new APIResponse(Boolean.FALSE,"Account verified failed", HttpStatus.UNAUTHORIZED);
-            }
-
-            return new APIResponse(Boolean.TRUE,"Account verified successfully", HttpStatus.OK);
+            return true;
         }
-        return new APIResponse(Boolean.FALSE,"OTP doesn't match", HttpStatus.OK);
+        return false;
     }
 
     @Transactional

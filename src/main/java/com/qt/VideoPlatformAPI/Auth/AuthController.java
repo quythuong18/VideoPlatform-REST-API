@@ -7,10 +7,7 @@ import com.qt.VideoPlatformAPI.Responses.AuthenticationResponse;
 import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -28,12 +25,17 @@ public class AuthController {
         return authService.authenticate(userReq);
     }
 
-    @PostMapping("/OTPVerification")
-    public APIResponse otpVerification(@RequestBody UserVerification userVerificationReq) {
-        return authService.otpVerification(userVerificationReq);
+    @PostMapping("/reset-password")
+    public APIResponse resetPassword(@RequestBody UserVerification userVerificationReq) {
+        return null;
     }
 
-    @PostMapping("/VerifyAccount")
+    @PostMapping("/otp-verification")
+    public APIResponse otpVerification(@RequestBody UserVerification userVerificationReq) {
+        return authService.activateAccount(userVerificationReq);
+    }
+
+    @PostMapping("/verify-account")
     public ResponseEntity<APIResponse> verifyAccount(@RequestBody UserProfile userReq) {
         return authService.verifyAccountAsync(userReq);
     }
