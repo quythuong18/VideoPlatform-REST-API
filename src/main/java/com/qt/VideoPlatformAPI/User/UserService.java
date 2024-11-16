@@ -4,6 +4,9 @@ import com.qt.VideoPlatformAPI.Responses.AvailabilityResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
@@ -14,6 +17,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
     private final IUserRepository userRepository;
+    private final IUserConnectionRepository userConnectionRepository;
 
     @Override
     public UserProfile loadUserByUsername(String username) {
@@ -27,8 +31,7 @@ public class UserService implements UserDetailsService {
             if(optionalUserProfile.isEmpty()) {
                 throw new UsernameNotFoundException("The username does not exist");
             }
-            UserProfile user = optionalUserProfile.get();
-            return user;
+            return optionalUserProfile.get();
 
         } catch (Exception e) {
             throw new UsernameNotFoundException("Error loading user", e);
@@ -49,4 +52,23 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AvailabilityResponse(Boolean.FALSE, "email " + email + " does not exist", HttpStatus.NOT_FOUND,Boolean.FALSE));
     }
 
+    public void followAUser(String username) {
+        UserProfile follower = loadUserByUsername(username);
+        UserProfile following = getCurrentUser();
+
+        UserConnection userConnection = new UserConnection();
+
+        userConnection.setFollower(follower);
+        userConnection.setFollowing(following);
+
+        userConnectionRepository.save(userConnection);
+    }
+
+    public UserProfile getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth == null) {
+            throw new AuthenticationServiceException("not authenticated");
+        }
+        return (UserProfile) auth.getPrincipal();
+    }
 }

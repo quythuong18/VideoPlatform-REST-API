@@ -31,6 +31,12 @@ public class UserController {
         return userService.checkEmailAvailability(email);
     }
 
+    @PostMapping("/{username}/follow")
+    ResponseEntity<APIResponse> followAUser(@PathVariable(value = "username") String username) {
+        userService.followAUser(username);
+        return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "follow " + username + " successfully", HttpStatus.OK));
+    }
+
     @PutMapping("/{username}")
     APIResponse updateUser(@RequestBody UserProfile user, @PathVariable(value = "username") String username) {
         return null;

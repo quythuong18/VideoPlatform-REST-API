@@ -33,12 +33,17 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req->req.
-                    requestMatchers("**/auth/**").permitAll().
-                    requestMatchers("**/users/checkUsernameAvailability").permitAll().
-                    requestMatchers("**/users/checkEmailAvailability").permitAll().
-                    requestMatchers(HttpMethod.GET,"**/users/{username}").authenticated().
-                    requestMatchers(HttpMethod.POST,"**/videos/new/").authenticated().
-                    requestMatchers(HttpMethod.POST,"**/file/video/{id}").authenticated()
+                        // auth
+                        requestMatchers("**/auth/**").permitAll().
+                        requestMatchers("**/users/checkUsernameAvailability").permitAll().
+                        requestMatchers("**/users/checkEmailAvailability").permitAll().
+                        // user
+                        requestMatchers(HttpMethod.GET,"**/users/{username}").authenticated().
+                        requestMatchers(HttpMethod.POST,"**/users/{username}/follow").authenticated().
+                        // video
+                        requestMatchers(HttpMethod.POST,"**/videos/new/").authenticated().
+                        requestMatchers(HttpMethod.POST,"**/file/video/{id}").authenticated().
+                        requestMatchers(HttpMethod.GET,"**/videos/{id}").permitAll()
 
                 )
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -19,7 +19,8 @@ public class VideoController {
 
     @PostMapping("/new/")
     public ResponseEntity<APIResponseWithData<Video>> addVideo(@RequestBody Video video) {
-        return ResponseEntity.ok(new APIResponseWithData<>(true, "add video metadata successfully", HttpStatus.OK, videoService.addVideo(video)));
+        return ResponseEntity.ok(new APIResponseWithData<>(true, "add video metadata successfully",
+        HttpStatus.OK, videoService.addVideo(video)));
     }
 
     @GetMapping("/")
@@ -29,7 +30,8 @@ public class VideoController {
 
     @GetMapping("/{videoid}") // get video metadata
     public ResponseEntity<APIResponseWithData<Video>> getOneVideo(@PathVariable(value = "videoid") String id) {
-        return ResponseEntity.ok(new APIResponseWithData<>(true, "add video metadata successfully", HttpStatus.OK, videoService.getVideoById(id)));
+        return ResponseEntity.ok(new APIResponseWithData<>(true, "get one video metadata successfully",
+        HttpStatus.OK, videoService.getVideoById(id)));
     }
 
     @GetMapping("/{videoid}/watch")

@@ -11,7 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -62,16 +64,14 @@ public class UserProfile extends TimeAudit implements UserDetails {
     fetch = FetchType.EAGER)
     private List<UserVerification> userVerifications;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "userProfile", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<UserFollower> userFollower;
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserConnection> following = new HashSet<>();
+
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserConnection> follower = new HashSet<>();
 
     @Column(name = "follower_count")
     private Long followerCount;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "userProfile", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<UserFollowing> userFollowing;
 
     @Column(name = "following_count")
     private Long followingCount;
