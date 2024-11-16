@@ -1,4 +1,4 @@
-package com.qt.VideoPlatformAPI.File.storage;
+package com.qt.VideoPlatformAPI.Exception;
 
 public class StorageFileNotFoundException extends StorageException {
 

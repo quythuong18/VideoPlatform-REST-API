@@ -1,6 +1,6 @@
-package com.qt.VideoPlatformAPI.File.storage;
+package com.qt.VideoPlatformAPI.Exception;
 
-class StorageException extends RuntimeException {
+public class StorageException extends RuntimeException {
     public StorageException(String message) {
         super(message);
     }
