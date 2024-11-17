@@ -61,43 +61,51 @@ public class FFmpegService {
 
         return videoFileMetadata;
     }
-    public Boolean transcodeVideo(VideoFileMetadata v) throws IOException {
+
+    public void transcodeVideo(VideoFileMetadata v) throws IOException {
         FFmpegBuilder builder = new FFmpegBuilder();
         for(Integer Quality : VideoEnv.VIDEO_QUALITY) {
-            if(v.getWidth() > Quality) {
+            if(v.getHeight() >= Quality) {
+                v.getQualities().add(Quality);
                 int newHeight = Quality;
                 int newWidth = (v.getWidth() * newHeight) / v.getHeight();
                 newWidth = (newWidth % 2 != 0)? newWidth + 1 : newWidth;
                 long newVideoBitrate = newWidth * newHeight * v.getVideoBitrate() / ((long) v.getWidth() * v.getHeight());
-                long newAudioBitrate = (v.getAudioBitrate() > VideoEnv.AUDIO_BITRATE)? VideoEnv.AUDIO_BITRATE : v.getAudioBitrate();
-
-                if(newWidth % 2 != 0) newWidth ++;
+                long newAudioBitrate = 0;
+                // check if Audio exists on that video
+                if(v.getAudioBitrate() != null)
+                    newAudioBitrate = (v.getAudioBitrate() > VideoEnv.AUDIO_BITRATE)? VideoEnv.AUDIO_BITRATE : v.getAudioBitrate();
 
                 // create dir for each quality
                 String qualityDir = VideoEnv.ROOT_LOCATION.toString() + "/" + v.getId() + "/" + Quality.toString();
 
-                Files.createDirectories(Paths.get(qualityDir));
-                builder.setInput(v.getPathName())
-                        .addOutput(qualityDir + "/" + Quality.toString() +
-                                FileSystemStorageService.getFileExtensionFromOriginalName(v.getPathName()))
-                        // video
-                        .addExtraArgs("-map", "0:v:0")
-                        .setVideoCodec("libx264")
-                        .setVideoBitRate(newVideoBitrate)
-                        .setVideoResolution(newWidth, newHeight)
-                        // audio
-                        .addExtraArgs("-map", "0:a:0")
-                        .setAudioCodec("aac")
-                        .setAudioBitRate(newAudioBitrate)
+                try {
+                    Files.createDirectories(Paths.get(qualityDir));
+                    builder.setInput(v.getPathName())
+                            .addOutput(qualityDir + "/" + Quality.toString() +
+                                    FileSystemStorageService.getFileExtensionFromOriginalName(v.getPathName()))
+                            // video
+                            .addExtraArgs("-map", "0:v:0")
+                            .setVideoCodec("libx264")
+                            .setVideoBitRate(newVideoBitrate)
+                            .setVideoResolution(newWidth, newHeight)
+                            // audio
+                            .addExtraArgs("-map", "0:a:0")
+                            .setAudioCodec("aac")
+                            .setAudioBitRate(newAudioBitrate)
 
-                        .setFormat("dash")
-                        .done();
-                ffmpeg.run(builder);
+                            .setFormat("dash")
+                            .done();
+                    ffmpeg.run(builder);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
-        return true;
     }
+
     public Boolean createManifestFile() {
+
         return true;
     }
     public String getVideoFileName(String videoId) {

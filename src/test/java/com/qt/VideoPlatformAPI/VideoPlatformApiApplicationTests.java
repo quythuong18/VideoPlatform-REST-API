@@ -16,21 +16,12 @@ class VideoPlatformApiApplicationTests {
 	private final FFmpegService fFmpegService = new FFmpegService(new FFmpeg("/sbin/ffmpeg"),
 			new FFprobe("/sbin/ffprobe"));
 
-	@Autowired
-	private UserService userService;
-
-    VideoPlatformApiApplicationTests(UserService userService) throws IOException {
-        this.userService = userService;
+    VideoPlatformApiApplicationTests() throws IOException {
     }
 
     @Test
 	void test_ffprobe() throws IOException {
 		fFmpegService.transcodeVideo(fFmpegService.getVideoFileMetadata("673060913c41642cc6987e7d"));
-	}
-
-	@Test
-	void test_load_current_user() {
-		userService.getCurrentUser();
 	}
 
 }

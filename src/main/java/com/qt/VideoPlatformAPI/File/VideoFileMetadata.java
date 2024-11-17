@@ -2,6 +2,9 @@ package com.qt.VideoPlatformAPI.File;
 
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 public class VideoFileMetadata {
     private String Id;
@@ -19,5 +22,5 @@ public class VideoFileMetadata {
     private String audioCodec;
 
     private String format;
-
+    private List<Integer> qualities = new ArrayList<>();
 }
