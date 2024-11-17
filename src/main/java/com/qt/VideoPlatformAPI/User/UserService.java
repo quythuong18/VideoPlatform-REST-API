@@ -1,5 +1,6 @@
 package com.qt.VideoPlatformAPI.User;
 
+import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.AvailabilityResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -52,16 +53,38 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AvailabilityResponse(Boolean.FALSE, "email " + email + " does not exist", HttpStatus.NOT_FOUND,Boolean.FALSE));
     }
 
-    public void followAUser(String username) {
-        UserProfile follower = loadUserByUsername(username);
-        UserProfile following = getCurrentUser();
-
+    public APIResponse followAUser(String username) {
+        UserProfile following = loadUserByUsername(username);
+        UserProfile follower = getCurrentUser();
+        // check if this connection exists or not
+        if(userConnectionRepository.existsByFollowerAndFollowing(follower, following)) {
+            return new APIResponse(Boolean.FALSE, "You already followed " + following.getUsername(), HttpStatus.BAD_REQUEST);
+        }
         UserConnection userConnection = new UserConnection();
-
         userConnection.setFollower(follower);
         userConnection.setFollowing(following);
 
-        userConnectionRepository.save(userConnection);
+        try {
+            userConnectionRepository.save(userConnection);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+        return new APIResponse(Boolean.TRUE, "Follow " + following.getUsername() + " successfully", HttpStatus.OK);
+    }
+    public APIResponse unfollowAUser(String username) {
+        UserProfile following = loadUserByUsername(username);
+        UserProfile follower = getCurrentUser();
+        // check if this connection exists or not
+        if(!userConnectionRepository.existsByFollowerAndFollowing(follower, following)) {
+            return new APIResponse(Boolean.FALSE, "You did not follow " + following.getUsername() + " yet", HttpStatus.BAD_REQUEST);
+        }
+        Optional<UserConnection> userConnectionOptional =
+        userConnectionRepository.findByFollowerAndFollowing(follower, following);
+
+        userConnectionRepository.delete(userConnectionOptional.get());
+
+        return new APIResponse(Boolean.TRUE, "You unfollow " + following.getUsername() + " successfully", HttpStatus.OK);
     }
 
     public UserProfile getCurrentUser() {
@@ -71,4 +94,5 @@ public class UserService implements UserDetailsService {
         }
         return (UserProfile) auth.getPrincipal();
     }
+
 }

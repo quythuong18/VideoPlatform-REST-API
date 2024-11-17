@@ -33,8 +33,12 @@ public class UserController {
 
     @PostMapping("/{username}/follow")
     ResponseEntity<APIResponse> followAUser(@PathVariable(value = "username") String username) {
-        userService.followAUser(username);
-        return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "follow " + username + " successfully", HttpStatus.OK));
+        return ResponseEntity.ok(userService.followAUser(username));
+    }
+
+    @PostMapping("/{username}/unfollow")
+    ResponseEntity<APIResponse> unfollowAUser(@PathVariable(value = "username") String username) {
+        return ResponseEntity.ok(userService.unfollowAUser(username));
     }
 
     @PutMapping("/{username}")

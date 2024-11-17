@@ -40,6 +40,7 @@ public class SecurityConfig {
                         // user
                         requestMatchers(HttpMethod.GET,"**/users/{username}").authenticated().
                         requestMatchers(HttpMethod.POST,"**/users/{username}/follow").authenticated().
+                        requestMatchers(HttpMethod.POST,"**/users/{username}/unfollow").authenticated().
                         // video
                         requestMatchers(HttpMethod.POST,"**/videos/new/").authenticated().
                         requestMatchers(HttpMethod.POST,"**/file/video/{id}").authenticated().
