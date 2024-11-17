@@ -26,13 +26,18 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public APIResponse resetPassword(@RequestBody UserVerification userVerificationReq) {
-        return null;
+    public ResponseEntity<APIResponse> resetPassword(@RequestParam String email) {
+        return ResponseEntity.ok(authService.resetPassword(email));
     }
 
-    @PostMapping("/otp-verification")
-    public APIResponse otpVerification(@RequestBody UserVerification userVerificationReq) {
-        return authService.activateAccount(userVerificationReq);
+    @PostMapping("/reset-password-verification")
+    public ResponseEntity<APIResponse> resetPasswordVerification(@RequestBody UserVerification userVerificationReq) {
+        return ResponseEntity.ok(authService.resetPasswordVerification(userVerificationReq));
+    }
+
+    @PostMapping("/account-otp-verification")
+    public ResponseEntity<APIResponse> otpVerification(@RequestBody UserVerification userVerificationReq) {
+        return ResponseEntity.ok(authService.activateAccount(userVerificationReq));
     }
 
     @PostMapping("/verify-account")

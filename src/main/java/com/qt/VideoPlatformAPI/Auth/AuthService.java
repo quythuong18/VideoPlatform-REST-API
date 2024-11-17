@@ -109,14 +109,39 @@ public class AuthService {
         return ResponseEntity.ok(new AuthenticationResponse(Boolean.TRUE, "authenticated", HttpStatus.OK, token));
     }
 
-    public void resetPassword(UserVerification userVerificationReq) {
-        if(userVerificationReq.getUser().getEmail().isEmpty()) {
-            throw new IllegalArgumentException("Email cant not be empty");
+    public APIResponse resetPassword(String email) {
+        Optional<UserProfile> userProfileOptional = userRepository.findByEmail(email);
+        if(userProfileOptional.isEmpty())
+            return new APIResponse(Boolean.FALSE, "User with that email not found", HttpStatus.NOT_FOUND);
+        verifyAccountAsync(userProfileOptional.get());
+        return new APIResponse(Boolean.TRUE, "An OTP was sent to your email to update your new password", HttpStatus.OK);
+    }
+
+    @Transactional
+    public APIResponse resetPasswordVerification(UserVerification userVerificationReq) {
+        if(userVerificationReq.getUser().getPassword() == null || userVerificationReq.getUser().getPassword().isEmpty())
+            throw new IllegalArgumentException("Password can not be null or empty");
+        if(userVerificationReq.getUser().getEmail() == null || userVerificationReq.getUser().getEmail().isEmpty())
+            throw new IllegalArgumentException("Email can not be emtpy or null");
+        if(userVerificationReq.getUser().getUsername() == null || userVerificationReq.getUser().getUsername().isEmpty())
+            throw new IllegalArgumentException("User name can not be emtpy or null");
+
+        if(otpVerification(userVerificationReq)) {
+            try {
+                Optional<UserProfile> userProfileOptional = userRepository.findByEmail(userVerificationReq.getUser().getEmail());
+                if(userProfileOptional.isEmpty())
+                    throw new IllegalArgumentException("User with email not found");
+                UserProfile userProfile = userProfileOptional.get();
+                // update new password
+                userProfile.setPassword(passwordEncoder.encode(userVerificationReq.getUser().getPassword()));
+
+                userRepository.save(userProfile);
+                return new APIResponse(Boolean.FALSE, "Reset password successfully", HttpStatus.OK);
+            } catch(Exception e) {
+                return new APIResponse(Boolean.FALSE, "Reset password fail", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
-        if(userVerificationReq.getUser().getPassword().isEmpty()) {
-            throw new IllegalArgumentException("Password cant not be empty");
-        }
-        otpVerification(userVerificationReq);
+        return new APIResponse(Boolean.FALSE, "Reset password fail", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     public ResponseEntity<APIResponse> verifyAccountAsync(UserProfile userReq) {
