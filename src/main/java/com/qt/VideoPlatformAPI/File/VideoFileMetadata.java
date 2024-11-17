@@ -9,6 +9,7 @@ import java.util.List;
 public class VideoFileMetadata {
     private String Id;
     private String pathName;
+    private String fileExtension;
 
     // video
     private Integer width;
