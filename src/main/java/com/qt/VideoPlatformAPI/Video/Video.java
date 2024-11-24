@@ -25,6 +25,7 @@ public class Video extends TimeAudit {
     private Instant uploadDate;
     private Long viewsCount;
     private Long likesCount;
+    private Long CommentsCount;
     private Boolean isPrivate;
     private Boolean isUploaded;
     private Boolean isProcessed;

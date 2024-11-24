@@ -5,6 +5,6 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 import java.util.Optional;
 
-public interface IVideosRepository extends MongoRepository<Video, Long> {
+public interface IVideosRepository extends MongoRepository<Video, String> {
     public Optional<Video> findById(String id);
 }

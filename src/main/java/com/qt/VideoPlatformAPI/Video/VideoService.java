@@ -22,6 +22,7 @@ public class VideoService {
         video.setUserId(user.getId());
         video.setLikesCount(0L);
         video.setViewsCount(0L);
+        video.setCommentsCount(0L);
 
         video.setIsUploaded(false);
         video.setIsProcessed(false);
@@ -39,23 +40,38 @@ public class VideoService {
         return iVideoRepository.save(video);
     }
 
-    public void increaseLikeCount(String id) {
-        Video video = getVideoById(id);
+    public void increaseLikeCount(String videoId) {
+        Video video = getVideoById(videoId);
         video.setLikesCount(video.getLikesCount() + 1);
         iVideoRepository.save(video);
     }
 
-    public void decreaseLikeCount(String id) {
-        Video video = getVideoById(id);
+    public void decreaseLikeCount(String videoId) {
+        Video video = getVideoById(videoId);
         video.setLikesCount(video.getLikesCount() - 1);
         iVideoRepository.save(video);
     }
 
-    public Video getVideoById(String id) {
-        Optional<Video> video = iVideoRepository.findById(id);
+    public void increaseCommentCount(String videoId) {
+        Video video = getVideoById(videoId);
+        video.setCommentsCount(video.getCommentsCount() + 1);
+        iVideoRepository.save(video);
+    }
+
+    public void decreaseCommentCount(String videoId) {
+        Video video = getVideoById(videoId);
+        video.setCommentsCount(video.getCommentsCount() - 1);
+        iVideoRepository.save(video);
+    }
+
+    public Video getVideoById(String videoId) {
+        Optional<Video> video = iVideoRepository.findById(videoId);
         if(video.isEmpty())
-            throw new IllegalArgumentException("Video data with id = " + id + "does not exist");
+            throw new IllegalArgumentException("Video data with id: " + videoId + "does not exist");
 
         return video.get();
+    }
+    public Boolean isVideoExistent(String videoId) {
+        return iVideoRepository.existsById(videoId);
     }
 }

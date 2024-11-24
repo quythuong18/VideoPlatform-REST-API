@@ -34,7 +34,7 @@ public class LikeService {
                 userService.getCurrentUser().getId());
 
         videoIdOptional.ifPresent(iLikeRepository::delete);
-        videoService.increaseLikeCount(videoId);
+        videoService.decreaseLikeCount(videoId);
     }
 
     public Boolean checkLikeVideo(String videoId) {

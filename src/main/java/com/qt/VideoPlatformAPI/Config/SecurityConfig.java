@@ -49,7 +49,12 @@ public class SecurityConfig {
                         // video like
                         requestMatchers(HttpMethod.POST,"**/videos/likes/{videoId}").authenticated().
                         requestMatchers(HttpMethod.DELETE,"**/videos/likes/{videoId}").authenticated().
-                        requestMatchers(HttpMethod.GET,"**/videos/likes/{videoId}").authenticated()
+                        requestMatchers(HttpMethod.GET,"**/videos/likes/{videoId}").authenticated().
+
+                        // video like
+                        requestMatchers(HttpMethod.POST,"**/comments").authenticated().
+                        requestMatchers(HttpMethod.DELETE,"**/comments").authenticated().
+                        requestMatchers(HttpMethod.PATCH,"**/comments").authenticated()
 
                 )
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
