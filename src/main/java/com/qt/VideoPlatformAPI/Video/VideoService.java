@@ -39,6 +39,18 @@ public class VideoService {
         return iVideoRepository.save(video);
     }
 
+    public void increaseLikeCount(String id) {
+        Video video = getVideoById(id);
+        video.setLikesCount(video.getLikesCount() + 1);
+        iVideoRepository.save(video);
+    }
+
+    public void decreaseLikeCount(String id) {
+        Video video = getVideoById(id);
+        video.setLikesCount(video.getLikesCount() - 1);
+        iVideoRepository.save(video);
+    }
+
     public Video getVideoById(String id) {
         Optional<Video> video = iVideoRepository.findById(id);
         if(video.isEmpty())
