@@ -44,7 +44,12 @@ public class SecurityConfig {
                         // video
                         requestMatchers(HttpMethod.POST,"**/videos/new/").authenticated().
                         requestMatchers(HttpMethod.POST,"**/file/video/{id}").authenticated().
-                        requestMatchers(HttpMethod.GET,"**/videos/{id}").permitAll()
+                        requestMatchers(HttpMethod.GET,"**/videos/{id}").permitAll().
+
+                        // video like
+                        requestMatchers(HttpMethod.POST,"**/videos/likes/{videoId}").authenticated().
+                        requestMatchers(HttpMethod.DELETE,"**/videos/likes/{videoId}").authenticated().
+                        requestMatchers(HttpMethod.GET,"**/videos/likes/{videoId}").authenticated()
 
                 )
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

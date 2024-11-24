@@ -1,4 +1,4 @@
-package com.qt.VideoPlatformAPI.Verification;
+package com.qt.VideoPlatformAPI.Utils;
 
 
 import lombok.AllArgsConstructor;

@@ -4,6 +4,7 @@ import com.qt.VideoPlatformAPI.File.storage.FileSystemStorageService;
 import com.qt.VideoPlatformAPI.Utils.VideoEnv;
 import lombok.AllArgsConstructor;
 import net.bramp.ffmpeg.FFmpeg;
+import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
@@ -14,6 +15,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -108,12 +111,41 @@ public class FFmpegService {
         return v;
     }
 
-    public VideoFileMetadata createManifestFile(VideoFileMetadata v) {
-        FFmpegBuilder builder = new FFmpegBuilder();
-        for(Integer quality: v.getQualities()) {
+    // because of some problems we dont use bramp/ffmpeg-cli-wrapper here
+    // instead we use process builder directly
+    public VideoFileMetadata createManifestFile(VideoFileMetadata v) throws IOException {
 
+        List<String> command = new ArrayList<>();
+        command.add(ffmpeg.getPath());
+
+        String videoDir = VideoEnv.ROOT_LOCATION + "/" + v.getId();
+        for(Integer quality : v.getQualities()) {
+            command.add("-re");
+            command.add("-i");
+            command.add(quality.toString() + v.getFileExtension());
         }
 
+        for(int i = 0; i < v.getQualities().size(); i++) {
+            command.add("-map");
+            command.add(String.valueOf(String.valueOf(i)));
+        }
+
+        command.add("-f");
+        command.add("dash");
+        command.add("output.mpd");
+
+        // run the command here
+        try {
+            System.out.println("Executing command:");
+            System.out.println(String.join(" ", command));
+            ProcessBuilder pb = new ProcessBuilder(command);
+            pb.inheritIO();
+            pb.directory(new File(videoDir));
+            Process p = pb.start();
+            p.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
         return v;
     }
     // this function will return file extension within ".", e.g: ".mp4"

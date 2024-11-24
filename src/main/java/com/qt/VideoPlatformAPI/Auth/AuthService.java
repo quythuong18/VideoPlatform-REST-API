@@ -5,7 +5,7 @@ import com.qt.VideoPlatformAPI.User.IUserRepository;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.AuthenticationResponse;
-import com.qt.VideoPlatformAPI.Verification.EmailService;
+import com.qt.VideoPlatformAPI.Utils.EmailService;
 import com.qt.VideoPlatformAPI.Verification.IUserVerificationRepository;
 import com.qt.VideoPlatformAPI.Verification.OTPGenerator;
 import com.qt.VideoPlatformAPI.Verification.UserVerification;
