@@ -21,7 +21,7 @@ public class VideoEnv {
             "video/webm"
     );
     public static final Path ROOT_LOCATION = Paths.get("videos-dir");
-    public static final List<Integer> VIDEO_QUALITY = Arrays.asList(144, 360, 480, 720, 1080);
+    public static final List<Integer> VIDEO_QUALITY = Arrays.asList(1080, 720, 480, 360, 144);
     public static final int AUDIO_BITRATE = 256000;
 
     @Bean
