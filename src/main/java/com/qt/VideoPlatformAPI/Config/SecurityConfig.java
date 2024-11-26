@@ -3,6 +3,7 @@ package com.qt.VideoPlatformAPI.Config;
 import com.qt.VideoPlatformAPI.Auth.JWTAuthenticationFilter;
 import com.qt.VideoPlatformAPI.User.UserService;
 import lombok.AllArgsConstructor;
+import org.apache.catalina.filters.CorsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,6 +20,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -31,7 +34,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
+//                .cors(AbstractHttpConfigurer::disable)
+                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(req->req.
                         // auth
                         requestMatchers("**/auth/**").permitAll().
@@ -51,10 +55,14 @@ public class SecurityConfig {
                         requestMatchers(HttpMethod.DELETE,"**/videos/likes/{videoId}").authenticated().
                         requestMatchers(HttpMethod.GET,"**/videos/likes/{videoId}").authenticated().
 
-                        // video like
+                        // comment
                         requestMatchers(HttpMethod.POST,"**/comments").authenticated().
                         requestMatchers(HttpMethod.DELETE,"**/comments").authenticated().
-                        requestMatchers(HttpMethod.PATCH,"**/comments").authenticated()
+                        requestMatchers(HttpMethod.PATCH,"**/comments").authenticated().
+
+                        // serve video manifest file
+                        requestMatchers(HttpMethod.GET,"/**").permitAll()
+
 
                 )
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -66,6 +74,28 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("http://localhost:3000"); // Domain Frontend
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter();
+    }
+
+    private UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();

@@ -2,6 +2,7 @@ package com.qt.VideoPlatformAPI.Video;
 
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
+import com.qt.VideoPlatformAPI.VideoPlatformApiApplication;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -30,14 +31,16 @@ public class VideoService {
         return iVideoRepository.save(video);
     }
 
-    public Video updateVideoUploadedStatus(Video video) {
+    public void updateVideoUploadedStatus(String videoId) {
+        Video video = getVideoById(videoId);
         video.setIsUploaded(true);
-        return iVideoRepository.save(video);
+        iVideoRepository.save(video);
     }
 
-    public Video updateVideoProcessedStatus(Video video) {
+    public void updateVideoProcessedStatus(String videoId) {
+        Video video = getVideoById(videoId);
         video.setIsProcessed(true);
-        return iVideoRepository.save(video);
+        iVideoRepository.save(video);
     }
 
     public void increaseLikeCount(String videoId) {
@@ -71,7 +74,15 @@ public class VideoService {
 
         return video.get();
     }
+
     public Boolean isVideoExistent(String videoId) {
         return iVideoRepository.existsById(videoId);
+    }
+
+    public Video watch(String videoId) {
+        // check if video exists
+        // check if video public
+        // check if video processed
+        return null;
     }
 }

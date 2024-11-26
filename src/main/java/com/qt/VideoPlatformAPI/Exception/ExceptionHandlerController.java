@@ -67,4 +67,13 @@ public class ExceptionHandlerController {
                 Boolean.FALSE, "Missing field", HttpStatus.BAD_REQUEST, errors
         ), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<APIResponse> resolveInternalServerError(FileUploadException exception) {
+        String message = exception.getMessage();
+        APIResponse response = new APIResponse(Boolean.FALSE, message, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }

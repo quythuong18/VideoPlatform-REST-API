@@ -4,7 +4,6 @@ import com.qt.VideoPlatformAPI.File.storage.FileSystemStorageService;
 import com.qt.VideoPlatformAPI.Utils.VideoEnv;
 import lombok.AllArgsConstructor;
 import net.bramp.ffmpeg.FFmpeg;
-import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
@@ -13,8 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

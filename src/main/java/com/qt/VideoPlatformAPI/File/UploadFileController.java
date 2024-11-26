@@ -21,6 +21,7 @@ import java.util.List;
 public class UploadFileController {
     private final FileSystemStorageService fileSystemStorageService;
     private final VideoService videoService;
+    private final VideoFileProcessingService videoFileProcessingService;
 
     @PostMapping("/video/{id}")
     public ResponseEntity<APIResponse>  handleVideoUpload(@RequestBody MultipartFile file, @PathVariable(name = "id") String id) throws FileUploadException {
@@ -40,8 +41,8 @@ public class UploadFileController {
         }
 
         fileSystemStorageService.store(file, id); // save video file upload
-        videoService.updateVideoUploadedStatus(video); // set video metadata status
-        // video processing Completable
+        videoService.updateVideoUploadedStatus(id); // set video metadata status
+        videoFileProcessingService.processVideoAsync(id); // video processing Completable
 
         return ResponseEntity.ok(new APIResponse(true, "Video uploaded successfully and being processed", HttpStatus.OK));
     }

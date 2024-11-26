@@ -32,7 +32,7 @@ public class VideoController {
     }
 
     @GetMapping("/{videoid}/watch")
-    public ResponseEntity<APIResponseWithData<Video>> watchOneVideo(@PathVariable(value = "videoid") Long videoId) {
+    public ResponseEntity<APIResponseWithData<Video>> watchOneVideo(@PathVariable(value = "videoid") String videoId) {
         return null;
     }
 }
