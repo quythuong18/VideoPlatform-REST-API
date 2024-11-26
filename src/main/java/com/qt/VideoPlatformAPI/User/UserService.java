@@ -12,7 +12,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 @AllArgsConstructor
@@ -85,6 +87,18 @@ public class UserService implements UserDetailsService {
         userConnectionRepository.delete(userConnectionOptional.get());
 
         return new APIResponse(Boolean.TRUE, "You unfollow " + following.getUsername() + " successfully", HttpStatus.OK);
+    }
+
+    public Set<String> getAllFollowings() {
+        UserProfile userProfile = getCurrentUser();
+        Set<UserConnection> followings = userProfile.getFollowing();
+        Set<String> usernameList = new HashSet<>();
+
+
+        followings.forEach(userConnection -> {
+            usernameList.add(userConnection.getFollowing().getUsername());
+        });
+        return usernameList;
     }
 
     public UserProfile getCurrentUser() {

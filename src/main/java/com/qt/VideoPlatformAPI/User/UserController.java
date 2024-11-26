@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @AllArgsConstructor
@@ -39,6 +41,12 @@ public class UserController {
     @PostMapping("/{username}/unfollow")
     ResponseEntity<APIResponse> unfollowAUser(@PathVariable(value = "username") String username) {
         return ResponseEntity.ok(userService.unfollowAUser(username));
+    }
+
+    @GetMapping("/followings")
+    public ResponseEntity<APIResponseWithData<Set<String>>> getAllFollowings() {
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE,
+                "Get all followings successfully", HttpStatus.OK, userService.getAllFollowings()));
     }
 
     @PutMapping("/{username}")

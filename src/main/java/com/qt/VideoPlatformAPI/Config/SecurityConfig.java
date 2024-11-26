@@ -41,10 +41,13 @@ public class SecurityConfig {
                         requestMatchers("**/auth/**").permitAll().
                         requestMatchers("**/users/checkUsernameAvailability").permitAll().
                         requestMatchers("**/users/checkEmailAvailability").permitAll().
+
                         // user
                         requestMatchers(HttpMethod.GET,"**/users/{username}").authenticated().
                         requestMatchers(HttpMethod.POST,"**/users/{username}/follow").authenticated().
                         requestMatchers(HttpMethod.POST,"**/users/{username}/unfollow").authenticated().
+                        requestMatchers(HttpMethod.GET,"**/users/followings").authenticated().
+
                         // video
                         requestMatchers(HttpMethod.POST,"**/videos/new/").authenticated().
                         requestMatchers(HttpMethod.POST,"**/file/video/{id}").authenticated().
@@ -59,6 +62,12 @@ public class SecurityConfig {
                         requestMatchers(HttpMethod.POST,"**/comments").authenticated().
                         requestMatchers(HttpMethod.DELETE,"**/comments").authenticated().
                         requestMatchers(HttpMethod.PATCH,"**/comments").authenticated().
+
+                        // playlist
+                        requestMatchers(HttpMethod.POST,"**/playlists/").authenticated().
+                        requestMatchers(HttpMethod.GET,"**/playlists/{playlistId}").authenticated().
+                        requestMatchers(HttpMethod.PATCH,"**/playlists/{playlistId}").authenticated().
+                        requestMatchers(HttpMethod.DELETE,"**/playlists/{playlistId}").authenticated().
 
                         // serve video manifest file
                         requestMatchers(HttpMethod.GET,"/**").permitAll()
