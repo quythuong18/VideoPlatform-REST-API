@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.qt.VideoPlatformAPI.Utils.TimeAudit;
 import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,12 +33,19 @@ public class UserProfile extends TimeAudit implements UserDetails {
     @Column(name = "id")
     private Long id;
 
+    @NotBlank
     @Column(name = "username")
     private String username;
 
+    @NotBlank
+    @Column(name = "full_name")
+    private String fullName;
+
+    @NotBlank
     @Column(name = "password")
     private String password;
 
+    @NotBlank
     @Column(name = "email")
     private String email;
 

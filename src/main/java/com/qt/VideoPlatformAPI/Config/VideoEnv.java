@@ -1,4 +1,4 @@
-package com.qt.VideoPlatformAPI.Utils;
+package com.qt.VideoPlatformAPI.Config;
 
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFprobe;

@@ -2,7 +2,9 @@ package com.qt.VideoPlatformAPI.User;
 
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.AvailabilityResponse;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -94,7 +96,6 @@ public class UserService implements UserDetailsService {
         Set<UserConnection> followings = userProfile.getFollowing();
         Set<String> usernameList = new HashSet<>();
 
-
         followings.forEach(userConnection -> {
             usernameList.add(userConnection.getFollowing().getUsername());
         });
@@ -104,9 +105,23 @@ public class UserService implements UserDetailsService {
     public UserProfile getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(auth == null) {
-            throw new AuthenticationServiceException("not authenticated");
+            throw new AuthenticationServiceException("Not authenticated");
         }
         return (UserProfile) auth.getPrincipal();
     }
 
+    @Transactional
+    public UserProfile updateUser(UserProfile newUserInfo) {
+        UserProfile currentUser = getCurrentUser();
+
+        currentUser.setUsername(newUserInfo.getUsername());
+        currentUser.setFullName(newUserInfo.getFullName());
+        //currentUser.setEmail(newUserInfo.getFullName());
+        currentUser.setBio(newUserInfo.getBio());
+        currentUser.setProfilePic(newUserInfo.getProfilePic());
+        currentUser.setDateOfBirth(newUserInfo.getDateOfBirth());
+        currentUser.setPhone(newUserInfo.getPhone());
+
+        return userRepository.save(currentUser);
+    }
 }

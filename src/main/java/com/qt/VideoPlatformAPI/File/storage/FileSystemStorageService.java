@@ -1,7 +1,7 @@
 package com.qt.VideoPlatformAPI.File.storage;
 
 import com.qt.VideoPlatformAPI.Exception.StorageException;
-import com.qt.VideoPlatformAPI.Utils.VideoEnv;
+import com.qt.VideoPlatformAPI.Config.VideoEnv;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 

@@ -26,7 +26,7 @@ class VideoPlatformApiApplicationTests {
 
 	@Test
 	void test_ffmpeg_manifestfile() throws IOException {
-		fFmpegService.createManifestFile(fFmpegService.transcodeVideo(fFmpegService.getVideoFileMetadata("673060913c41642cc6987e7d")));
+		fFmpegService.createManifestFile(fFmpegService.transcodeVideo(fFmpegService.getVideoFileMetadata("6744b91da5560704186ae0bb")));
 	}
 
 }

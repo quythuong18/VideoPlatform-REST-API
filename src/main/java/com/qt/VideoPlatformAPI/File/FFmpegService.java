@@ -1,7 +1,7 @@
 package com.qt.VideoPlatformAPI.File;
 
 import com.qt.VideoPlatformAPI.File.storage.FileSystemStorageService;
-import com.qt.VideoPlatformAPI.Utils.VideoEnv;
+import com.qt.VideoPlatformAPI.Config.VideoEnv;
 import lombok.AllArgsConstructor;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFprobe;
@@ -117,7 +117,7 @@ public class FFmpegService {
 
         String videoDir = VideoEnv.ROOT_LOCATION + "/" + v.getId();
         for(Integer quality : v.getQualities()) {
-            command.add("-re");
+//            command.add("-re");
             command.add("-i");
             command.add(quality.toString() + v.getFileExtension());
         }
@@ -127,8 +127,20 @@ public class FFmpegService {
             command.add(String.valueOf(String.valueOf(i)));
         }
 
+        command.add("-c:v");
+        command.add("copy");
+        command.add("-c:a");
+        command.add("copy");
+
         command.add("-f");
         command.add("dash");
+
+        command.add("-seg_duration");
+        command.add("4");
+
+        command.add("-adaptation_sets");
+        command.add("\"id=0,streams=v id=1,streams=a\"");
+
         command.add("output.mpd");
 
         // run the command here

@@ -45,17 +45,15 @@ public class UserController {
 
     @GetMapping("/followings")
     public ResponseEntity<APIResponseWithData<Set<String>>> getAllFollowings() {
-        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE,
+        return ResponseEntity.ok(new APIResponseWithData<Set<String>>(Boolean.TRUE,
                 "Get all followings successfully", HttpStatus.OK, userService.getAllFollowings()));
     }
 
-    @PutMapping("/{username}")
-    APIResponse updateUser(@RequestBody UserProfile user, @PathVariable(value = "username") String username) {
-        return null;
-    }
-
-    @DeleteMapping("/{username}")
-    ResponseEntity<UserProfile> deleteUser(@PathVariable(value = "username") String username) {
-        return null;
+    @PutMapping("/")
+    ResponseEntity<APIResponseWithData<UserProfile>> updateUser(@RequestBody UserProfile user) {
+        if(user == null)
+            return ResponseEntity.status(400).body(new APIResponseWithData<UserProfile>(Boolean.FALSE, "User is null", HttpStatus.BAD_REQUEST, null));
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE,
+                "Update user successfully", HttpStatus.OK, userService.updateUser()));
     }
 }
