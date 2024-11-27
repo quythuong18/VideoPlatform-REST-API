@@ -54,6 +54,6 @@ public class UserController {
         if(user == null)
             return ResponseEntity.status(400).body(new APIResponseWithData<UserProfile>(Boolean.FALSE, "User is null", HttpStatus.BAD_REQUEST, null));
         return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE,
-                "Update user successfully", HttpStatus.OK, userService.updateUser()));
+                "Update user successfully", HttpStatus.OK, userService.updateUser(user)));
     }
 }

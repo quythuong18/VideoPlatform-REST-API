@@ -24,6 +24,7 @@ public class VideoService {
         video.setLikesCount(0L);
         video.setViewsCount(0L);
         video.setCommentsCount(0L);
+        video.setIsCommentOff(video.getIsCommentOff());
 
         video.setIsUploaded(false);
         video.setIsProcessed(false);

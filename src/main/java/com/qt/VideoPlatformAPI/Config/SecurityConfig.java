@@ -3,7 +3,6 @@ package com.qt.VideoPlatformAPI.Config;
 import com.qt.VideoPlatformAPI.Auth.JWTAuthenticationFilter;
 import com.qt.VideoPlatformAPI.User.UserService;
 import lombok.AllArgsConstructor;
-import org.apache.catalina.filters.CorsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -28,83 +27,74 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity
 @AllArgsConstructor
 public class SecurityConfig {
+
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
     private final UserService userService;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-//                .cors(AbstractHttpConfigurer::disable)
-                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(req->req.
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Cấu hình CORS
+                .authorizeHttpRequests(req -> req
                         // auth
-                        requestMatchers("**/auth/**").permitAll().
-                        requestMatchers("**/users/checkUsernameAvailability").permitAll().
-                        requestMatchers("**/users/checkEmailAvailability").permitAll().
+                        .requestMatchers("**/auth/**").permitAll()
+                        .requestMatchers("**/users/checkUsernameAvailability").permitAll()
+                        .requestMatchers("**/users/checkEmailAvailability").permitAll()
 
                         // user
-                        requestMatchers(HttpMethod.GET,"**/users/{username}").authenticated().
-                        requestMatchers(HttpMethod.POST,"**/users/{username}/follow").authenticated().
-                        requestMatchers(HttpMethod.POST,"**/users/{username}/unfollow").authenticated().
-                        requestMatchers(HttpMethod.GET,"**/users/followings").authenticated().
+                        .requestMatchers(HttpMethod.GET, "**/users/{username}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "**/users/{username}/follow").authenticated()
+                        .requestMatchers(HttpMethod.POST, "**/users/{username}/unfollow").authenticated()
+                        .requestMatchers(HttpMethod.GET, "**/users/followings").authenticated()
 
                         // video
-                        requestMatchers(HttpMethod.POST,"**/videos/new/").authenticated().
-                        requestMatchers(HttpMethod.POST,"**/file/video/{id}").authenticated().
-                        requestMatchers(HttpMethod.GET,"**/videos/{id}").permitAll().
+                        .requestMatchers(HttpMethod.POST, "**/videos/new/").authenticated()
+                        .requestMatchers(HttpMethod.POST, "**/file/video/{id}").authenticated()
+                        .requestMatchers(HttpMethod.GET, "**/videos/{id}").permitAll()
 
                         // video like
-                        requestMatchers(HttpMethod.POST,"**/videos/likes/{videoId}").authenticated().
-                        requestMatchers(HttpMethod.DELETE,"**/videos/likes/{videoId}").authenticated().
-                        requestMatchers(HttpMethod.GET,"**/videos/likes/{videoId}").authenticated().
+                        .requestMatchers(HttpMethod.POST, "**/videos/likes/{videoId}").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "**/videos/likes/{videoId}").authenticated()
+                        .requestMatchers(HttpMethod.GET, "**/videos/likes/{videoId}").authenticated()
 
                         // comment
-                        requestMatchers(HttpMethod.POST,"**/comments").authenticated().
-                        requestMatchers(HttpMethod.DELETE,"**/comments").authenticated().
-                        requestMatchers(HttpMethod.PATCH,"**/comments").authenticated().
+                        .requestMatchers(HttpMethod.POST, "**/comments").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "**/comments").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "**/comments").authenticated()
 
                         // playlist
-                        requestMatchers(HttpMethod.POST,"**/playlists/").authenticated().
-                        requestMatchers(HttpMethod.GET,"**/playlists/{playlistId}").authenticated().
-                        requestMatchers(HttpMethod.PATCH,"**/playlists/{playlistId}").authenticated().
-                        requestMatchers(HttpMethod.DELETE,"**/playlists/{playlistId}").authenticated().
+                        .requestMatchers(HttpMethod.POST, "**/playlists/").authenticated()
+                        .requestMatchers(HttpMethod.GET, "**/playlists/{playlistId}").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "**/playlists/{playlistId}").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "**/playlists/{playlistId}").authenticated()
 
                         // serve video manifest file
-                        requestMatchers(HttpMethod.GET,"/**").permitAll()
-
-
+                        .requestMatchers(HttpMethod.GET, "/**").permitAll()
                 )
-                .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:3000"); // Domain Frontend
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter();
-    }
-
-    private UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        config.addAllowedOriginPattern("*"); // Cho phép tất cả các domain (có thể thay bằng domain cụ thể nếu cần)
+        config.addAllowedHeader("*"); // Cho phép tất cả các headers
+        config.addAllowedMethod("*"); // Cho phép tất cả các phương thức HTTP
+        config.setMaxAge(3600L); // Cache CORS trong 1 giờ
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:3000");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        source.registerCorsConfiguration("/**", config);
+        source.registerCorsConfiguration("/**", config); // Áp dụng CORS cho tất cả endpoints
         return source;
     }
+
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -117,6 +107,4 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
-
-
 }
