@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -80,10 +81,14 @@ public class VideoService {
         return iVideoRepository.existsById(videoId);
     }
 
-    public Video watch(String videoId) {
-        // check if video exists
-        // check if video public
-        // check if video processed
-        return null;
+    public List<Video> getAllVideosByUsername(String username) {
+        UserProfile user = userService.loadUserByUsername(username);
+        List<Video> videoList = iVideoRepository.findAllByUserId(user.getUsername());
+        for(Video v : videoList) {
+            if(v.getIsUploaded() || v.getIsProcessed() || v.getIsPrivate()) {
+                videoList.remove(v);
+            }
+        }
+        return videoList;
     }
 }

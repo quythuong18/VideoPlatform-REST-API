@@ -21,18 +21,17 @@ public class VideoController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<APIResponseWithData<List<Video>>> getVideos(Integer numberOfVideo) {
-        return null;
+    public ResponseEntity<APIResponseWithData<List<Video>>> getAllVideosByUsername(@RequestParam String username) {
+        if(username == null || username.isBlank())
+            return ResponseEntity.status(400).body(new APIResponseWithData<>(Boolean.FALSE,
+                    "Username is null or blank", HttpStatus.BAD_REQUEST, null));
+        return ResponseEntity.ok(new APIResponseWithData<List<Video>>(Boolean.TRUE,
+                "Get all videos successfully", HttpStatus.OK, videoService.getAllVideosByUsername(username)));
     }
 
     @GetMapping("/{videoid}") // get video metadata
     public ResponseEntity<APIResponseWithData<Video>> getOneVideo(@PathVariable(value = "videoid") String id) {
         return ResponseEntity.ok(new APIResponseWithData<>(true, "get one video metadata successfully",
         HttpStatus.OK, videoService.getVideoById(id)));
-    }
-
-    @GetMapping("/{videoid}/watch")
-    public ResponseEntity<APIResponseWithData<Video>> watchOneVideo(@PathVariable(value = "videoid") String videoId) {
-        return null;
     }
 }

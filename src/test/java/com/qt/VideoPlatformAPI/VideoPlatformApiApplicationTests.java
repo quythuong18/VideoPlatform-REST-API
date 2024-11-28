@@ -1,6 +1,7 @@
 package com.qt.VideoPlatformAPI;
 
 import com.qt.VideoPlatformAPI.File.FFmpegService;
+import com.qt.VideoPlatformAPI.File.VideoFileMetadata;
 import com.qt.VideoPlatformAPI.User.UserService;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFprobe;
