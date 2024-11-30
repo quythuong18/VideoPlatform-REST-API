@@ -2,6 +2,8 @@ package com.qt.VideoPlatformAPI.File;
 
 import com.qt.VideoPlatformAPI.File.storage.FileSystemStorageService;
 import com.qt.VideoPlatformAPI.Config.VideoEnv;
+import com.qt.VideoPlatformAPI.Video.Video;
+import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFprobe;
@@ -19,8 +21,9 @@ import java.util.Objects;
 @Component
 @AllArgsConstructor
 public class FFmpegService {
-    FFmpeg ffmpeg;
-    FFprobe ffprobe;
+    private FFmpeg ffmpeg;
+    private FFprobe ffprobe;
+    private final VideoService videoService;
 
     public VideoFileMetadata getVideoFileMetadata(String videoId) throws IOException {
         String videoFileName = getVideoFileName(videoId);
@@ -122,24 +125,22 @@ public class FFmpegService {
             command.add(quality.toString() + v.getFileExtension());
         }
 
+        StringBuilder stream = new StringBuilder("0");
+
         for(int i = 0; i < v.getQualities().size(); i++) {
             command.add("-map");
             command.add(String.valueOf(String.valueOf(i)));
+            stream.append(",").append(Integer.toString(i));
         }
 
-        command.add("-c:v");
-        command.add("copy");
-        command.add("-c:a");
+        command.add("-c");
         command.add("copy");
 
         command.add("-f");
         command.add("dash");
 
-        command.add("-seg_duration");
-        command.add("4");
-
         command.add("-adaptation_sets");
-        command.add("\"id=0,streams=v id=1,streams=a\"");
+        command.add("\"id=0,streams=" + stream + " id=1,streams=" + stream + "\"");
 
         command.add("output.mpd");
 
@@ -171,5 +172,22 @@ public class FFmpegService {
             }
         }
         return null;
+    }
+    public void getVideoThumbnailFrame(String videoId) throws IOException {
+        Video v = videoService.getVideoById(videoId);
+        if(!v.getIsUploaded())
+            return;
+
+        FFmpegBuilder builder = new FFmpegBuilder();
+        try {
+            builder.setInput(VideoEnv.ROOT_LOCATION.toString() + "/" + videoId + "/" + getVideoFileName(v.getId()))
+                    .addOutput(VideoEnv.ROOT_LOCATION.toString() + "/" + videoId + "/" + "thumbnail.jpg")
+                    .addExtraArgs("-ss", "00:00:01")
+                    .addExtraArgs("-vframes", "1")
+                    .done();
+            ffmpeg.run(builder);
+        } catch (IOException e) {
+            throw new IOException(e);
+        }
     }
 }

@@ -22,7 +22,6 @@ public class Video extends TimeAudit {
     private List<String> tags;
     private String url;
     private Long duration;
-    private Instant uploadDate;
     private Long viewsCount;
     private Long likesCount;
     private Long CommentsCount;

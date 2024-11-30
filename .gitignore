@@ -34,3 +34,9 @@ build/
 
 ### videos
 videos-dir/*
+
+### others
+src/main/java/com/qt/VideoPlatformAPI/Config/SecurityConfig.java
+src/main/java/com/qt/VideoPlatformAPI/Config/VideoEnv.java
+src/main/resources/application.properties
+

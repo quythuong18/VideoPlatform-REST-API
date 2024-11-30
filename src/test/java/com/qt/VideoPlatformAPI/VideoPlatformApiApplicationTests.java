@@ -13,21 +13,11 @@ import java.io.IOException;
 
 @SpringBootTest
 class VideoPlatformApiApplicationTests {
-
-	private final FFmpegService fFmpegService = new FFmpegService(new FFmpeg("/sbin/ffmpeg"),
-			new FFprobe("/sbin/ffprobe"));
-
-    VideoPlatformApiApplicationTests() throws IOException {
-    }
+    @Autowired
+    FFmpegService fFmpegService;
 
     @Test
-	void test_ffmpeg() throws IOException {
-		fFmpegService.transcodeVideo(fFmpegService.getVideoFileMetadata("673060913c41642cc6987e7d"));
-	}
-
-	@Test
-	void test_ffmpeg_manifestfile() throws IOException {
-		fFmpegService.createManifestFile(fFmpegService.transcodeVideo(fFmpegService.getVideoFileMetadata("6744b91da5560704186ae0bb")));
-	}
-
+    public void testThumbnail() throws IOException {
+        fFmpegService.getVideoThumbnailFrame("6744950cf882237fb9bd833e");
+    }
 }
