@@ -133,14 +133,11 @@ public class FFmpegService {
             stream.append(",").append(Integer.toString(i));
         }
 
-        command.add("-c");
-        command.add("copy");
-
         command.add("-f");
         command.add("dash");
 
-        command.add("-adaptation_sets");
-        command.add("\"id=0,streams=" + stream + " id=1,streams=" + stream + "\"");
+//        command.add("-adaptation_sets");
+//        command.add("\"id=0,streams=" + stream + " id=1,streams=" + stream + "\"");
 
         command.add("output.mpd");
 
