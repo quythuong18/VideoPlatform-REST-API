@@ -6,6 +6,7 @@ import com.qt.VideoPlatformAPI.VideoPlatformApiApplication;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -90,5 +91,9 @@ public class VideoService {
             }
         }
         return videoList;
+    }
+
+    public void updateThumbnailVideo(String videoId, String thumbnailUrl) {
+
     }
 }

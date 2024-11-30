@@ -20,7 +20,7 @@ public class Video extends TimeAudit {
     private String title;
     private String description;
     private List<String> tags;
-    private String url;
+    private String thumbnailUrl;
     private Long duration;
     private Long viewsCount;
     private Long likesCount;
