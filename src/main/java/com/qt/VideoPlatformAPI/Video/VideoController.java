@@ -22,13 +22,13 @@ public class VideoController {
         HttpStatus.OK, videoService.addVideo(video)));
     }
 
-    @GetMapping("/")
-    public ResponseEntity<APIResponseWithData<List<Video>>> getAllVideosByUsername(@RequestParam String username) {
-        if(username == null || username.isBlank())
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<APIResponseWithData<List<Video>>> getAllVideosByUserId(@PathVariable Long userId) {
+        if(userId == null)
             return ResponseEntity.status(400).body(new APIResponseWithData<>(Boolean.FALSE,
-                    "Username is null or blank", HttpStatus.BAD_REQUEST, null));
-        return ResponseEntity.ok(new APIResponseWithData<List<Video>>(Boolean.TRUE,
-                "Get all videos successfully", HttpStatus.OK, videoService.getAllVideosByUsername(username)));
+                    "UserId is null", HttpStatus.BAD_REQUEST, null));
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE,
+                "Get all videos successfully", HttpStatus.OK, videoService.getAllVideosByUserId(userId)));
     }
 
     @GetMapping("/{videoid}") // get video metadata

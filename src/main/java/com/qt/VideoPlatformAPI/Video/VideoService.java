@@ -85,14 +85,9 @@ public class VideoService {
         return iVideoRepository.existsById(videoId);
     }
 
-    public List<Video> getAllVideosByUsername(String username) {
-        UserProfile user = userService.loadUserByUsername(username);
-        List<Video> videoList = iVideoRepository.findAllByUserId(user.getUsername());
-        for(Video v : videoList) {
-            if(v.getIsUploaded() || v.getIsProcessed() || v.getIsPrivate()) {
-                videoList.remove(v);
-            }
-        }
+    public List<Video> getAllVideosByUserId(Long userId) {
+        List<Video> videoList = iVideoRepository.findAllByUserId(userId);
+        videoList.removeIf(v -> !v.getIsUploaded() && !v.getIsProcessed() && v.getIsPrivate());
         return videoList;
     }
 

@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface IVideosRepository extends MongoRepository<Video, String> {
     public Optional<Video> findById(String id);
-    public List<Video> findAllByUserId(String userId);
+    public List<Video> findAllByUserId(Long userId);
 }
