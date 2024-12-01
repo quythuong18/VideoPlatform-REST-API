@@ -18,6 +18,7 @@ public class Playlist {
     private Long userId;
     @NotBlank(message = "Name is required")
     private String name;
+    private String description;
     private String pictureUrl;
     @NotNull(message = "Video id list must be non-null")
     private List<String> videoIdsList;

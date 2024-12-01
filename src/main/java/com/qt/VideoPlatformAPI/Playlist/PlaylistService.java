@@ -33,6 +33,9 @@ public class PlaylistService {
         if(!videoService.isVideoExistent(videoId))
             throw new IllegalArgumentException("Video id does not exist");
 
+        if(checkVideoExistsInAPlaylist(playlistId, videoId))
+            throw new IllegalArgumentException("The video is already added to playlist");
+
         Playlist playlist = getPlaylistById(playlistId);
         playlist.getVideoIdsList().add(videoId);
 
@@ -49,7 +52,9 @@ public class PlaylistService {
             throw new IllegalArgumentException("The video is not in the playlist");
 
         Playlist playlist = getPlaylistById(playlistId);
-        playlist.getVideoIdsList().remove(playlistId);
+        playlist.getVideoIdsList().remove(videoId);
+
+        iPlaylistRepository.save(playlist);
     }
 
     public Boolean checkVideoExistsInAPlaylist(String playlistId, String videoId) {

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 
@@ -55,5 +56,11 @@ public class UserController {
             return ResponseEntity.status(400).body(new APIResponseWithData<UserProfile>(Boolean.FALSE, "User is null", HttpStatus.BAD_REQUEST, null));
         return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE,
                 "Update user successfully", HttpStatus.OK, userService.updateUser(user)));
+    }
+
+    @PostMapping("/profilePic")
+    ResponseEntity<APIResponseWithData<String>> updateProfilePic(MultipartFile img) {
+        UserProfile user = userService.getCurrentUser();
+        return null;
     }
 }

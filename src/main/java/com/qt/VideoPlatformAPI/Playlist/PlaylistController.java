@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class PlaylistController {
     private final PlaylistService playlistService;
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<APIResponseWithData<Playlist>> createPlaylist(@RequestBody Playlist playlist) {
         if(playlist == null)
             return ResponseEntity.status(400).body(new APIResponseWithData<Playlist>(Boolean.FALSE,
@@ -27,10 +27,10 @@ public class PlaylistController {
             return ResponseEntity.status(400).body(new APIResponseWithData<Playlist>(Boolean.FALSE,
                     "Playlist id is null or blank", HttpStatus.BAD_REQUEST, null));
         return ResponseEntity.ok(new APIResponseWithData<Playlist>(Boolean.TRUE,
-                "Create playlist successfully", HttpStatus.OK, playlistService.getPlaylistById(playlistId)));
+                "Get a playlist successfully", HttpStatus.OK, playlistService.getPlaylistById(playlistId)));
     }
 
-    @PatchMapping("/{playlistId}")
+    @PatchMapping("/{playlistId}/add")
     public ResponseEntity<APIResponse> addVideoToPlaylist(@PathVariable String playlistId, @RequestParam String videoId) {
         if(playlistId == null || playlistId.isBlank())
             return ResponseEntity.status(400).body(new APIResponse(Boolean.FALSE, "Playlist id is null or blank", HttpStatus.BAD_REQUEST));
@@ -41,9 +41,15 @@ public class PlaylistController {
         return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Add video to playlist successfully", HttpStatus.OK));
     }
 
-    @DeleteMapping("/{playlistId}")
+    @PatchMapping("/{playlistId}/remove")
     public ResponseEntity<APIResponse> deleteVideoFromPlaylist(@PathVariable String playlistId, @RequestParam String videoId) {
-        return null;
+        if(playlistId == null || playlistId.isBlank())
+            return ResponseEntity.status(400).body(new APIResponse(Boolean.FALSE, "Playlist id is null or blank", HttpStatus.BAD_REQUEST));
+        if(videoId == null || videoId.isBlank())
+            return ResponseEntity.status(400).body(new APIResponse(Boolean.FALSE, "Video id is null or blank", HttpStatus.BAD_REQUEST));
+
+        playlistService.deleteVideoFromPlaylist(playlistId, videoId);
+        return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Remove video from playlist successfully", HttpStatus.OK));
     }
 
 

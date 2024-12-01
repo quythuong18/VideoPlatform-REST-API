@@ -76,7 +76,7 @@ public class VideoService {
     public Video getVideoById(String videoId) {
         Optional<Video> video = iVideoRepository.findById(videoId);
         if(video.isEmpty())
-            throw new IllegalArgumentException("Video data with id: " + videoId + "does not exist");
+            throw new IllegalArgumentException("Video data with id: " + videoId + " does not exist");
 
         return video.get();
     }

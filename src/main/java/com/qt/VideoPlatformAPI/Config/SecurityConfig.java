@@ -68,8 +68,8 @@ public class SecurityConfig {
                         // playlist
                         .requestMatchers(HttpMethod.POST, "**/playlists/").authenticated()
                         .requestMatchers(HttpMethod.GET, "**/playlists/{playlistId}").authenticated()
-                        .requestMatchers(HttpMethod.PATCH, "**/playlists/{playlistId}").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "**/playlists/{playlistId}").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "**/playlists/{playlistId}/add").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "**/playlists/{playlistId}/remove").authenticated()
 
                         // serve video manifest file
                         .requestMatchers(HttpMethod.GET, "/**").permitAll()
