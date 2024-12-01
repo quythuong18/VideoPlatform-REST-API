@@ -7,11 +7,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/playlists")
 @AllArgsConstructor
 public class PlaylistController {
     private final PlaylistService playlistService;
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<APIResponseWithData<List<Playlist>>> getAllPlaylistsByUserId(@PathVariable Long userId) {
+        if(userId == null)
+            return ResponseEntity.status(400).body(new APIResponseWithData<>(Boolean.FALSE,
+                    "userId is null", HttpStatus.BAD_REQUEST, null));
+        return ResponseEntity.ok(new APIResponseWithData<>(
+                Boolean.TRUE, "Get all playlists of a user successfully", HttpStatus.OK,
+                playlistService.getAllPlaylistsByUserId(userId)
+        ));
+    }
+
     @PostMapping("/")
     public ResponseEntity<APIResponseWithData<Playlist>> createPlaylist(@RequestBody Playlist playlist) {
         if(playlist == null)
@@ -33,7 +47,7 @@ public class PlaylistController {
     @PatchMapping("/{playlistId}/add")
     public ResponseEntity<APIResponse> addVideoToPlaylist(@PathVariable String playlistId, @RequestParam String videoId) {
         if(playlistId == null || playlistId.isBlank())
-            return ResponseEntity.status(400).body(new APIResponse(Boolean.FALSE, "Playlist id is null or blank", HttpStatus.BAD_REQUEST));
+            return ResponseEntity.status(402).body(new APIResponse(Boolean.FALSE, "Playlist id is null or blank", HttpStatus.BAD_REQUEST));
         if(videoId == null || videoId.isBlank())
             return ResponseEntity.status(400).body(new APIResponse(Boolean.FALSE, "Video id is null or blank", HttpStatus.BAD_REQUEST));
 

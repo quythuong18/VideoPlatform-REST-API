@@ -69,6 +69,7 @@ public class SecurityConfig {
                         // playlist
                         .requestMatchers(HttpMethod.POST, "**/playlists/").authenticated()
                         .requestMatchers(HttpMethod.GET, "**/playlists/{playlistId}").authenticated()
+                        .requestMatchers(HttpMethod.GET, "**/playlists/user/{userId}").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "**/playlists/{playlistId}/add").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "**/playlists/{playlistId}/remove").authenticated()
 

@@ -6,6 +6,7 @@ import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -25,6 +26,11 @@ public class PlaylistService {
         if(playlistOptional.isEmpty())
             throw new IllegalArgumentException("Playlist id does not exist");
         return playlistOptional.get();
+    }
+
+    public List<Playlist> getAllPlaylistsByUserId(Long userId) {
+        List<Playlist> allPlaylists = iPlaylistRepository.findAllByUserId(userId);
+        return allPlaylists;
     }
 
     public void addVideoToPlaylist(String playlistId, String videoId) {
