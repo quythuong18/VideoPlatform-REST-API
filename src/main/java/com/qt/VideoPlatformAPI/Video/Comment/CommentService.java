@@ -23,6 +23,10 @@ public class CommentService {
         if(!videoService.isVideoExistent(comment.getVideoId()))
             throw new IllegalArgumentException("Video with that id does not exist");
 
+        //check if video comment on or off
+        if(videoService.getVideoById(comment.getVideoId()).getIsCommentOff())
+            throw new IllegalArgumentException("Video with that id has comment off");
+
         if(comment.getContent() == null || comment.getContent().isEmpty())
             throw new IllegalArgumentException("Comment content is null or empty");
         comment.setUserId(userService.getCurrentUser().getId());
