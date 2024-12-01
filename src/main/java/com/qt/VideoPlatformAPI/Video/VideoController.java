@@ -40,17 +40,22 @@ public class VideoController {
         HttpStatus.OK, videoService.getVideoById(id)));
     }
 
-    @PostMapping("/{videoId}")
-    public ResponseEntity<APIResponse> updateThumbnail(@PathVariable String videoId, @RequestBody MultipartFile file) throws IOException {
+    @PostMapping("/{videoId}/thumbnail")
+    public ResponseEntity<APIResponseWithData<String>> updateThumbnail(@PathVariable String videoId, @RequestBody MultipartFile file) throws IOException {
         if(file.isEmpty())
             throw new IllegalArgumentException("Please upload a image file");
-        if(videoService.isVideoExistent(videoId))
+        if(!videoService.isVideoExistent(videoId))
             throw new IllegalArgumentException("The video Id does not exist");
 
         Video video = videoService.getVideoById(videoId);
+        String url;
         if(video.getThumbnailUrl() == null || video.getThumbnailUrl().isBlank())
-            cloudinaryService.uploadPhoto(file, "thumbnail", videoId);
-        cloudinaryService.updatePhoto(file, "thumnail", videoId);
-        return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Upload thumbnail successfully", HttpStatus.OK));
+            url = cloudinaryService.uploadPhoto(file, "thumbnail", videoId);
+        else
+            url = cloudinaryService.updatePhoto(file, "thumnail", videoId);
+
+        videoService.updateThumbnailVideo(video, url);
+        return ResponseEntity.ok(new APIResponseWithData<String>(Boolean.TRUE,
+        "Upload thumbnail successfully", HttpStatus.OK, url));
     }
 }

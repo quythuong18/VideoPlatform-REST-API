@@ -51,7 +51,7 @@ public class SecurityConfig {
                         // video
                         .requestMatchers(HttpMethod.POST, "**/videos/new/").authenticated()
                         .requestMatchers(HttpMethod.POST, "**/file/video/{id}").authenticated()
-                        .requestMatchers(HttpMethod.POST, "**/videos/{videoId}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "**/videos/{videoId}/thumbnail").authenticated()
                         .requestMatchers(HttpMethod.GET, "**/videos/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "**/videos/").permitAll()
 

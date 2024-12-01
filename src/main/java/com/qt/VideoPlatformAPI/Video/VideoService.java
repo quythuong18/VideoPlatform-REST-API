@@ -93,7 +93,8 @@ public class VideoService {
         return videoList;
     }
 
-    public void updateThumbnailVideo(String videoId, String thumbnailUrl) {
-
+    public void updateThumbnailVideo(Video video, String thumbnailUrl) {
+        video.setThumbnailUrl(thumbnailUrl);
+        iVideoRepository.save(video);
     }
 }
