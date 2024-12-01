@@ -33,19 +33,18 @@ public class UserProfile extends TimeAudit implements UserDetails {
     @Column(name = "id")
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "username is required")
     @Column(name = "username")
     private String username;
 
-    @NotBlank
     @Column(name = "full_name")
     private String fullName;
 
-    @NotBlank
+    @NotBlank(message = "password is required")
     @Column(name = "password")
     private String password;
 
-    @NotBlank
+    @NotBlank(message = "email is required")
     @Column(name = "email")
     private String email;
 

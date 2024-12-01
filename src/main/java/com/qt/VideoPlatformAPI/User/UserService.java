@@ -1,5 +1,6 @@
 package com.qt.VideoPlatformAPI.User;
 
+import com.qt.VideoPlatformAPI.File.CloudinaryService;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.AvailabilityResponse;
 import jakarta.transaction.Transactional;
@@ -13,7 +14,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -23,6 +26,7 @@ import java.util.Set;
 public class UserService implements UserDetailsService {
     private final IUserRepository userRepository;
     private final IUserConnectionRepository userConnectionRepository;
+    private final CloudinaryService cloudinaryService;
 
     @Override
     public UserProfile loadUserByUsername(String username) {
@@ -114,7 +118,7 @@ public class UserService implements UserDetailsService {
     public UserProfile updateUser(UserProfile newUserInfo) {
         UserProfile currentUser = getCurrentUser();
 
-        currentUser.setUsername(newUserInfo.getUsername());
+        //currentUser.setUsername(newUserInfo.getUsername());
         currentUser.setFullName(newUserInfo.getFullName());
         //currentUser.setEmail(newUserInfo.getFullName());
         currentUser.setBio(newUserInfo.getBio());
@@ -123,5 +127,18 @@ public class UserService implements UserDetailsService {
         currentUser.setPhone(newUserInfo.getPhone());
 
         return userRepository.save(currentUser);
+    }
+
+    @Transactional
+    public String updateProfilePic(MultipartFile img) throws IOException {
+        UserProfile user = getCurrentUser();
+        String url;
+        if(user.getProfilePic() == null || user.getProfilePic().isBlank())
+            url = cloudinaryService.uploadPhoto(img, "profile", user.getId().toString());
+        else
+            url = cloudinaryService.updatePhoto(img, "profile", user.getId().toString());
+        user.setProfilePic(url);
+        userRepository.save(user);
+        return url;
     }
 }

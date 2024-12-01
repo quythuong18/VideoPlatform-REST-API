@@ -21,8 +21,8 @@ public class VideoEnv {
             "video/webm"
     );
     public static final List<String> IMAGE_MIME_TYPES = Arrays.asList(
-            "image/jpeg ",
-            "image/png ",
+            "image/jpeg",
+            "image/png",
             "image/webp"
     );
     public static final Path ROOT_LOCATION = Paths.get("videos-dir");

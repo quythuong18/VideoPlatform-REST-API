@@ -1,5 +1,6 @@
 package com.qt.VideoPlatformAPI.User;
 
+import com.qt.VideoPlatformAPI.Config.VideoEnv;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
 import com.qt.VideoPlatformAPI.Responses.AvailabilityResponse;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Set;
 
 @RestController
@@ -59,8 +61,14 @@ public class UserController {
     }
 
     @PostMapping("/profilePic")
-    ResponseEntity<APIResponseWithData<String>> updateProfilePic(MultipartFile img) {
-        UserProfile user = userService.getCurrentUser();
-        return null;
+    ResponseEntity<APIResponseWithData<String>> updateProfilePic(@RequestBody MultipartFile img) throws IOException {
+        if(img == null)
+            throw new IllegalArgumentException("Please upload a image file");
+        if(!VideoEnv.IMAGE_MIME_TYPES.contains(img.getContentType()))
+            throw new IllegalArgumentException("The image format is not supported");
+
+        String profilePicUrl = userService.updateProfilePic(img);
+        return ResponseEntity.ok(new APIResponseWithData<String>(Boolean.TRUE,
+                "Upload profile picture successfully", HttpStatus.OK, profilePicUrl));
     }
 }
