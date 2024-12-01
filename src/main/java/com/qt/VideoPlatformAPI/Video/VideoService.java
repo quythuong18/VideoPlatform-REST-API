@@ -1,5 +1,6 @@
 package com.qt.VideoPlatformAPI.Video;
 
+import com.qt.VideoPlatformAPI.File.CloudinaryService;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.VideoPlatformApiApplication;
@@ -8,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +18,7 @@ import java.util.Optional;
 public class VideoService {
     private final IVideosRepository iVideoRepository;
     private final UserService userService;
+    private final CloudinaryService cloudinaryService;
 
     public Video addVideo(Video video) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -93,8 +96,15 @@ public class VideoService {
         return videoList;
     }
 
-    public void updateThumbnailVideo(Video video, String thumbnailUrl) {
-        video.setThumbnailUrl(thumbnailUrl);
+    public String updateThumbnailVideo(String videoId, MultipartFile file) throws IOException {
+        Video video = getVideoById(videoId);
+        String url;
+        if(video.getThumbnailUrl() == null || video.getThumbnailUrl().isBlank())
+            url = cloudinaryService.uploadPhoto(file, "thumbnail", videoId);
+        else
+            url = cloudinaryService.updatePhoto(file, "thumbnail", videoId);
+        video.setThumbnailUrl(url);
         iVideoRepository.save(video);
+        return url;
     }
 }

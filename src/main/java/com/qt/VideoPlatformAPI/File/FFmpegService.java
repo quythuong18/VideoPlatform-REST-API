@@ -170,10 +170,12 @@ public class FFmpegService {
         }
         return null;
     }
-    public void getVideoThumbnailFrame(String videoId) throws IOException {
+
+    // this function will
+    public void createVideoThumbnailFrame(String videoId) throws IOException {
         Video v = videoService.getVideoById(videoId);
         if(!v.getIsUploaded())
-            return;
+            throw new IllegalArgumentException("Video has been not uploaded yet");
 
         FFmpegBuilder builder = new FFmpegBuilder();
         try {

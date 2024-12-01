@@ -24,15 +24,20 @@ public class CloudinaryService {
         ));
     }
     public String uploadPhoto(MultipartFile file, String folder, String fileName) throws IOException {
-        Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
-                Map.of("folder", "videoplatform" + "/" + folder,
-                "public_id", fileName));
+        Map options = ObjectUtils.asMap(
+                "folder", "videoplatform" + "/" + folder,
+                "public_id", fileName
+        );
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), options);
         return (String) uploadResult.get("url");
     }
     public String updatePhoto(MultipartFile file, String folder, String fileName) throws IOException {
-        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
-                "public_id", fileName
-        ));
+        Map options = ObjectUtils.asMap(
+                "folder", "videoplatform" + "/" + folder,
+                "public_id", fileName, // Use the same public_id to overwrite
+                "overwrite", true      // Explicitly indicate overwrite (optional)
+        );
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), options);
         return (String) uploadResult.get("url");
     }
 }

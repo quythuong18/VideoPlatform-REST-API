@@ -16,12 +16,17 @@ public class VideoFileProcessingService {
     public void processVideoAsync(String videoId) {
         CompletableFuture.runAsync(() -> {
             try {
+                VideoFileMetadata videoFileMetadata =
                 fFmpegService.createManifestFile(fFmpegService.transcodeVideo(fFmpegService.getVideoFileMetadata(videoId)));
+                fFmpegService.createVideoThumbnailFrame(videoId);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }).thenAccept((res) -> {
             videoService.updateVideoProcessedStatus(videoId);
+            Video v = videoService.getVideoById(videoId);
+//            if(v.getThumbnailUrl() == null || v.getThumbnailUrl().isBlank())
+//                videoService.updateThumbnailVideo(videoId, )
         });
     }
 }
