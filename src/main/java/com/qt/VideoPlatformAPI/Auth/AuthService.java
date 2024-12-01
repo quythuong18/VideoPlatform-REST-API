@@ -70,7 +70,7 @@ public class AuthService {
         if(otpVerification(userVerification)) {
             try {
                 userRepository.activateAccount(userVerification.getUser().getUsername());
-                return new APIResponse(Boolean.FALSE,"Account activated successfully", HttpStatus.OK);
+                return new APIResponse(Boolean.TRUE,"Account activated successfully", HttpStatus.OK);
             }
             catch (Exception e) {
                 System.out.println("Account verification can not update in DB: " + e.getMessage());
