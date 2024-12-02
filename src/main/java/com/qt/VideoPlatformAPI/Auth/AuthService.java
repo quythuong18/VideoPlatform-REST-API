@@ -57,6 +57,8 @@ public class AuthService {
 
         userReq.setIsVerified(Boolean.FALSE);
         userReq.setIsPrivate(Boolean.FALSE);
+        userReq.setFollowerCount(0L);
+        userReq.setFollowingCount(0L);
         UserProfile user = userRepository.save(userReq);
 
         // call the verify account function here

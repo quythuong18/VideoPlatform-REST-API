@@ -65,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "**/comments").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "**/comments").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "**/comments").authenticated()
+                        .requestMatchers(HttpMethod.GET, "**/comments/video/{videoId}").permitAll()
 
                         // playlist
                         .requestMatchers(HttpMethod.POST, "**/playlists/").authenticated()

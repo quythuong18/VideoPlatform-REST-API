@@ -5,6 +5,7 @@ import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -68,5 +69,10 @@ public class CommentService {
 
     public boolean isCommentExistent(String commentId) {
         return iCommentRepository.existsById(commentId);
+    }
+
+    public List<Comment> getAllCommentByVideoId(String videoId) {
+        List<Comment> commentList = iCommentRepository.findAllByVideoId(videoId);
+        return commentList;
     }
 }

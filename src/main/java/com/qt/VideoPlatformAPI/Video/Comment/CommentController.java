@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/comments")
 @AllArgsConstructor
@@ -30,6 +32,15 @@ public class CommentController {
             );
         commentService.deleteComment(commentId);
         return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Deleted a comment successfully", HttpStatus.OK));
+    }
+
+    @GetMapping("/video/{videoId}")
+    public ResponseEntity<APIResponseWithData<List<Comment>>> getAllCommentByVideoId(@PathVariable String videoId) {
+        if(videoId == null || videoId.isBlank())
+            return  ResponseEntity.status(400).body(
+                    new APIResponseWithData<>(Boolean.FALSE, "Video id is null or blank", HttpStatus.BAD_REQUEST, null));
+        return ResponseEntity.ok(new APIResponseWithData<List<Comment>>(Boolean.TRUE, "Get all comment in a video successfully", HttpStatus.OK,
+        commentService.getAllCommentByVideoId(videoId)));
     }
 
     @PatchMapping()
