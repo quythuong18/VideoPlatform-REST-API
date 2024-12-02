@@ -13,9 +13,9 @@ public class LikeController {
     private final LikeService likeService;
     @PostMapping("/{videoId}")
     public ResponseEntity<APIResponse> likeVideo(@PathVariable String videoId) {
-        if(videoId == null || videoId.isEmpty())
+        if(videoId == null || videoId.isBlank())
             return ResponseEntity.status(400).body(
-                    new APIResponse(Boolean.FALSE, "Video id is null or empty", HttpStatus.BAD_REQUEST));
+                    new APIResponse(Boolean.FALSE, "Video id is null or blank", HttpStatus.BAD_REQUEST));
         likeService.LikeVideo(videoId);
         return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Like video successfully", HttpStatus.OK));
     }

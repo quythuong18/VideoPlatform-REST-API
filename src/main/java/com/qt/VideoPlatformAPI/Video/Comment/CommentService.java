@@ -12,6 +12,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class CommentService {
     private final ICommentRepository iCommentRepository;
+    private final ICommentLikeRepository iCommentLikeRepository;
     private final VideoService videoService;
     private final UserService userService;
 
@@ -71,7 +72,7 @@ public class CommentService {
         return iCommentRepository.existsById(commentId);
     }
 
-    public List<Comment> getAllCommentByVideoId(String videoId, boolean acesding) {
+    public List<Comment> getAllCommentByVideoIdByTimestamp(String videoId, boolean acesding) {
         List<Comment> commentList;
         if(acesding)
             commentList = iCommentRepository.findAllByOrderByCreatedAtAsc(videoId);
@@ -79,4 +80,43 @@ public class CommentService {
             commentList = iCommentRepository.findAllByOrderByCreatedAtDesc(videoId);
         return commentList;
     }
+
+    // like comment
+    public CommentLike likeAComment(String commentId) {
+        if(checkLikeComment(commentId))
+            throw new IllegalArgumentException("You've already liked this comment");
+        CommentLike commentLike = new CommentLike();
+        commentLike.setCommentId(commentId);
+        commentLike.setUserId(userService.getCurrentUser().getId());
+
+        increaseCommentLikeCount(commentId);
+        return iCommentLikeRepository.save(commentLike);
+    }
+
+    public void removeALikeComment(String commentId) {
+        Optional<CommentLike> commentLike = iCommentLikeRepository.findByCommentIdAndUserId(commentId,
+                userService.getCurrentUser().getId());
+        if(commentLike.isEmpty())
+            throw new IllegalArgumentException("You've not liked this comment before");
+
+        iCommentLikeRepository.delete(commentLike.get());
+        decreaseCommentLikeCount(commentId);
+    }
+
+    public void increaseCommentLikeCount(String commentId) {
+        Comment comment = getCommentById(commentId);
+        comment.setLikeCount(comment.getLikeCount() + 1);
+        iCommentRepository.save(comment);
+    }
+    public void decreaseCommentLikeCount(String commentId) {
+        Comment comment = getCommentById(commentId);
+        comment.setLikeCount(comment.getLikeCount() - 1);
+        iCommentRepository.save(comment);
+    }
+    public boolean checkLikeComment(String commentId) {
+        Optional<CommentLike> commentLike = iCommentLikeRepository.findByCommentIdAndUserId(commentId,
+                userService.getCurrentUser().getId());
+        return commentLike.isPresent();
+    }
+
 }

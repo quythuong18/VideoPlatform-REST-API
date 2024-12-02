@@ -40,7 +40,7 @@ public class CommentController {
         if(videoId == null || videoId.isBlank())
             return  ResponseEntity.status(400).body(
                     new APIResponseWithData<>(Boolean.FALSE, "Video id is null or blank", HttpStatus.BAD_REQUEST, null));
-        List<Comment> commentList = commentService.getAllCommentByVideoId(videoId, "oldest".equalsIgnoreCase(order));
+        List<Comment> commentList = commentService.getAllCommentByVideoIdByTimestamp(videoId, "oldest".equalsIgnoreCase(order));
         return ResponseEntity.ok(new APIResponseWithData<List<Comment>>(Boolean.TRUE, "Get all comment in a video successfully", HttpStatus.OK,
         commentList));
     }
@@ -52,5 +52,38 @@ public class CommentController {
                     new APIResponseWithData<Comment>(Boolean.FALSE, "Comment is null or empty", HttpStatus.BAD_REQUEST, null)
             );
         return ResponseEntity.ok(new APIResponseWithData<Comment>(Boolean.TRUE, "Updated a comment successfully", HttpStatus.OK, commentService.updateComment(comment)));
+    }
+
+    @PostMapping("/like/{commentId}")
+    public ResponseEntity<APIResponseWithData<CommentLike>> likeAComment(@PathVariable String commentId) {
+        if(commentId == null || commentId.isBlank())
+            return ResponseEntity.status(400).body(
+                    new APIResponseWithData<CommentLike>(Boolean.FALSE, "Comment id is null or blank",
+                    HttpStatus.BAD_REQUEST, null));
+        return ResponseEntity.ok(new APIResponseWithData<CommentLike>(Boolean.TRUE, "Like comment successfully",
+                HttpStatus.OK, commentService.likeAComment(commentId)));
+    }
+
+    @DeleteMapping("/like/{commentId}")
+    public ResponseEntity<APIResponse> removeALikeComment(@PathVariable String commentId) {
+        if(commentId == null || commentId.isBlank())
+            return ResponseEntity.status(400).body(
+                    new APIResponse(Boolean.FALSE, "Comment id is null or blank",
+                            HttpStatus.BAD_REQUEST));
+
+        commentService.removeALikeComment(commentId);
+        return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Unlike comment successfully",
+                HttpStatus.OK));
+    }
+
+    @GetMapping("/like/{commentId}")
+    public ResponseEntity<APIResponse> checkLikeComment(@PathVariable String commentId) {
+        if(commentId == null || commentId.isBlank())
+            return ResponseEntity.status(400).body(
+                    new APIResponse(Boolean.FALSE, "Comment id is null or blank",
+                            HttpStatus.BAD_REQUEST));
+        if(commentService.checkLikeComment(commentId))
+            return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Liked", HttpStatus.OK));
+        return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Not liked yet", HttpStatus.OK));
     }
 }
