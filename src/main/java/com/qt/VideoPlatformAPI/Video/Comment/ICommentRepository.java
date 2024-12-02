@@ -5,5 +5,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface ICommentRepository extends MongoRepository<Comment, String> {
-    List<Comment> findAllByVideoId(String videoId);
+    List<Comment> findAllByOrderByCreatedAtAsc(String videoId);
+    List<Comment> findAllByOrderByCreatedAtDesc(String videoId);
 }

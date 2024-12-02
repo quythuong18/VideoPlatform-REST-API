@@ -71,8 +71,12 @@ public class CommentService {
         return iCommentRepository.existsById(commentId);
     }
 
-    public List<Comment> getAllCommentByVideoId(String videoId) {
-        List<Comment> commentList = iCommentRepository.findAllByVideoId(videoId);
+    public List<Comment> getAllCommentByVideoId(String videoId, boolean acesding) {
+        List<Comment> commentList;
+        if(acesding)
+            commentList = iCommentRepository.findAllByOrderByCreatedAtAsc(videoId);
+        else
+            commentList = iCommentRepository.findAllByOrderByCreatedAtDesc(videoId);
         return commentList;
     }
 }

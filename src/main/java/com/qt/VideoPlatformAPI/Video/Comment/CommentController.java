@@ -35,12 +35,14 @@ public class CommentController {
     }
 
     @GetMapping("/video/{videoId}")
-    public ResponseEntity<APIResponseWithData<List<Comment>>> getAllCommentByVideoId(@PathVariable String videoId) {
+    public ResponseEntity<APIResponseWithData<List<Comment>>> getAllCommentByVideoIdByTimestampOrder(@PathVariable String videoId,
+        @RequestParam(defaultValue = "newest") String order) {
         if(videoId == null || videoId.isBlank())
             return  ResponseEntity.status(400).body(
                     new APIResponseWithData<>(Boolean.FALSE, "Video id is null or blank", HttpStatus.BAD_REQUEST, null));
+        List<Comment> commentList = commentService.getAllCommentByVideoId(videoId, "oldest".equalsIgnoreCase(order));
         return ResponseEntity.ok(new APIResponseWithData<List<Comment>>(Boolean.TRUE, "Get all comment in a video successfully", HttpStatus.OK,
-        commentService.getAllCommentByVideoId(videoId)));
+        commentList));
     }
 
     @PatchMapping()
