@@ -24,6 +24,7 @@ public class Comment extends TimeAudit {
     @NotBlank(message = "Content is required")
     private String content;
     private String replyTo;
+    private List<String> replies;
     private Long likeCount;
     private Long replyCount;
     private Boolean isEdited;

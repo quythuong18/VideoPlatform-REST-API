@@ -2,9 +2,11 @@ package com.qt.VideoPlatformAPI.Video.Comment;
 
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.VideoService;
+import com.sun.tools.jconsole.JConsoleContext;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,10 +19,6 @@ public class CommentService {
     private final UserService userService;
 
     public Comment addAComment(Comment comment) {
-        // check if replyTo exist
-        if(comment.getReplyTo() != null && isCommentExistent(comment.getReplyTo()))
-            throw new IllegalArgumentException("Video with that id does not exist");
-
         // check if video exist
         if(!videoService.isVideoExistent(comment.getVideoId()))
             throw new IllegalArgumentException("Video with that id does not exist");
@@ -34,7 +32,25 @@ public class CommentService {
         comment.setUserId(userService.getCurrentUser().getId());
         comment.setLikeCount(0L);
         comment.setReplyCount(0L);
+        comment.setReplies(new ArrayList<>());
         comment.setIsEdited(Boolean.FALSE);
+
+        // check if replyTo exist
+        if(comment.getReplyTo() != null) {
+            if(isCommentExistent(comment.getReplyTo()))
+                throw new IllegalArgumentException("Comment with that id does not exist");
+            Comment parentComment = getCommentById(comment.getReplyTo());
+
+            videoService.increaseCommentCount(comment.getVideoId());
+            Comment savedComment = iCommentRepository.save(comment);
+
+            // replyCount + 1
+            parentComment.setReplyCount(parentComment.getReplyCount() + 1);
+            // add child to list
+            parentComment.getReplies().add(savedComment.getId());
+            iCommentRepository.save(parentComment);
+            return savedComment;
+        }
 
         videoService.increaseCommentCount(comment.getVideoId());
         return iCommentRepository.save(comment);
@@ -49,8 +65,13 @@ public class CommentService {
 
     public void deleteComment(String commentId) {
         // check if comment exist
-        if(!isCommentExistent(commentId))
+        if(isCommentExistent(commentId))
             throw new IllegalArgumentException("Comment with that id does not exist");
+
+        Comment comment = getCommentById(commentId);
+        if(comment.getReplyTo() != null) {
+            decreaseReplyCount(comment.getReplyTo());
+        }
 
         videoService.decreaseCommentCount(getCommentById(commentId).getVideoId());
         iCommentRepository.deleteById(commentId);
@@ -69,7 +90,7 @@ public class CommentService {
     }
 
     public boolean isCommentExistent(String commentId) {
-        return iCommentRepository.existsById(commentId);
+        return !iCommentRepository.existsById(commentId);
     }
 
     public List<Comment> getAllCommentByVideoIdByTimestamp(String videoId, boolean acesding) {
@@ -79,6 +100,39 @@ public class CommentService {
         else
             commentList = iCommentRepository.findAllByOrderByCreatedAtDesc(videoId);
         return commentList;
+    }
+
+    public List<Comment> getAllParentCommentByVideoIdByTimestamp(String videoId, boolean acesding) {
+        List<Comment> commentList;
+        if(acesding)
+            commentList = iCommentRepository.findAllByOrderByCreatedAtAsc(videoId);
+        else
+            commentList = iCommentRepository.findAllByOrderByCreatedAtDesc(videoId);
+
+        List<Comment> returnList = new ArrayList<>();
+        for(Comment c : commentList) {
+            if(c.getReplyTo() == null) {
+                returnList.add(c);
+            }
+        }
+        return returnList;
+    }
+
+    public List<Comment> getAllChildrenComment(String commentId) {
+        List<Comment> commentChildList;
+        commentChildList = iCommentRepository.findAllByReplyTo(commentId);
+        return commentChildList;
+    }
+
+    public void increaseReplyCount(String commentId) {
+        Comment comment = getCommentById(commentId);
+        comment.setReplyCount(comment.getReplyCount() + 1);
+        iCommentRepository.save(comment);
+    }
+    public void decreaseReplyCount(String commentId) {
+        Comment comment = getCommentById(commentId);
+        comment.setReplyCount(comment.getReplyCount() - 1);
+        iCommentRepository.save(comment);
     }
 
     // like comment
@@ -118,5 +172,4 @@ public class CommentService {
                 userService.getCurrentUser().getId());
         return commentLike.isPresent();
     }
-
 }

@@ -24,8 +24,9 @@ public class CommentController {
 
         return ResponseEntity.ok(new APIResponseWithData<Comment>(Boolean.TRUE, "Added a comment successfully", HttpStatus.OK, commentService.addAComment(comment)));
     }
-    @DeleteMapping()
-    public ResponseEntity<APIResponse> deleteAComment(@RequestParam String commentId) {
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<APIResponse> deleteAComment(@PathVariable String commentId) {
         if(commentId == null)
             return  ResponseEntity.status(400).body(
                     new APIResponseWithData<Comment>(Boolean.FALSE, "Comment id is null or empty", HttpStatus.BAD_REQUEST, null)
@@ -43,6 +44,26 @@ public class CommentController {
         List<Comment> commentList = commentService.getAllCommentByVideoIdByTimestamp(videoId, "oldest".equalsIgnoreCase(order));
         return ResponseEntity.ok(new APIResponseWithData<List<Comment>>(Boolean.TRUE, "Get all comment in a video successfully", HttpStatus.OK,
         commentList));
+    }
+
+    @GetMapping("/video/parent/{videoId}")
+    public ResponseEntity<APIResponseWithData<List<Comment>>> getAllParentCommentByVideoIdByTimestampOrder(@PathVariable String videoId,
+                                                                                                     @RequestParam(defaultValue = "newest") String order) {
+        if(videoId == null || videoId.isBlank())
+            return  ResponseEntity.status(400).body(
+                    new APIResponseWithData<>(Boolean.FALSE, "Video id is null or blank", HttpStatus.BAD_REQUEST, null));
+        List<Comment> commentList = commentService.getAllParentCommentByVideoIdByTimestamp(videoId, "oldest".equalsIgnoreCase(order));
+        return ResponseEntity.ok(new APIResponseWithData<List<Comment>>(Boolean.TRUE, "Get all parent comment in a video successfully", HttpStatus.OK,
+                commentList));
+    }
+
+    @GetMapping("/{commentId}")
+    public ResponseEntity<APIResponseWithData<List<Comment>>> getAllChildrenComment(@PathVariable String commentId) {
+        if(commentId == null || commentId.isBlank())
+            return  ResponseEntity.status(400).body(
+                    new APIResponseWithData<>(Boolean.FALSE, "Comment id is null or blank", HttpStatus.BAD_REQUEST, null));
+        return ResponseEntity.ok(new APIResponseWithData<List<Comment>>(Boolean.TRUE, "Get all children comment in a video successfully",
+        HttpStatus.OK, commentService.getAllChildrenComment(commentId)));
     }
 
     @PatchMapping()
