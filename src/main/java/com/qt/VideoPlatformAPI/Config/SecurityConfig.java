@@ -76,6 +76,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "**/playlists/user/{userId}").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "**/playlists/{playlistId}/add").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "**/playlists/{playlistId}/remove").authenticated()
+                        .requestMatchers(HttpMethod.POST, "**/playlists/{playlistId}/thumbnail").authenticated()
 
                         // serve video manifest file
                         .requestMatchers(HttpMethod.GET, "/**").permitAll()
