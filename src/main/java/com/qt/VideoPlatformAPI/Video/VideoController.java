@@ -37,6 +37,15 @@ public class VideoController {
         HttpStatus.OK, videoService.getVideoById(id)));
     }
 
+    @GetMapping("/random")
+    public ResponseEntity<APIResponseWithData<List<Video>>> getRandomVideos(@RequestParam Integer count) {
+        if(count == null || count <= 0)
+            return ResponseEntity.status(400).body(new APIResponseWithData<>(Boolean.FALSE, "Count value is invalid",
+                    HttpStatus.BAD_REQUEST, null));
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get random videos successfully",
+                HttpStatus.OK, videoService.getRandomVideos(count)));
+    }
+
     @PostMapping("/{videoId}/thumbnail")
     public ResponseEntity<APIResponseWithData<String>> updateThumbnail(@PathVariable String videoId, @RequestBody MultipartFile file) throws IOException {
         if(file.isEmpty())

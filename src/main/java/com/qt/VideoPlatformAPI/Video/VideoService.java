@@ -80,6 +80,9 @@ public class VideoService {
 
         return video.get();
     }
+    public List<Video> getRandomVideos(Integer count) {
+        return iVideoRepository.findRandomVideos(count);
+    }
 
     public Boolean isVideoExistent(String videoId) {
         return iVideoRepository.existsById(videoId);
