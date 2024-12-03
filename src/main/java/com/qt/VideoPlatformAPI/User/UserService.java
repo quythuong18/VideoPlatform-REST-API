@@ -135,6 +135,7 @@ public class UserService implements UserDetailsService {
         //currentUser.setEmail(newUserInfo.getFullName());
         currentUser.setBio(newUserInfo.getBio());
         currentUser.setProfilePic(newUserInfo.getProfilePic());
+        currentUser.setIsPrivate(newUserInfo.getIsPrivate());
         currentUser.setDateOfBirth(newUserInfo.getDateOfBirth());
         currentUser.setPhone(newUserInfo.getPhone());
 

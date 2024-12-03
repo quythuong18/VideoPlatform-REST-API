@@ -71,9 +71,11 @@ public class UserProfile extends TimeAudit implements UserDetails {
     fetch = FetchType.EAGER)
     private List<UserVerification> userVerifications;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserConnection> following = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserConnection> follower = new HashSet<>();
 
