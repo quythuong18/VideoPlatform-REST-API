@@ -15,8 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 public class CommentController {
     private final CommentService commentService;
-    @PostMapping()
-    public ResponseEntity<APIResponseWithData<Comment>> addAComment(@Valid @RequestBody Comment comment) {
+    @PostMapping("/")
+    public ResponseEntity<APIResponseWithData<Comment>> addAComment(@RequestBody Comment comment) {
         if(comment == null)
             return  ResponseEntity.status(400).body(
                     new APIResponseWithData<Comment>(Boolean.FALSE, "Comment is null or empty", HttpStatus.BAD_REQUEST, null)
