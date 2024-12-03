@@ -43,7 +43,8 @@ public class SecurityConfig {
                         .requestMatchers("**/users/checkEmailAvailability").permitAll()
 
                         // user
-                        .requestMatchers(HttpMethod.GET, "**/users/{username}").authenticated()
+                        .requestMatchers(HttpMethod.GET, "**/users/").authenticated()
+                        .requestMatchers(HttpMethod.GET, "**/users/{username}/public").permitAll()
                         .requestMatchers(HttpMethod.POST, "**/users/{username}/follow").authenticated()
                         .requestMatchers(HttpMethod.POST, "**/users/{username}/unfollow").authenticated()
                         .requestMatchers(HttpMethod.GET, "**/users/followings").authenticated()
@@ -63,7 +64,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "**/videos/likes/{videoId}").authenticated()
 
                         // comment
-                        .requestMatchers(HttpMethod.POST, "**/comments").authenticated()
+                        .requestMatchers(HttpMethod.POST, "**/comments/").authenticated()
                         .requestMatchers(HttpMethod.GET, "**/comments/{commentId}").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "**/comments/{commentId}").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "**/comments").authenticated()

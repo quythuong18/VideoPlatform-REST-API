@@ -1,6 +1,7 @@
 package com.qt.VideoPlatformAPI.User;
 
 import com.qt.VideoPlatformAPI.Config.VideoEnv;
+import com.qt.VideoPlatformAPI.DTO.UserPublicDTO;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
 import com.qt.VideoPlatformAPI.Responses.AvailabilityResponse;
@@ -19,11 +20,20 @@ import java.util.Set;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/{username}")
-    ResponseEntity<APIResponseWithData<UserProfile>> getCurrentUserProfile(@PathVariable(name = "username") String username) {
-        UserProfile user = userService.loadUserByUsername(username);
+    @GetMapping("/")
+    ResponseEntity<APIResponseWithData<UserProfile>> getCurrentUserProfile() {
+        UserProfile user = userService.getCurrentUser();
         user.setPassword(null);
         return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "get profile successfully", HttpStatus.OK, user));
+    }
+    @GetMapping("/{username}/public")
+    ResponseEntity<APIResponseWithData<UserPublicDTO>> getAPublicUserProfile(@PathVariable String username) {
+        if(username == null || username.isBlank())
+            return ResponseEntity.status(400).body(new APIResponseWithData<>(Boolean.TRUE, "Get public profile successfully",
+                    HttpStatus.BAD_REQUEST, null));
+
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get public profile successfully",
+            HttpStatus.OK, userService.getAPublicUser(username)));
     }
 
     @GetMapping("/checkUsernameAvailability")

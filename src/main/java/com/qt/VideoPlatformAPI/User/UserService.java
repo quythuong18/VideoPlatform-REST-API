@@ -1,5 +1,6 @@
 package com.qt.VideoPlatformAPI.User;
 
+import com.qt.VideoPlatformAPI.DTO.UserPublicDTO;
 import com.qt.VideoPlatformAPI.File.CloudinaryService;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.AvailabilityResponse;
@@ -30,6 +31,15 @@ public class UserService implements UserDetailsService {
     private final IUserRepository userRepository;
     private final IUserConnectionRepository userConnectionRepository;
     private final CloudinaryService cloudinaryService;
+    private final ModelMapper mapper;
+
+    public UserPublicDTO getAPublicUser(String username) {
+        Optional<UserProfile> userProfileOptional = userRepository.findByUsername(username);
+        if(userProfileOptional.isEmpty())
+            throw new IllegalArgumentException("Username does not exist");
+        UserPublicDTO userPublicDTO = mapper.map(userProfileOptional.get(), UserPublicDTO.class);
+        return userPublicDTO;
+    }
 
     @Override
     public UserProfile loadUserByUsername(String username) {
@@ -49,6 +59,7 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException("Error loading user", e);
         }
     }
+
     public UserProfile getUserByUserId(Long userId) {
         Optional<UserProfile> userProfileOptional = userRepository.findById(userId);
         if(userProfileOptional.isEmpty())
