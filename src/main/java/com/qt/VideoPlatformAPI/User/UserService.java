@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -106,10 +107,12 @@ public class UserService implements UserDetailsService {
 
     public Set<String> getAllFollowings() {
         UserProfile userProfile = getCurrentUser();
-        Set<UserConnection> followings = userProfile.getFollowing();
+        List<UserConnection> userConnectionList = userConnectionRepository.findByFollower(userProfile);
+
         Set<String> usernameList = new HashSet<>();
 
-        followings.forEach(userConnection -> {
+        userConnectionList.forEach(userConnection -> {
+            System.out.println(userConnection);
             usernameList.add(userConnection.getFollowing().getUsername());
         });
         return usernameList;
