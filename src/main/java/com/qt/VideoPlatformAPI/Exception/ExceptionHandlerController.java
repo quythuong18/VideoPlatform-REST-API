@@ -26,6 +26,15 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(response, httpStatus);
     }
 
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<APIResponse> resolveException(UsernameNotFoundException exception) {
+        String message = exception.getMessage();
+        APIResponse response = new APIResponse(Boolean.FALSE, message, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(UsernameNotFoundException.class)
     @ResponseBody
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED)

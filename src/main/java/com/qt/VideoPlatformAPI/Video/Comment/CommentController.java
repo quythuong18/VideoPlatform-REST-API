@@ -22,7 +22,9 @@ public class CommentController {
                     new APIResponseWithData<Comment>(Boolean.FALSE, "Comment is null or empty", HttpStatus.BAD_REQUEST, null)
             );
 
-        return ResponseEntity.ok(new APIResponseWithData<Comment>(Boolean.TRUE, "Added a comment successfully", HttpStatus.OK, commentService.addAComment(comment)));
+        //return "Added a comment successfully";
+        return ResponseEntity.ok(new APIResponseWithData<Comment>(Boolean.TRUE, "Add a comment in a video successfully", HttpStatus.OK,
+                commentService.addAComment(comment)));
     }
 
     @DeleteMapping("/{commentId}")
