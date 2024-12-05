@@ -24,7 +24,8 @@ public class CommentService {
             throw new IllegalArgumentException("Video with that id does not exist");
 
         //check if video comment on or off
-        if(videoService.getVideoById(comment.getVideoId()).getIsCommentOff())
+        Boolean isCommentOff = videoService.getVideoById(comment.getVideoId()).getIsCommentOff();
+        if(isCommentOff == null || !isCommentOff)
             throw new IllegalArgumentException("Video with that id has comment off");
 
         if(comment.getContent() == null || comment.getContent().isEmpty())
