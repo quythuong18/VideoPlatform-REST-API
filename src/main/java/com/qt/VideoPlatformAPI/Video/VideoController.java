@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("api/v1/videos")
@@ -44,6 +45,20 @@ public class VideoController {
                     HttpStatus.BAD_REQUEST, null));
         return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get random videos successfully",
                 HttpStatus.OK, videoService.getRandomVideos(count)));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<APIResponseWithData<?>> getSearchResult(
+            @RequestParam(defaultValue = "video") String type,
+            @RequestParam String pattern,
+            @RequestParam(defaultValue = "6") Integer count
+    ) {
+        if(Objects.equals(type, "tag")) {
+            return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get search result successfully", HttpStatus.OK,
+                    videoService.searchByVideoTag(pattern, count)));
+        }
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get search result successfully", HttpStatus.OK,
+                videoService.searchByVideoTitle(pattern, count)));
     }
 
     @PostMapping("/{videoId}/thumbnail")

@@ -107,4 +107,15 @@ public class VideoService {
         iVideoRepository.save(video);
         return url;
     }
+
+    public List<Video> searchByVideoTitle(String pattern, Integer count) {
+        if(pattern == null || count == null || count <= 0)
+            throw new IllegalArgumentException("Invalid input param");
+        return customVideoRepository.searchByTitle(pattern, count);
+    }
+    public List<Video> searchByVideoTag(String tag, Integer count) {
+        if(tag == null || count == null || count <= 0)
+            throw new IllegalArgumentException("Invalid input param");
+        return customVideoRepository.searchByTag(tag, count);
+    }
 }

@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,5 +23,27 @@ public class CustomVideoRepository {
         AggregationResults<Video> results = mongoTemplate.aggregate(aggregation, "video", Video.class);
 
         return results.getMappedResults();
+    }
+
+    public List<Video> searchByTitle(String searchPattern, Integer count) {
+        Query query = new Query();
+        // Create criteria to search for the substring in the specific field
+        query.addCriteria(Criteria.where("title").regex(searchPattern, "i")); // Case-insensitive regex
+
+        query.limit(count);
+
+        // Use count() to get the number of matching documents
+        return mongoTemplate.find(query, Video.class, "video");
+    }
+    public List<Video> searchByTag(String tag, Integer count) {
+        Query query = new Query();
+
+        // Search for videos where "tags" array contains the specified tag
+        query.addCriteria(Criteria.where("tags").in(tag));
+
+        query.limit(count);
+
+        // Execute the query and return the results
+        return mongoTemplate.find(query, Video.class, "video");
     }
 }
