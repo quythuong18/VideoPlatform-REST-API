@@ -96,18 +96,18 @@ public class CommentService {
     public List<Comment> getAllCommentByVideoIdByTimestamp(String videoId, boolean acesding) {
         List<Comment> commentList;
         if(acesding)
-            commentList = iCommentRepository.findAllByOrderByCreatedAtAsc(videoId);
+            commentList = iCommentRepository.findAllByVideoIdOrderByCreatedAtAsc(videoId);
         else
-            commentList = iCommentRepository.findAllByOrderByCreatedAtDesc(videoId);
+            commentList = iCommentRepository.findAllByVideoIdOrderByCreatedAtDesc(videoId);
         return commentList;
     }
 
     public List<Comment> getAllParentCommentByVideoIdByTimestamp(String videoId, boolean acesding) {
         List<Comment> commentList;
         if(acesding)
-            commentList = iCommentRepository.findAllByOrderByCreatedAtAsc(videoId);
+            commentList = iCommentRepository.findAllByVideoIdOrderByCreatedAtAsc(videoId);
         else
-            commentList = iCommentRepository.findAllByOrderByCreatedAtDesc(videoId);
+            commentList = iCommentRepository.findAllByVideoIdOrderByCreatedAtDesc(videoId);
 
         List<Comment> returnList = new ArrayList<>();
         for(Comment c : commentList) {
