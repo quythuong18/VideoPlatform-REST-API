@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -39,5 +40,14 @@ public class CloudinaryService {
         );
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(), options);
         return (String) uploadResult.get("url");
+    }
+    public String uploadThumbnailFromVideo(File file, String filename) throws IOException {
+         Map uploadOptions = ObjectUtils.asMap(
+                    "folder", "videoplatform/thumbnail",
+                    "public_id", filename
+            );
+         Map uploadResult = cloudinary.uploader().upload(file, uploadOptions);
+        System.out.println(uploadResult.get("url"));
+         return (String) uploadResult.get("url");
     }
 }

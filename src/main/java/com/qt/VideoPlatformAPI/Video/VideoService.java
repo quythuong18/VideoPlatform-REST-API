@@ -3,7 +3,6 @@ package com.qt.VideoPlatformAPI.Video;
 import com.qt.VideoPlatformAPI.File.CloudinaryService;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
-import com.qt.VideoPlatformAPI.VideoPlatformApiApplication;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -27,6 +26,7 @@ public class VideoService {
 
         // set more information for the video
         video.setUserId(user.getId());
+
         video.setLikesCount(0L);
         video.setViewsCount(0L);
         video.setCommentsCount(0L);
@@ -96,7 +96,7 @@ public class VideoService {
         return videoList;
     }
 
-    public String updateThumbnailVideo(String videoId, MultipartFile file) throws IOException {
+    public String uploadThumbnailVideo(String videoId, MultipartFile file) throws IOException {
         Video video = getVideoById(videoId);
         String url;
         if(video.getThumbnailUrl() == null || video.getThumbnailUrl().isBlank())
@@ -106,6 +106,12 @@ public class VideoService {
         video.setThumbnailUrl(url);
         iVideoRepository.save(video);
         return url;
+    }
+
+    public void updateThumbnailUrl(String videoId, String url) {
+        Video video = getVideoById(videoId);
+        video.setThumbnailUrl(url);
+        iVideoRepository.save(video);
     }
 
     public List<Video> searchByVideoTitle(String pattern, Integer count) {

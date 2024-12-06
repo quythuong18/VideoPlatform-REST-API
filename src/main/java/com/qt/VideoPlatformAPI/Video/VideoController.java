@@ -68,7 +68,7 @@ public class VideoController {
         if(!videoService.isVideoExistent(videoId))
             throw new IllegalArgumentException("The video Id does not exist");
 
-        String thumbnailUrl = videoService.updateThumbnailVideo(videoId, file);
+        String thumbnailUrl = videoService.uploadThumbnailVideo(videoId, file);
 
         return ResponseEntity.ok(new APIResponseWithData<String>(Boolean.TRUE,
         "Upload thumbnail successfully", HttpStatus.OK, thumbnailUrl));

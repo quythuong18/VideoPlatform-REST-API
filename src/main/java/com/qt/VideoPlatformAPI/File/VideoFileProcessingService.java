@@ -14,8 +14,9 @@ import java.util.concurrent.CompletableFuture;
 @Component
 @AllArgsConstructor
 public class VideoFileProcessingService {
-    FFmpegService fFmpegService;
-    VideoService videoService;
+    private FFmpegService fFmpegService;
+    private VideoService videoService;
+    private CloudinaryService cloudinaryService;
     public void processVideoAsync(String videoId) {
         CompletableFuture.runAsync(() -> {
             try {
@@ -34,8 +35,9 @@ public class VideoFileProcessingService {
                 if (!file.exists()) {
                     throw new IllegalArgumentException("File not found at path: " + filePath);
                 }
+
                 try {
-                    videoService.updateThumbnailVideo(videoId, (MultipartFile) file);
+                    videoService.updateThumbnailUrl(videoId, cloudinaryService.uploadThumbnailFromVideo(file, videoId));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
