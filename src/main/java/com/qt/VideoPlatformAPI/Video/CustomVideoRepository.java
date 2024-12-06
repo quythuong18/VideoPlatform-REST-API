@@ -30,6 +30,10 @@ public class CustomVideoRepository {
         // Create criteria to search for the substring in the specific field
         query.addCriteria(Criteria.where("title").regex(searchPattern, "i")); // Case-insensitive regex
 
+        query.addCriteria(Criteria.where("isPrivate").is(false));
+        query.addCriteria(Criteria.where("isUploaded").is(true));
+        query.addCriteria(Criteria.where("isProcessed").is(true));
+
         query.limit(count);
 
         // Use count() to get the number of matching documents
@@ -40,6 +44,10 @@ public class CustomVideoRepository {
 
         // Search for videos where "tags" array contains the specified tag
         query.addCriteria(Criteria.where("tags").in(tag));
+
+        query.addCriteria(Criteria.where("isPrivate").is(false));
+        query.addCriteria(Criteria.where("isUploaded").is(true));
+        query.addCriteria(Criteria.where("isProcessed").is(true));
 
         query.limit(count);
 

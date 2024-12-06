@@ -49,7 +49,7 @@ public class VideoController {
 
     @GetMapping("/search")
     public ResponseEntity<APIResponseWithData<?>> getSearchResult(
-            @RequestParam(defaultValue = "video") String type,
+            @RequestParam(defaultValue = "title") String type,
             @RequestParam String pattern,
             @RequestParam(defaultValue = "6") Integer count
     ) {
