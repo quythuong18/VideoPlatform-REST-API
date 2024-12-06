@@ -30,8 +30,15 @@ public class UserService implements UserDetailsService {
     private final CloudinaryService cloudinaryService;
     private final ModelMapper mapper;
 
-    public UserPublicDTO getAPublicUser(String username) {
+    public UserPublicDTO getAPublicUserByUsername(String username) {
         Optional<UserProfile> userProfileOptional = userRepository.findByUsername(username);
+        if(userProfileOptional.isEmpty())
+            throw new IllegalArgumentException("Username does not exist");
+        return mapper.map(userProfileOptional.get(), UserPublicDTO.class);
+    }
+
+    public UserPublicDTO getAPublicUserById(Long userId) {
+        Optional<UserProfile> userProfileOptional = userRepository.findById(userId);
         if(userProfileOptional.isEmpty())
             throw new IllegalArgumentException("Username does not exist");
         return mapper.map(userProfileOptional.get(), UserPublicDTO.class);

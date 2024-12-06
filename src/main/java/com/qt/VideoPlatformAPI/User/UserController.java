@@ -28,14 +28,24 @@ public class UserController {
         return ResponseEntity.ok(new APIResponseWithData<UserProfile>(Boolean.TRUE, "get profile successfully",
         HttpStatus.OK, user));
     }
-    @GetMapping("/{username}/public")
-    ResponseEntity<APIResponseWithData<UserPublicDTO>> getAPublicUserProfile(@PathVariable String username) {
+    @GetMapping("/{username}/public-username")
+    ResponseEntity<APIResponseWithData<UserPublicDTO>> getAPublicUserProfileByUsername(@PathVariable String username) {
         if(username == null || username.isBlank())
             return ResponseEntity.status(400).body(new APIResponseWithData<>(Boolean.TRUE, "Get public profile successfully",
                     HttpStatus.BAD_REQUEST, null));
 
         return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get public profile successfully",
-            HttpStatus.OK, userService.getAPublicUser(username)));
+            HttpStatus.OK, userService.getAPublicUserByUsername(username)));
+    }
+
+    @GetMapping("/{userId}/public-id")
+    ResponseEntity<APIResponseWithData<UserPublicDTO>> getAPublicUserProfileByUserId(@PathVariable Long userId) {
+        if(userId == null)
+            return ResponseEntity.status(400).body(new APIResponseWithData<>(Boolean.FALSE, "userId null",
+                    HttpStatus.BAD_REQUEST, null));
+
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get public profile successfully",
+                HttpStatus.OK, userService.getAPublicUserById(userId)));
     }
 
     @GetMapping("/checkUsernameAvailability")
