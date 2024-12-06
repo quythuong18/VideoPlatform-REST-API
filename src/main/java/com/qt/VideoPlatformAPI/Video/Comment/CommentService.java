@@ -2,7 +2,6 @@ package com.qt.VideoPlatformAPI.Video.Comment;
 
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.VideoService;
-import com.sun.tools.jconsole.JConsoleContext;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

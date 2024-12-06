@@ -19,6 +19,7 @@ public class VideoService {
     private final IVideosRepository iVideoRepository;
     private final UserService userService;
     private final CloudinaryService cloudinaryService;
+    private final CustomVideoRepository customVideoRepository;
 
     public Video addVideo(Video video) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -82,7 +83,7 @@ public class VideoService {
     }
 
     public List<Video> getRandomVideos(Integer count) {
-        return iVideoRepository.findRandomVideos(count);
+        return customVideoRepository.getRandomVideos(count);
     }
 
     public Boolean isVideoExistent(String videoId) {

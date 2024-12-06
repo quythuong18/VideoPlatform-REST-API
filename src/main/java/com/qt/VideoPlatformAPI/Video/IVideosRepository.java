@@ -10,7 +10,4 @@ import java.util.Optional;
 public interface IVideosRepository extends MongoRepository<Video, String> {
     public Optional<Video> findById(String id);
     public List<Video> findAllByUserId(Long userId);
-
-    @Query(value = "{}", sort = "{ $sample: { size: ?0 } }")
-    public List<Video> findRandomVideos(Integer count);
 }
