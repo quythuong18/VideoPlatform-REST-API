@@ -45,6 +45,7 @@ public class SecurityConfig {
                         // user
                         .requestMatchers(HttpMethod.GET, "**/users/").authenticated()
                         .requestMatchers(HttpMethod.GET, "**/users/{username}/public").permitAll()
+                        .requestMatchers(HttpMethod.GET, "**/users/search").permitAll()
                         .requestMatchers(HttpMethod.POST, "**/users/{username}/follow").authenticated()
                         .requestMatchers(HttpMethod.POST, "**/users/{username}/unfollow").authenticated()
                         .requestMatchers(HttpMethod.GET, "**/users/followings").authenticated()

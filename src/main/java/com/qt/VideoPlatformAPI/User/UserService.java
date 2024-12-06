@@ -20,10 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.text.html.Option;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @AllArgsConstructor
@@ -37,8 +34,7 @@ public class UserService implements UserDetailsService {
         Optional<UserProfile> userProfileOptional = userRepository.findByUsername(username);
         if(userProfileOptional.isEmpty())
             throw new IllegalArgumentException("Username does not exist");
-        UserPublicDTO userPublicDTO = mapper.map(userProfileOptional.get(), UserPublicDTO.class);
-        return userPublicDTO;
+        return mapper.map(userProfileOptional.get(), UserPublicDTO.class);
     }
 
     @Override
@@ -181,5 +177,14 @@ public class UserService implements UserDetailsService {
         user.setProfilePic(url);
         userRepository.save(user);
         return url;
+    }
+
+    public List<UserPublicDTO> searchByUsername(String searchPattern) {
+        List<UserProfile> userProfileList = userRepository.findByUsernameContaining(searchPattern);
+        List<UserPublicDTO> userPublicDTOList = new ArrayList<>();
+        for(UserProfile u : userProfileList) {
+            userPublicDTOList.add(mapper.map(u, UserPublicDTO.class));
+        }
+        return userPublicDTOList;
     }
 }

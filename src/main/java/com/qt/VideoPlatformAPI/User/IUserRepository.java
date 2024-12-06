@@ -4,11 +4,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface IUserRepository extends JpaRepository<UserProfile, Long> {
 
     Optional<UserProfile> findByUsername(String username);
+
+    List<UserProfile> findByUsernameContaining(String username);
 
     @Query("SELECT p FROM UserProfile p WHERE p.email = ?1")
     Optional<UserProfile> findByEmail(String email);

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -61,6 +62,16 @@ public class UserController {
     public ResponseEntity<APIResponseWithData<Set<String>>> getAllFollowings() {
         return ResponseEntity.ok(new APIResponseWithData<Set<String>>(Boolean.TRUE,
                 "Get all followings successfully", HttpStatus.OK, userService.getAllFollowings()));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<APIResponseWithData<List<UserPublicDTO>>> searchByUsername(@RequestParam String pattern) {
+        if(pattern == null || pattern.isBlank()) {
+            return ResponseEntity.status(400).body(new APIResponseWithData<>(Boolean.FALSE, "Search pattern is blank or null",
+                    HttpStatus.BAD_REQUEST, null));
+        }
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Search by username successfully", HttpStatus.OK,
+                userService.searchByUsername(pattern)));
     }
 
     @PutMapping("/")
