@@ -61,7 +61,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             setErrorResponse(HttpStatus.UNAUTHORIZED, response, "JWT malformed");
         }
         //...
-        filterChain.doFilter(request, response);
     }
     private void setErrorResponse(HttpStatus status, HttpServletResponse response, String message) throws IOException {
 
