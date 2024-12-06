@@ -24,7 +24,8 @@ public class UserController {
     ResponseEntity<APIResponseWithData<UserProfile>> getCurrentUserProfile() {
         UserProfile user = userService.getCurrentUser();
         user.setPassword(null);
-        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "get profile successfully", HttpStatus.OK, user));
+        return ResponseEntity.ok(new APIResponseWithData<UserProfile>(Boolean.TRUE, "get profile successfully",
+        HttpStatus.OK, user));
     }
     @GetMapping("/{username}/public")
     ResponseEntity<APIResponseWithData<UserPublicDTO>> getAPublicUserProfile(@PathVariable String username) {

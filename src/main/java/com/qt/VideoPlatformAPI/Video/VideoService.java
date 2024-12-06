@@ -80,6 +80,7 @@ public class VideoService {
 
         return video.get();
     }
+
     public List<Video> getRandomVideos(Integer count) {
         return iVideoRepository.findRandomVideos(count);
     }

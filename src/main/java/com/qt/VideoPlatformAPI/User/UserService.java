@@ -93,12 +93,9 @@ public class UserService implements UserDetailsService {
         userConnection.setFollower(follower);
         userConnection.setFollowing(following);
 
-        try {
-            userConnectionRepository.save(userConnection);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
+
+        increaseFollowsCount(follower, following);
+        userConnectionRepository.save(userConnection);
         return new APIResponse(Boolean.TRUE, "Follow " + following.getUsername() + " successfully", HttpStatus.OK);
     }
     public APIResponse unfollowAUser(String username) {
@@ -111,9 +108,29 @@ public class UserService implements UserDetailsService {
         Optional<UserConnection> userConnectionOptional =
         userConnectionRepository.findByFollowerAndFollowing(follower, following);
 
+        decreaseFollowsCount(follower, following);
         userConnectionRepository.delete(userConnectionOptional.get());
 
         return new APIResponse(Boolean.TRUE, "You unfollow " + following.getUsername() + " successfully", HttpStatus.OK);
+    }
+
+    public void increaseFollowsCount(UserProfile follower, UserProfile following) {
+        if(follower.getFollowerCount() == null)
+            follower.setFollowerCount(0L);
+        if(following.getFollowingCount() == null)
+            follower.setFollowingCount(0L);
+
+        follower.setFollowerCount(follower.getFollowerCount() + 1);
+        following.setFollowingCount(following.getFollowingCount() + 1);
+        userRepository.save(follower);
+        userRepository.save(following);
+    }
+
+    public void decreaseFollowsCount(UserProfile follower, UserProfile following) {
+        follower.setFollowerCount(follower.getFollowerCount() - 1);
+        following.setFollowingCount(following.getFollowingCount() - 1);
+        userRepository.save(follower);
+        userRepository.save(following);
     }
 
     public Set<String> getAllFollowings() {
