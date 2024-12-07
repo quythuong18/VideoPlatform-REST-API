@@ -99,6 +99,7 @@ public class UserService implements UserDetailsService {
         userConnectionRepository.save(userConnection);
         return new APIResponse(Boolean.TRUE, "Follow " + following.getUsername() + " successfully", HttpStatus.OK);
     }
+
     public APIResponse unfollowAUser(String username) {
         UserProfile following = loadUserByUsername(username);
         UserProfile follower = getCurrentUser();
@@ -113,6 +114,14 @@ public class UserService implements UserDetailsService {
         userConnectionRepository.delete(userConnectionOptional.get());
 
         return new APIResponse(Boolean.TRUE, "You unfollow " + following.getUsername() + " successfully", HttpStatus.OK);
+    }
+
+    public Boolean hasFollowed(String username) {
+        UserProfile follower = getCurrentUser();
+        UserProfile following = loadUserByUsername(username);
+        if(userConnectionRepository.existsByFollowerAndFollowing(follower, following))
+            return true;
+        return false;
     }
 
     public void increaseFollowsCount(UserProfile follower, UserProfile following) {

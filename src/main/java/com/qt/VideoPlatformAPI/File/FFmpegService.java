@@ -85,27 +85,31 @@ public class FFmpegService {
                 // get the file extension
                 v.setFileExtension(FileSystemStorageService.getFileExtensionFromOriginalName(v.getPathName()));
 
-                try {
-                    builder.setInput(v.getPathName())
-                            .addOutput(VideoDir + "/" + quality.toString() + v.getFileExtension())
-                            // video
-                            .addExtraArgs("-map", "0:v:0")
-                            .setVideoCodec("libx264")
-                            .setVideoBitRate(newVideoBitrate)
-                            .setVideoResolution(newWidth, newHeight)
-                            // audio
-                            .addExtraArgs("-map", "0:a:0")
-                            .setAudioCodec("aac")
-                            .setAudioBitRate(newAudioBitrate)
+//                try {
+//                    builder
+//                            .addExtraArgs("-hwaccel", "cuda")
+//                            . setInput(v.getPathName())
+//                            .addOutput(VideoDir + "/" + quality.toString() + v.getFileExtension())
+//                            // video
+//                            .addExtraArgs("-map", "0:v:0")
+//                            .setVideoCodec("h264_nvenc")
+//                            .setVideoBitRate(newVideoBitrate)
+//                            .setVideoResolution(newWidth, newHeight)
+//                            // audio
+//                            .addExtraArgs("-map", "0:a:0")
+//                            .setAudioCodec("aac")
+//                            .setAudioBitRate(newAudioBitrate)
+//
+//                            .addExtraArgs("-init_seg_name", quality.toString() + "-init-stream-$RepresentationID$.m4s")
+//                            .addExtraArgs("-media_seg_name", quality.toString() + "-chunk-stream-$RepresentationID$-$Number%05d$.m4s")
+//                            .setFormat("dash")
+//                            .done();
+//                    ffmpeg.run(builder);
+//                } catch (Exception e) {
+//                    throw new RuntimeException(e);
+//                }
 
-                            .addExtraArgs("-init_seg_name", quality.toString() + "-init-stream-$RepresentationID$.m4s")
-                            .addExtraArgs("-media_seg_name", quality.toString() + "-chunk-stream-$RepresentationID$-$Number%05d$.m4s")
-                            .setFormat("dash")
-                            .done();
-                    ffmpeg.run(builder);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+
             }
         }
         return v;

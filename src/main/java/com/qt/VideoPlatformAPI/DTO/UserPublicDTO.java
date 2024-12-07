@@ -9,6 +9,7 @@ public class UserPublicDTO {
     private String username;
     private String fullName;
     private String profilePic;
+    private String bio;
     private String dateOfBirth;
     private String followerCount;
     private String followingCount;
