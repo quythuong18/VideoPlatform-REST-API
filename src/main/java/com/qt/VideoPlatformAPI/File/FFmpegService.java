@@ -85,31 +85,29 @@ public class FFmpegService {
                 // get the file extension
                 v.setFileExtension(FileSystemStorageService.getFileExtensionFromOriginalName(v.getPathName()));
 
-//                try {
-//                    builder
-//                            .addExtraArgs("-hwaccel", "cuda")
-//                            . setInput(v.getPathName())
-//                            .addOutput(VideoDir + "/" + quality.toString() + v.getFileExtension())
-//                            // video
-//                            .addExtraArgs("-map", "0:v:0")
-//                            .setVideoCodec("h264_nvenc")
-//                            .setVideoBitRate(newVideoBitrate)
-//                            .setVideoResolution(newWidth, newHeight)
-//                            // audio
-//                            .addExtraArgs("-map", "0:a:0")
-//                            .setAudioCodec("aac")
-//                            .setAudioBitRate(newAudioBitrate)
-//
-//                            .addExtraArgs("-init_seg_name", quality.toString() + "-init-stream-$RepresentationID$.m4s")
-//                            .addExtraArgs("-media_seg_name", quality.toString() + "-chunk-stream-$RepresentationID$-$Number%05d$.m4s")
-//                            .setFormat("dash")
-//                            .done();
-//                    ffmpeg.run(builder);
-//                } catch (Exception e) {
-//                    throw new RuntimeException(e);
-//                }
+                try {
+                    builder
+                            .addExtraArgs("-hwaccel", "cuda")
+                            . setInput(v.getPathName())
+                            .addOutput(VideoDir + "/" + quality.toString() + v.getFileExtension())
+                            // video
+                            .addExtraArgs("-map", "0:v:0")
+                            .setVideoCodec("h264_nvenc")
+                            .setVideoBitRate(newVideoBitrate)
+                            .setVideoResolution(newWidth, newHeight)
+                            // audio
+                            .addExtraArgs("-map", "0:a:0")
+                            .setAudioCodec("aac")
+                            .setAudioBitRate(newAudioBitrate)
 
-
+                            .addExtraArgs("-init_seg_name", quality.toString() + "-init-stream-$RepresentationID$.m4s")
+                            .addExtraArgs("-media_seg_name", quality.toString() + "-chunk-stream-$RepresentationID$-$Number%05d$.m4s")
+                            .setFormat("dash")
+                            .done();
+                    ffmpeg.run(builder);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         return v;
@@ -118,33 +116,23 @@ public class FFmpegService {
     // because of some problems we dont use bramp/ffmpeg-cli-wrapper here
     // instead we use process builder directly
     public VideoFileMetadata createManifestFile(VideoFileMetadata v) throws IOException {
-
         List<String> command = new ArrayList<>();
         command.add(ffmpeg.getPath());
 
         String videoDir = VideoEnv.ROOT_LOCATION + "/" + v.getId();
         for(Integer quality : v.getQualities()) {
-//            command.add("-re");
             command.add("-i");
             command.add(quality.toString() + v.getFileExtension());
         }
-
         StringBuilder stream = new StringBuilder("0");
-
         for(int i = 0; i < v.getQualities().size(); i++) {
             command.add("-map");
             command.add(String.valueOf(String.valueOf(i)));
             stream.append(",").append(Integer.toString(i));
         }
-
         command.add("-f");
         command.add("dash");
-
-//        command.add("-adaptation_sets");
-//        command.add("\"id=0,streams=" + stream + " id=1,streams=" + stream + "\"");
-
         command.add("output.mpd");
-
         // run the command here
         try {
             System.out.println("Executing command:");
