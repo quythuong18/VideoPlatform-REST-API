@@ -27,6 +27,17 @@ public class CommentController {
                 commentService.addAComment(comment)));
     }
 
+    @GetMapping("/{commentId}")
+    public ResponseEntity<APIResponseWithData<Comment>>  getACommentById(@PathVariable String commentId) {
+        if(commentId == null || commentId.isBlank())
+            return  ResponseEntity.status(400).body(
+                    new APIResponseWithData<Comment>(Boolean.FALSE, "Comment id is null or empty", HttpStatus.BAD_REQUEST, null)
+            );
+        return ResponseEntity.ok(new APIResponseWithData(Boolean.FALSE, "Get comment by id successfully", HttpStatus.OK,
+                commentService.getCommentById(commentId)));
+
+    }
+
     @DeleteMapping("/{commentId}")
     public ResponseEntity<APIResponse> deleteAComment(@PathVariable String commentId) {
         if(commentId == null)
@@ -59,7 +70,7 @@ public class CommentController {
                 commentList));
     }
 
-    @GetMapping("/{commentId}")
+    @GetMapping("/{commentId}/children")
     public ResponseEntity<APIResponseWithData<List<Comment>>> getAllChildrenComment(@PathVariable String commentId) {
         if(commentId == null || commentId.isBlank())
             return  ResponseEntity.status(400).body(
