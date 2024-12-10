@@ -10,4 +10,5 @@ public interface ICommentRepository extends MongoRepository<Comment, String> {
     List<Comment> findAllByUserIdOrderByCreatedAtAsc(String userId);
     List<Comment> findAllByUserIdOrderByCreatedAtDesc(String userId);
     List<Comment> findAllByReplyTo(String replyTo);
+    List<Comment> findAllByUserId(Long userId);
 }

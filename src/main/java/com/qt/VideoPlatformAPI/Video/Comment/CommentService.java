@@ -1,5 +1,6 @@
 package com.qt.VideoPlatformAPI.Video.Comment;
 
+import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
@@ -63,6 +64,11 @@ public class CommentService {
         return commentOptional.get();
     }
 
+    public List<Comment> getAllCommentOfCurrentUser() {
+        UserProfile userProfile = userService.getCurrentUser();
+        return iCommentRepository.findAllByUserId(userProfile.getId());
+    }
+
     public void deleteComment(String commentId) {
         // check if comment exist
         if(isCommentExistent(commentId))
@@ -124,11 +130,6 @@ public class CommentService {
         return commentChildList;
     }
 
-    public void increaseReplyCount(String commentId) {
-        Comment comment = getCommentById(commentId);
-        comment.setReplyCount(comment.getReplyCount() + 1);
-        iCommentRepository.save(comment);
-    }
     public void decreaseReplyCount(String commentId) {
         Comment comment = getCommentById(commentId);
         comment.setReplyCount(comment.getReplyCount() - 1);

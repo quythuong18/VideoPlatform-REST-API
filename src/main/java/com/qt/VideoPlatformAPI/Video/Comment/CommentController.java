@@ -33,7 +33,7 @@ public class CommentController {
             return  ResponseEntity.status(400).body(
                     new APIResponseWithData<Comment>(Boolean.FALSE, "Comment id is null or empty", HttpStatus.BAD_REQUEST, null)
             );
-        return ResponseEntity.ok(new APIResponseWithData(Boolean.FALSE, "Get comment by id successfully", HttpStatus.OK,
+        return ResponseEntity.ok(new APIResponseWithData(Boolean.TRUE, "Get comment by id successfully", HttpStatus.OK,
                 commentService.getCommentById(commentId)));
 
     }
@@ -110,6 +110,11 @@ public class CommentController {
                 HttpStatus.OK));
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<APIResponseWithData<List<Comment>>> getAllCommentOfCurentUser() {
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "get all my comments successfully",
+                HttpStatus.OK, commentService.getAllCommentOfCurrentUser()));
+    }
     @GetMapping("/like/{commentId}")
     public ResponseEntity<APIResponse> checkLikeComment(@PathVariable String commentId) {
         if(commentId == null || commentId.isBlank())

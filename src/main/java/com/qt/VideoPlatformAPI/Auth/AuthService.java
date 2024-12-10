@@ -178,7 +178,7 @@ public class AuthService {
         //generate OTP and send it to user
         String otpVerification = OTPGenerator.generate(6);
         String textMessage = "This is OTP to activate your account\n" +
-                            "It will expire in 60 seconds\n" +
+                            "It will expire in 150 seconds\n" +
                             otpVerification;
 
         System.out.println(textMessage);
@@ -189,7 +189,7 @@ public class AuthService {
         UserVerification userVerification = new UserVerification();
         userVerification.setUser(user);
         userVerification.setOtpCode(otpVerification);
-        userVerification.setExpirationTime(Instant.now().plusSeconds(60));
+        userVerification.setExpirationTime(Instant.now().plusSeconds(120));
 
 //        userVerificationRepository.save(userVerification);
         try {
