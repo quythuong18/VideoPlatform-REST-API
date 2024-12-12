@@ -79,7 +79,7 @@ public class CommentController {
         HttpStatus.OK, commentService.getAllChildrenComment(commentId)));
     }
 
-    @PutMapping()
+    @PutMapping("")
     public ResponseEntity<APIResponseWithData<Comment>> updateAComment(@RequestBody Comment comment) {
         if(comment == null)
             return  ResponseEntity.status(400).body(

@@ -2,17 +2,24 @@ package com.qt.VideoPlatformAPI.Video.Comment;
 
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
+import com.qt.VideoPlatformAPI.Video.Video;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
 
 @Component
 @AllArgsConstructor
 public class CommentService {
+    private static final Logger logger = Logger.getLogger(CommentService.class.getName());
     private final ICommentRepository iCommentRepository;
     private final ICommentLikeRepository iCommentLikeRepository;
     private final VideoService videoService;
@@ -44,6 +51,7 @@ public class CommentService {
 
             videoService.increaseCommentCount(comment.getVideoId());
             Comment savedComment = iCommentRepository.save(comment);
+            savedComment.setVideoId(parentComment.getVideoId()); // set the video id for the child comment
 
             // replyCount + 1
             parentComment.setReplyCount(parentComment.getReplyCount() + 1);
@@ -75,6 +83,23 @@ public class CommentService {
             throw new IllegalArgumentException("Comment with that id does not exist");
 
         Comment comment = getCommentById(commentId);
+        Long userId = userService.getCurrentUser().getId();
+        // check the user - who delete the comment, owner or video owner,
+        // they both have the right to delete this comment
+        if(userId != comment.getUserId() && userId != videoService.getVideoById(comment.getVideoId()).getUserId()) {
+            throw new AccessDeniedException("You are not authorized to delete this comment");
+        }
+
+        // delete all the child comment(recursion async)
+        CompletableFuture.runAsync(() -> {
+            List<String> childrenComment = comment.getReplies();
+            for(String child : childrenComment) {
+                iCommentRepository.deleteById(child);
+            }
+        }).thenAccept((res) -> {
+            logger.info("Deleted all children comment");
+        });
+
         if(comment.getReplyTo() != null) {
             decreaseReplyCount(comment.getReplyTo());
         }
@@ -89,6 +114,10 @@ public class CommentService {
             throw new IllegalArgumentException("Comment with that id does not exist");
 
         Comment updatedComment = getCommentById(comment.getId());
+
+        if(userService.getCurrentUser().getId() != updatedComment.getUserId())
+            throw new AccessDeniedException("You are not authorized to update this comment");
+
         updatedComment.setIsEdited(Boolean.TRUE);
         updatedComment.setContent(comment.getContent());
 
