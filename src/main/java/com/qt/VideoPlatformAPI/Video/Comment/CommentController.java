@@ -61,7 +61,7 @@ public class CommentController {
 
     @GetMapping("/video/parent/{videoId}")
     public ResponseEntity<APIResponseWithData<List<Comment>>> getAllParentCommentByVideoIdByTimestampOrder(@PathVariable String videoId,
-                                                                                                     @RequestParam(defaultValue = "newest") String order) {
+                                            @RequestParam(defaultValue = "newest") String order) {
         if(videoId == null || videoId.isBlank())
             return  ResponseEntity.status(400).body(
                     new APIResponseWithData<>(Boolean.FALSE, "Video id is null or blank", HttpStatus.BAD_REQUEST, null));
@@ -71,12 +71,15 @@ public class CommentController {
     }
 
     @GetMapping("/{commentId}/children")
-    public ResponseEntity<APIResponseWithData<List<Comment>>> getAllChildrenComment(@PathVariable String commentId) {
+    public ResponseEntity<APIResponseWithData<List<Comment>>> getAllChildrenComment(@PathVariable String commentId,
+                                             @RequestParam(defaultValue = "newest") String order) {
         if(commentId == null || commentId.isBlank())
             return  ResponseEntity.status(400).body(
                     new APIResponseWithData<>(Boolean.FALSE, "Comment id is null or blank", HttpStatus.BAD_REQUEST, null));
+
+        List<Comment> childCommentList = commentService.getAllChildrenCommentByTimestamp(commentId, "oldest".equalsIgnoreCase(order));
         return ResponseEntity.ok(new APIResponseWithData<List<Comment>>(Boolean.TRUE, "Get all children comment in a video successfully",
-        HttpStatus.OK, commentService.getAllChildrenComment(commentId)));
+        HttpStatus.OK, childCommentList));
     }
 
     @PutMapping()

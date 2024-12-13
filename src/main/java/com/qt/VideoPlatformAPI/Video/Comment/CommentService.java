@@ -78,7 +78,8 @@ public class CommentService {
         Long userId = userService.getCurrentUser().getId();
         // check the user - who delete the comment, owner or video owner,
         // they both have the right to delete this comment
-        if(userId != comment.getUserId() && userId != videoService.getVideoById(comment.getVideoId()).getUserId()) {
+        if(!Objects.equals(userId, comment.getUserId()) &&
+          !Objects.equals(userId, videoService.getVideoById(comment.getVideoId()).getUserId())) {
             throw new AccessDeniedException("You are not authorized to delete this comment");
         }
 
@@ -114,9 +115,9 @@ public class CommentService {
         return iCommentRepository.save(updatedComment);
     }
 
-    public List<Comment> getAllCommentByVideoIdByTimestamp(String videoId, boolean acesding) {
+    public List<Comment> getAllCommentByVideoIdByTimestamp(String videoId, boolean ascending) {
         List<Comment> commentList;
-        if(acesding)
+        if(ascending)
             commentList = iCommentRepository.findAllByVideoIdOrderByCreatedAtAsc(videoId);
         else
             commentList = iCommentRepository.findAllByVideoIdOrderByCreatedAtDesc(videoId);
@@ -139,9 +140,12 @@ public class CommentService {
         return returnList;
     }
 
-    public List<Comment> getAllChildrenComment(String commentId) {
+    public List<Comment> getAllChildrenCommentByTimestamp(String commentId, boolean ascending) {
         List<Comment> commentChildList;
-        commentChildList = iCommentRepository.findAllByReplyTo(commentId);
+        if(ascending)
+            commentChildList = iCommentRepository.findAllByReplyToOrderByCreatedAtAsc(commentId);
+        else
+            commentChildList = iCommentRepository.findAllByReplyToOrderByCreatedAtDesc(commentId);
         return commentChildList;
     }
 

@@ -125,11 +125,6 @@ public class UserService implements UserDetailsService {
     }
 
     public void increaseFollowsCount(UserProfile follower, UserProfile following) {
-        if(follower.getFollowerCount() == null)
-            follower.setFollowerCount(0L);
-        if(following.getFollowingCount() == null)
-            follower.setFollowingCount(0L);
-
         follower.setFollowingCount(follower.getFollowingCount() + 1);
         following.setFollowerCount(following.getFollowerCount() + 1);
         userRepository.save(follower);
@@ -137,8 +132,8 @@ public class UserService implements UserDetailsService {
     }
 
     public void decreaseFollowsCount(UserProfile follower, UserProfile following) {
-        follower.setFollowerCount(follower.getFollowerCount() - 1);
-        following.setFollowingCount(following.getFollowingCount() - 1);
+        follower.setFollowingCount(follower.getFollowingCount() - 1);
+        following.setFollowerCount(following.getFollowerCount() - 1);
         userRepository.save(follower);
         userRepository.save(following);
     }
