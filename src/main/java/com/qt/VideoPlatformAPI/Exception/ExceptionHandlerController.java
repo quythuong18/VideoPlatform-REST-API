@@ -5,6 +5,7 @@ import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
 import org.apache.commons.fileupload.FileUploadException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -26,10 +27,10 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(response, httpStatus);
     }
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(AccessDeniedException.class)
     @ResponseBody
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
-    public ResponseEntity<APIResponse> resolveException(UsernameNotFoundException exception) {
+    public ResponseEntity<APIResponse> resolveAccessDeniedException(AccessDeniedException exception) {
         String message = exception.getMessage();
         APIResponse response = new APIResponse(Boolean.FALSE, message, HttpStatus.UNAUTHORIZED);
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);

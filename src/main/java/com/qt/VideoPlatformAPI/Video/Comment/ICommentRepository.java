@@ -3,6 +3,7 @@ package com.qt.VideoPlatformAPI.Video.Comment;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ICommentRepository extends MongoRepository<Comment, String> {
     List<Comment> findAllByVideoIdOrderByCreatedAtAsc(String videoId);
@@ -11,4 +12,5 @@ public interface ICommentRepository extends MongoRepository<Comment, String> {
     List<Comment> findAllByUserIdOrderByCreatedAtDesc(String userId);
     List<Comment> findAllByReplyTo(String replyTo);
     List<Comment> findAllByUserId(Long userId);
+    Optional<Comment> findById(String id);
 }

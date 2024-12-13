@@ -2,16 +2,14 @@ package com.qt.VideoPlatformAPI.Video.Comment;
 
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
-import com.qt.VideoPlatformAPI.Video.Video;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
@@ -45,8 +43,6 @@ public class CommentService {
 
         // check if replyTo exist
         if(comment.getReplyTo() != null) {
-            if(isCommentExistent(comment.getReplyTo()))
-                throw new IllegalArgumentException("Comment with that id does not exist");
             Comment parentComment = getCommentById(comment.getReplyTo());
 
             videoService.increaseCommentCount(comment.getVideoId());
@@ -78,10 +74,6 @@ public class CommentService {
     }
 
     public void deleteComment(String commentId) {
-        // check if comment exist
-        if(isCommentExistent(commentId))
-            throw new IllegalArgumentException("Comment with that id does not exist");
-
         Comment comment = getCommentById(commentId);
         Long userId = userService.getCurrentUser().getId();
         // check the user - who delete the comment, owner or video owner,
@@ -109,23 +101,17 @@ public class CommentService {
     }
 
     public Comment updateComment(Comment comment) {
-        // check if comment exist
-        if(!isCommentExistent(comment.getId()))
-            throw new IllegalArgumentException("Comment with that id does not exist");
-
         Comment updatedComment = getCommentById(comment.getId());
+        Long currentUserId = userService.getCurrentUser().getId();
+        Long commentOwnerId = updatedComment.getUserId();
 
-        if(userService.getCurrentUser().getId() != updatedComment.getUserId())
+        if(!Objects.equals(currentUserId, commentOwnerId))
             throw new AccessDeniedException("You are not authorized to update this comment");
 
         updatedComment.setIsEdited(Boolean.TRUE);
         updatedComment.setContent(comment.getContent());
 
         return iCommentRepository.save(updatedComment);
-    }
-
-    public boolean isCommentExistent(String commentId) {
-        return !iCommentRepository.existsById(commentId);
     }
 
     public List<Comment> getAllCommentByVideoIdByTimestamp(String videoId, boolean acesding) {
