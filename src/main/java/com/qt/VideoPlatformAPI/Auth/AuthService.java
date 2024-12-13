@@ -125,8 +125,8 @@ public class AuthService {
             throw new IllegalArgumentException("Password can not be null or empty");
         if(userVerificationReq.getUser().getEmail() == null || userVerificationReq.getUser().getEmail().isEmpty())
             throw new IllegalArgumentException("Email can not be emtpy or null");
-        if(userVerificationReq.getUser().getUsername() == null || userVerificationReq.getUser().getUsername().isEmpty())
-            throw new IllegalArgumentException("User name can not be emtpy or null");
+//        if(userVerificationReq.getUser().getUsername() == null || userVerificationReq.getUser().getUsername().isEmpty())
+//            throw new IllegalArgumentException("User name can not be emtpy or null");
 
         if(otpVerification(userVerificationReq)) {
             try {

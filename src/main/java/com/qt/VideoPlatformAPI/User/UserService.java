@@ -130,8 +130,8 @@ public class UserService implements UserDetailsService {
         if(following.getFollowingCount() == null)
             follower.setFollowingCount(0L);
 
-        follower.setFollowerCount(follower.getFollowerCount() + 1);
-        following.setFollowingCount(following.getFollowingCount() + 1);
+        follower.setFollowingCount(follower.getFollowingCount() + 1);
+        following.setFollowerCount(following.getFollowerCount() + 1);
         userRepository.save(follower);
         userRepository.save(following);
     }
