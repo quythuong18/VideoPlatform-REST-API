@@ -4,6 +4,7 @@ import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
@@ -149,6 +150,20 @@ public class CommentService {
         return commentChildList;
     }
 
+    // Manage comments for current user
+    public List<Comment> getAllCommentFromMyVideos(Integer page, Integer size) {
+        try {
+            UserProfile user = userService.getCurrentUser();
+
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+            Slice<Comment> pageComments = iCommentRepository.findAllCommentForAllVideosByUserId(user.getId(), pageable);
+
+            return pageComments.getContent();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void decreaseReplyCount(String commentId) {
         Comment comment = getCommentById(commentId);
         comment.setReplyCount(comment.getReplyCount() - 1);
@@ -182,11 +197,13 @@ public class CommentService {
         comment.setLikeCount(comment.getLikeCount() + 1);
         iCommentRepository.save(comment);
     }
+
     public void decreaseCommentLikeCount(String commentId) {
         Comment comment = getCommentById(commentId);
         comment.setLikeCount(comment.getLikeCount() - 1);
         iCommentRepository.save(comment);
     }
+
     public boolean checkLikeComment(String commentId) {
         Optional<CommentLike> commentLike = iCommentLikeRepository.findByCommentIdAndUserId(commentId,
                 userService.getCurrentUser().getId());

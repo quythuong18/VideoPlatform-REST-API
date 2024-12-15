@@ -82,6 +82,15 @@ public class CommentController {
         HttpStatus.OK, childCommentList));
     }
 
+    @GetMapping("/myVideosComments")
+    public ResponseEntity<APIResponseWithData<List<Comment>>> getMyVideosComments(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get all my videos's comments successfully", HttpStatus.OK,
+        commentService.getAllCommentFromMyVideos(page, size)));
+    }
+
     @PutMapping()
     public ResponseEntity<APIResponseWithData<Comment>> updateAComment(@RequestBody Comment comment) {
         if(comment == null)
