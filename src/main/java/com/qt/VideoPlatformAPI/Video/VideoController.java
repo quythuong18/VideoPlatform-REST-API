@@ -73,4 +73,12 @@ public class VideoController {
         return ResponseEntity.ok(new APIResponseWithData<String>(Boolean.TRUE,
         "Upload thumbnail successfully", HttpStatus.OK, thumbnailUrl));
     }
+
+    @PutMapping("")
+    public ResponseEntity<APIResponseWithData<Video>> updateVideo(@RequestBody Video video) {
+        if(video == null)
+            throw new IllegalArgumentException("Video object is null");
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Update video successfully", HttpStatus.OK,
+                videoService.updateVideoInfo(video)));
+    }
 }

@@ -4,12 +4,14 @@ import com.qt.VideoPlatformAPI.File.CloudinaryService;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -38,6 +40,24 @@ public class VideoService {
         return iVideoRepository.save(video);
     }
 
+    public Video updateVideoInfo(Video newVideoInfo) {
+        UserProfile currentUser = userService.getCurrentUser();
+        Video updatedVideo = getVideoById(newVideoInfo.getId());
+
+        if(!Objects.equals(currentUser.getId(), updatedVideo.getUserId()))
+            throw new AccessDeniedException("You are not authorized to update this video");
+
+        if(newVideoInfo.getTitle() != null)
+            updatedVideo.setTitle(newVideoInfo.getTitle());
+        if(newVideoInfo.getDescription() != null)
+            updatedVideo.setDescription(newVideoInfo.getDescription());
+        if(newVideoInfo.getIsPrivate() != null)
+            updatedVideo.setIsPrivate(newVideoInfo.getIsPrivate());
+        if(newVideoInfo.getIsCommentOff() != null)
+            updatedVideo.setIsCommentOff(newVideoInfo.getIsCommentOff());
+
+        return iVideoRepository.save(updatedVideo);
+    }
     public void updateVideoUploadedStatus(String videoId) {
         Video video = getVideoById(videoId);
         video.setIsUploaded(true);
