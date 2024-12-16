@@ -138,7 +138,7 @@ public class AuthService {
                 userProfile.setPassword(passwordEncoder.encode(userVerificationReq.getUser().getPassword()));
 
                 userRepository.save(userProfile);
-                return new APIResponse(Boolean.FALSE, "Reset password successfully", HttpStatus.OK);
+                return new APIResponse(Boolean.TRUE, "Reset password successfully", HttpStatus.OK);
             } catch(Exception e) {
                 return new APIResponse(Boolean.FALSE, "Reset password fail", HttpStatus.INTERNAL_SERVER_ERROR);
             }
