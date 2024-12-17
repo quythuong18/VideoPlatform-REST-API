@@ -1,5 +1,6 @@
 package com.qt.VideoPlatformAPI.Video;
 
+import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -80,5 +81,13 @@ public class VideoController {
             throw new IllegalArgumentException("Video object is null");
         return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Update video successfully", HttpStatus.OK,
                 videoService.updateVideoInfo(video)));
+    }
+
+    @DeleteMapping("/{videoId}")
+    public ResponseEntity<APIResponse> deleteVideo(@PathVariable String videoId) {
+        if(videoId == null)
+            throw new IllegalArgumentException("Video id is null");
+        videoService.deleteVideo(videoId);
+        return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Delete video successfully", HttpStatus.OK));
     }
 }

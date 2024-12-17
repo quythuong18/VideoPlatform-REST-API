@@ -4,18 +4,22 @@ import com.qt.VideoPlatformAPI.Config.VideoEnv;
 import com.qt.VideoPlatformAPI.Video.Video;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class VideoFileProcessingService {
-    private FFmpegService fFmpegService;
-    private VideoService videoService;
+    @Lazy private FFmpegService fFmpegService;
+    @Lazy private VideoService videoService;
     private CloudinaryService cloudinaryService;
     public void processVideoAsync(String videoId) {
         CompletableFuture.runAsync(() -> {
@@ -43,5 +47,19 @@ public class VideoFileProcessingService {
                 }
             }
         });
+    }
+    public void deleteVideoFiles(String videoId) {
+        deleteFile(new File(VideoEnv.ROOT_LOCATION.toString() + "/" + videoId));
+    }
+    public boolean deleteFile(File file) {
+        if(file.isDirectory()) {
+            File[] files = file.listFiles();
+            if(files != null) {
+                for(File f: files) {
+                    deleteFile(f);
+                }
+            }
+        }
+        return file.delete();
     }
 }

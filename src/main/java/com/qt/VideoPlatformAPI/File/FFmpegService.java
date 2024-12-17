@@ -4,12 +4,13 @@ import com.qt.VideoPlatformAPI.File.storage.FileSystemStorageService;
 import com.qt.VideoPlatformAPI.Config.VideoEnv;
 import com.qt.VideoPlatformAPI.Video.Video;
 import com.qt.VideoPlatformAPI.Video.VideoService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -19,11 +20,11 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class FFmpegService {
     private FFmpeg ffmpeg;
     private FFprobe ffprobe;
-    private final VideoService videoService;
+    @Lazy private final VideoService videoService;
 
     public VideoFileMetadata getVideoFileMetadata(String videoId) throws IOException {
         String videoFileName = getVideoFileName(videoId);

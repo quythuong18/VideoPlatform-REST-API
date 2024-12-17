@@ -3,7 +3,8 @@ package com.qt.VideoPlatformAPI.Video.Comment;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.VideoService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -16,12 +17,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CommentService {
     private static final Logger logger = Logger.getLogger(CommentService.class.getName());
     private final ICommentRepository iCommentRepository;
     private final ICommentLikeRepository iCommentLikeRepository;
-    private final VideoService videoService;
+    @Lazy private final VideoService videoService;
     private final UserService userService;
 
     public Comment addAComment(Comment comment) {
@@ -148,6 +149,13 @@ public class CommentService {
         else
             commentChildList = iCommentRepository.findAllByReplyToOrderByCreatedAtDesc(commentId);
         return commentChildList;
+    }
+
+    public void deleteAllCommentsByVideoId(String videoId) {
+        List<Comment> commentList = iCommentRepository.findAllByVideoIdOrderByCreatedAtAsc(videoId);
+        for(Comment c : commentList) {
+            iCommentRepository.deleteById(c.getId());
+        }
     }
 
     // Manage comments for current user

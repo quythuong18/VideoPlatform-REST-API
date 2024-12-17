@@ -1,9 +1,12 @@
 package com.qt.VideoPlatformAPI.Video;
 
 import com.qt.VideoPlatformAPI.File.CloudinaryService;
+import com.qt.VideoPlatformAPI.File.VideoFileProcessingService;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
-import lombok.AllArgsConstructor;
+import com.qt.VideoPlatformAPI.Video.Comment.CommentService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -13,14 +16,19 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class VideoService {
+    private static final Logger logger = Logger.getLogger(VideoService.class.getName());
     private final IVideosRepository iVideoRepository;
     private final UserService userService;
+    @Lazy private final CommentService commentService;
     private final CloudinaryService cloudinaryService;
     private final CustomVideoRepository customVideoRepository;
+    @Lazy private final VideoFileProcessingService videoFileProcessingService;
 
     public Video addVideo(Video video) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -55,6 +63,8 @@ public class VideoService {
             updatedVideo.setIsPrivate(newVideoInfo.getIsPrivate());
         if(newVideoInfo.getIsCommentOff() != null)
             updatedVideo.setIsCommentOff(newVideoInfo.getIsCommentOff());
+        if(newVideoInfo.getTags() != null)
+            updatedVideo.setTags(newVideoInfo.getTags());
 
         return iVideoRepository.save(updatedVideo);
     }
@@ -139,9 +149,34 @@ public class VideoService {
             throw new IllegalArgumentException("Invalid input param");
         return customVideoRepository.searchByTitle(pattern, count);
     }
+
     public List<Video> searchByVideoTag(String tag, Integer count) {
         if(tag == null || count == null || count <= 0)
             throw new IllegalArgumentException("Invalid input param");
         return customVideoRepository.searchByTag(tag, count);
+    }
+
+    public void deleteVideo(String videoId) {
+        Video video = getVideoById(videoId);
+        if(!Objects.equals(userService.getCurrentUser().getId(), video.getUserId())) {
+            throw new AccessDeniedException("You are not authorized to delete this video");
+        }
+        // delete the comments
+        CompletableFuture.runAsync(() -> {
+            commentService.deleteAllCommentsByVideoId(videoId);
+        }).thenAccept((res) -> {
+            logger.info("Deleted all comments of video " + videoId);
+        });
+
+        // delete the video file
+        CompletableFuture.runAsync(() -> {
+            videoFileProcessingService.deleteVideoFiles(videoId);
+        }).thenAccept((res) -> {
+            logger.info("Deleted files of video " + videoId);
+        });
+
+        //delete the video data
+        iVideoRepository.deleteById(videoId);
+
     }
 }

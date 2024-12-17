@@ -7,6 +7,7 @@ import com.qt.VideoPlatformAPI.Video.Video;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
 import org.apache.commons.fileupload.FileUploadException;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class UploadFileController {
     private final FileSystemStorageService fileSystemStorageService;
-    private final VideoService videoService;
+    @Lazy private final VideoService videoService;
     private final VideoFileProcessingService videoFileProcessingService;
 
     @PostMapping("/video/{id}")
