@@ -1,11 +1,9 @@
 package com.qt.VideoPlatformAPI.Playlist;
 
 import com.qt.VideoPlatformAPI.File.CloudinaryService;
-import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +16,7 @@ import java.util.Optional;
 public class PlaylistService {
     private final IPlaylistRepository iPlaylistRepository;
     private final UserService userService;
-    @Lazy private final VideoService videoService;
+    private final VideoService videoService;
     private final CloudinaryService cloudinaryService;
 
     public Playlist createPlaylist(Playlist playlist) {

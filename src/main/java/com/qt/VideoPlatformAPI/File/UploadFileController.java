@@ -13,16 +13,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.logging.Logger;
+
 @RestController
 @RequestMapping("/api/v1/file")
 @AllArgsConstructor
 public class UploadFileController {
+    private final Logger logger;
     private final FileSystemStorageService fileSystemStorageService;
-    @Lazy private final VideoService videoService;
+    private final VideoService videoService;
     private final VideoFileProcessingService videoFileProcessingService;
 
     @PostMapping("/video/{id}")
-    public ResponseEntity<APIResponse>  handleVideoUpload(@RequestBody MultipartFile file, @PathVariable(name = "id") String id) throws FileUploadException {
+    public ResponseEntity<APIResponse> handleVideoUpload(@RequestBody MultipartFile file, @PathVariable(name = "id") String id) throws FileUploadException {
 
         Video video = videoService.getVideoById(id);
         if(video.getIsUploaded())
@@ -31,8 +34,6 @@ public class UploadFileController {
         if(file.isEmpty())
             throw new IllegalArgumentException("Please upload a video file");
 
-        String originalFilename = file.getOriginalFilename();
-
         String contentType = file.getContentType();
         if(contentType == null || !VideoEnv.VIDEO_MIME_TYPES.contains(contentType)) {
             return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(new APIResponse(false, "Invalid video file type", HttpStatus.UNSUPPORTED_MEDIA_TYPE));
@@ -40,6 +41,8 @@ public class UploadFileController {
 
         fileSystemStorageService.store(file, id); // save video file upload
         videoService.updateVideoUploadedStatus(id); // set video metadata status
+        logger.info("Video file has been uploaded");
+        logger.info("Video file is processing");
         videoFileProcessingService.processVideoAsync(id); // video processing Completable
 
         return ResponseEntity.ok(new APIResponse(true, "Video uploaded successfully and being processed", HttpStatus.OK));

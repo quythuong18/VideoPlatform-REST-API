@@ -15,6 +15,7 @@ public interface ICommentRepository extends MongoRepository<Comment, String> {
     List<Comment> findAllByReplyToOrderByCreatedAtAsc(String replyTo);
     List<Comment> findAllByReplyToOrderByCreatedAtDesc(String replyTo);
     List<Comment> findAllByUserId(Long userId);
+    int deleteAllByVideoId(String videoId);
     Optional<Comment> findById(String id);
 
     @Aggregation(pipeline = {

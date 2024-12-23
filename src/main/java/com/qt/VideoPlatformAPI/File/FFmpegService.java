@@ -18,13 +18,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 @Component
 @RequiredArgsConstructor
 public class FFmpegService {
-    private FFmpeg ffmpeg;
-    private FFprobe ffprobe;
-    @Lazy private final VideoService videoService;
+    private final Logger logger;
+    private final FFmpeg ffmpeg;
+    private final FFprobe ffprobe;
+    private final VideoService videoService;
 
     public VideoFileMetadata getVideoFileMetadata(String videoId) throws IOException {
         String videoFileName = getVideoFileName(videoId);
@@ -121,6 +123,9 @@ public class FFmpegService {
         command.add(ffmpeg.getPath());
 
         String videoDir = VideoEnv.ROOT_LOCATION + "/" + v.getId();
+        command.add("-re");
+        command.add("-hwaccel");
+        command.add("cuda");
         for(Integer quality : v.getQualities()) {
             command.add("-i");
             command.add(quality.toString() + v.getFileExtension());
@@ -136,8 +141,7 @@ public class FFmpegService {
         command.add("output.mpd");
         // run the command here
         try {
-            System.out.println("Executing command:");
-            System.out.println(String.join(" ", command));
+            logger.info("Executing command: " + String.join(" ", command));
             ProcessBuilder pb = new ProcessBuilder(command);
             pb.inheritIO();
             pb.directory(new File(videoDir));

@@ -4,9 +4,8 @@ import com.qt.VideoPlatformAPI.File.CloudinaryService;
 import com.qt.VideoPlatformAPI.File.VideoFileProcessingService;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
-import com.qt.VideoPlatformAPI.Video.Comment.CommentService;
+import com.qt.VideoPlatformAPI.Video.Comment.ICommentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -22,13 +21,13 @@ import java.util.logging.Logger;
 @Component
 @RequiredArgsConstructor
 public class VideoService {
-    private static final Logger logger = Logger.getLogger(VideoService.class.getName());
+    private final Logger logger;
     private final IVideosRepository iVideoRepository;
     private final UserService userService;
-    @Lazy private final CommentService commentService;
+    private final ICommentRepository iCommentRepository;
     private final CloudinaryService cloudinaryService;
     private final CustomVideoRepository customVideoRepository;
-    @Lazy private final VideoFileProcessingService videoFileProcessingService;
+    private final VideoFileProcessingService videoFileProcessingService;
 
     public Video addVideo(Video video) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -163,7 +162,7 @@ public class VideoService {
         }
         // delete the comments
         CompletableFuture.runAsync(() -> {
-            commentService.deleteAllCommentsByVideoId(videoId);
+            iCommentRepository.deleteAllByVideoId(videoId);
         }).thenAccept((res) -> {
             logger.info("Deleted all comments of video " + videoId);
         });

@@ -19,10 +19,10 @@ import java.util.logging.Logger;
 @Component
 @RequiredArgsConstructor
 public class CommentService {
-    private static final Logger logger = Logger.getLogger(CommentService.class.getName());
+    private final Logger logger;
     private final ICommentRepository iCommentRepository;
     private final ICommentLikeRepository iCommentLikeRepository;
-    @Lazy private final VideoService videoService;
+    private final VideoService videoService;
     private final UserService userService;
 
     public Comment addAComment(Comment comment) {
