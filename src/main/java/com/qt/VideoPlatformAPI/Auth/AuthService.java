@@ -157,7 +157,8 @@ public class AuthService {
     }
 
     public Boolean otpVerification(UserVerification userVerificationReq) {
-        Optional<UserVerification> userVerificationInDB = userVerificationRepository.findByUsername(userVerificationReq.getUser().getUsername());
+//        Optional<UserVerification> userVerificationInDB = userVerificationRepository.findByUsername(userVerificationReq.getUser().getUsername());
+        Optional<UserVerification> userVerificationInDB = userVerificationRepository.findByEmail(userVerificationReq.getUser().getEmail());
         if(userVerificationInDB.isEmpty()) {
             throw new IllegalArgumentException("Account verification doesn't exist");
         }

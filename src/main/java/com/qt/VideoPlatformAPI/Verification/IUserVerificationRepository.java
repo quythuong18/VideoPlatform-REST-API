@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface IUserVerificationRepository extends JpaRepository<UserVerification, Long> {
 
-    @Query("SELECT u FROM UserVerification u WHERE u.user.username = ?1 ORDER BY u.id DESC LIMIT 1")
-    Optional<UserVerification> findByUsername(String username);
+    @Query("SELECT u FROM UserVerification u WHERE u.user.email = ?1 ORDER BY u.id DESC LIMIT 1")
+    Optional<UserVerification> findByEmail(String email);
 }
