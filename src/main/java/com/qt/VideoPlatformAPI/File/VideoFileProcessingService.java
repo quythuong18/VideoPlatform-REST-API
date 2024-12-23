@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class VideoFileProcessingService {
     private final FFmpegService fFmpegService;
-    private final VideoService videoService;
+    @Lazy private final VideoService videoService;
     private final CloudinaryService cloudinaryService;
     public void processVideoAsync(String videoId) {
         CompletableFuture.runAsync(() -> {

@@ -26,7 +26,7 @@ public class FFmpegService {
     private final Logger logger;
     private final FFmpeg ffmpeg;
     private final FFprobe ffprobe;
-    private final VideoService videoService;
+    @Lazy private final VideoService videoService;
 
     public VideoFileMetadata getVideoFileMetadata(String videoId) throws IOException {
         String videoFileName = getVideoFileName(videoId);
