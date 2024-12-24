@@ -9,4 +9,5 @@ public interface IUserConnectionRepository extends JpaRepository<UserConnection,
     boolean existsByFollowerAndFollowing(UserProfile follower, UserProfile following);
     Optional<UserConnection> findByFollowerAndFollowing(UserProfile follower, UserProfile following);
     List<UserConnection> findByFollower(UserProfile follower);
+    List<UserConnection> findByFollowing(UserProfile following);
 }

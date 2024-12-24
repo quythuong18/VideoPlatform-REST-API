@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "**/users/{username}/unfollow").authenticated()
                         .requestMatchers(HttpMethod.GET, "**/users/{username}/checkFollow").authenticated()
                         .requestMatchers(HttpMethod.GET, "**/users/followings").authenticated()
+                        .requestMatchers(HttpMethod.GET, "**/users/followers").authenticated()
                         .requestMatchers(HttpMethod.POST, "**/users/profilePic").authenticated()
                         .requestMatchers(HttpMethod.PUT, "**/users/").authenticated()
 

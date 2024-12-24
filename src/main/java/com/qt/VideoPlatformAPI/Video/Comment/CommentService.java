@@ -96,6 +96,8 @@ public class CommentService {
 
         if(comment.getReplyTo() != null) {
             decreaseReplyCount(comment.getReplyTo());
+            Comment parent = getCommentById(comment.getReplyTo());
+            parent.getReplies().remove(commentId); // remove the child from replies of parent
         }
 
         videoService.decreaseCommentCount(getCommentById(commentId).getVideoId());

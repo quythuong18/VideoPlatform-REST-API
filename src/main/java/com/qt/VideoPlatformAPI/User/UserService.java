@@ -151,6 +151,19 @@ public class UserService implements UserDetailsService {
         return usernameList;
     }
 
+    public Set<String> getAllFollowers() {
+        UserProfile userProfile = getCurrentUser();
+        List<UserConnection> userConnectionList = userConnectionRepository.findByFollowing(userProfile);
+
+        Set<String> usernameList = new HashSet<>();
+
+        userConnectionList.forEach(userConnection -> {
+            System.out.println(userConnection);
+            usernameList.add(userConnection.getFollower().getUsername());
+        });
+        return usernameList;
+    }
+
     public UserProfile getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(auth == null) {

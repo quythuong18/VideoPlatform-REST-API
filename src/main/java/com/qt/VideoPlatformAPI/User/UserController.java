@@ -81,6 +81,12 @@ public class UserController {
                 "Get all followings successfully", HttpStatus.OK, userService.getAllFollowings()));
     }
 
+    @GetMapping("/followers")
+    public ResponseEntity<APIResponseWithData<Set<String>>> getAllFollowers() {
+        return ResponseEntity.ok(new APIResponseWithData<Set<String>>(Boolean.TRUE,
+                "Get all followers successfully", HttpStatus.OK, userService.getAllFollowers()));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<APIResponseWithData<List<UserPublicDTO>>> searchByUsername(@RequestParam String pattern) {
         if(pattern == null || pattern.isBlank()) {
