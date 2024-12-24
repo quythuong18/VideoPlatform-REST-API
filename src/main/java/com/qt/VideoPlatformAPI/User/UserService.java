@@ -116,14 +116,6 @@ public class UserService implements UserDetailsService {
         return new APIResponse(Boolean.TRUE, "You unfollow " + following.getUsername() + " successfully", HttpStatus.OK);
     }
 
-    public Boolean hasFollowed(String username) {
-        UserProfile follower = getCurrentUser();
-        UserProfile following = loadUserByUsername(username);
-        if(userConnectionRepository.existsByFollowerAndFollowing(follower, following))
-            return true;
-        return false;
-    }
-
     public void increaseFollowsCount(UserProfile follower, UserProfile following) {
         follower.setFollowingCount(follower.getFollowingCount() + 1);
         following.setFollowerCount(following.getFollowerCount() + 1);
@@ -170,6 +162,20 @@ public class UserService implements UserDetailsService {
             throw new AuthenticationServiceException("Not authenticated");
         }
         return (UserProfile) auth.getPrincipal();
+    }
+
+    // check if username follow the current user
+    public Boolean checkFollower(String username) {
+        UserProfile currentUser = getCurrentUser();
+        UserProfile user = loadUserByUsername(username);
+        return userConnectionRepository.existsByFollowerAndFollowing(user, currentUser);
+    }
+
+    // check if current user follow the username
+    public Boolean checkFollowing(String username) {
+        UserProfile currentUser = getCurrentUser();
+        UserProfile user = loadUserByUsername(username);
+        return userConnectionRepository.existsByFollowerAndFollowing(currentUser, user);
     }
 
     @Transactional

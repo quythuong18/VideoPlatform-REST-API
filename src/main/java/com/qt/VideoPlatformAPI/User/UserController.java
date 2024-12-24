@@ -68,9 +68,16 @@ public class UserController {
         return ResponseEntity.ok(userService.unfollowAUser(username));
     }
 
-    @GetMapping("/{username}/checkFollow")
-    ResponseEntity<APIResponse> checkFollow(@PathVariable(value = "username") String username) {
-        if(userService.hasFollowed(username))
+    @GetMapping("/{username}/checkFollower")
+    ResponseEntity<APIResponse> checkFollower(@PathVariable(value = "username") String username) {
+        if(userService.checkFollower(username))
+            return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Followed", HttpStatus.OK));
+        return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Not follow", HttpStatus.OK));
+    }
+
+    @GetMapping("/{username}/checkFollowing")
+    ResponseEntity<APIResponse> checkFollowing(@PathVariable(value = "username") String username) {
+        if(userService.checkFollowing(username))
             return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Followed", HttpStatus.OK));
         return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Not follow", HttpStatus.OK));
     }
