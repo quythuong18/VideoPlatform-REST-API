@@ -4,7 +4,6 @@ import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -172,6 +171,55 @@ public class CommentService {
         }
     }
 
+    public List<Comment> getAllCommentFromMyVideosThatCurrentUserReplied() {
+        try {
+            UserProfile user = userService.getCurrentUser();
+
+            Pageable pageable = PageRequest.of(0, 999999, Sort.by(Sort.Direction.DESC, "createdAt"));
+            Slice<Comment> pageComments = iCommentRepository.findAllCommentForAllVideosByUserId(user.getId(), pageable);
+
+            List<Comment> comments = pageComments.getContent();
+            List<Comment> result = new ArrayList<Comment>();
+            for(Comment c : comments) {
+                List<String> replies = c.getReplies();
+                for(String r : replies) {
+                    if(checkReplied(r, user.getId())) {
+                        result.add(c);
+                        break;
+                    }
+                }
+            }
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<Comment> getAllCommentFromMyVideosThatCurrentUserNotReplied() {
+        try {
+            UserProfile user = userService.getCurrentUser();
+
+            Pageable pageable = PageRequest.of(0, 999999, Sort.by(Sort.Direction.DESC, "createdAt"));
+            Slice<Comment> pageComments = iCommentRepository.findAllCommentForAllVideosByUserId(user.getId(), pageable);
+
+            List<Comment> comments = new ArrayList<>(pageComments.getContent());
+            List<Comment> toRemove = new ArrayList<>();
+            for(Comment c : comments) {
+                List<String> replies = c.getReplies();
+                for(String r : replies) {
+                    if(checkReplied(r, user.getId())) {
+                        toRemove.add(c);
+                        break;
+                    }
+                }
+            }
+            comments.removeAll(toRemove);
+            return comments;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void decreaseReplyCount(String commentId) {
         Comment comment = getCommentById(commentId);
         comment.setReplyCount(comment.getReplyCount() - 1);
@@ -216,5 +264,10 @@ public class CommentService {
         Optional<CommentLike> commentLike = iCommentLikeRepository.findByCommentIdAndUserId(commentId,
                 userService.getCurrentUser().getId());
         return commentLike.isPresent();
+    }
+
+    public boolean checkReplied(String commentId, Long userId) {
+        Comment c = getCommentById(commentId);
+        return Objects.equals(c.getUserId(), userId);
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/comments")
@@ -85,8 +86,16 @@ public class CommentController {
     @GetMapping("/myVideosComments")
     public ResponseEntity<APIResponseWithData<List<Comment>>> getMyVideosComments(
             @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "all") String repliedFilter
     ) {
+        if(repliedFilter.equals("replied"))
+            return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get all my videos's comments(replied) successfully", HttpStatus.OK,
+                    commentService.getAllCommentFromMyVideosThatCurrentUserReplied()));
+        else if(repliedFilter.equals("not-replied"))
+            return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get all my videos's comments(not replied) successfully", HttpStatus.OK,
+                    commentService.getAllCommentFromMyVideosThatCurrentUserNotReplied()));
+
         return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get all my videos's comments successfully", HttpStatus.OK,
         commentService.getAllCommentFromMyVideos(page, size)));
     }
@@ -138,4 +147,5 @@ public class CommentController {
             return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Liked", HttpStatus.OK));
         return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Not liked yet", HttpStatus.OK));
     }
+
 }
