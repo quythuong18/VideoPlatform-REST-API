@@ -160,20 +160,23 @@ public class CommentService {
     }
 
     // Manage comments for current user
-    public List<Comment> getAllCommentFromMyVideos(Integer page, Integer size) {
+    public List<Comment> getAllCommentFromMyVideos(String videoId, Integer page, Integer size) {
         try {
             UserProfile user = userService.getCurrentUser();
 
             Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
             Slice<Comment> pageComments = iCommentRepository.findAllCommentForAllVideosByUserId(user.getId(), pageable);
 
-            return pageComments.getContent();
+            // temporary solution
+            List<Comment> comments = pageComments.getContent();
+            if(videoId != null) return videoIdFilter(comments, videoId);
+            return comments;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<Comment> getAllCommentFromMyVideosThatCurrentUserReplied() {
+    public List<Comment> getAllCommentFromMyVideosThatCurrentUserReplied(String videoId) {
         try {
             UserProfile user = userService.getCurrentUser();
 
@@ -191,13 +194,15 @@ public class CommentService {
                     }
                 }
             }
+            // temporary solution
+            if(videoId != null) videoIdFilter(result, videoId);
             return result;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<Comment> getAllCommentFromMyVideosThatCurrentUserNotReplied() {
+    public List<Comment> getAllCommentFromMyVideosThatCurrentUserNotReplied(String videoId) {
         try {
             UserProfile user = userService.getCurrentUser();
 
@@ -216,10 +221,24 @@ public class CommentService {
                 }
             }
             comments.removeAll(toRemove);
+            // temporary solution
+            if(videoId != null) videoIdFilter(comments, videoId);
             return comments;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    // It's just a temporary solution I do in the backend for the 3 above methods,
+    // I will refactor the Mongo database to get better performance of filter feature
+    List<Comment> videoIdFilter(List<Comment> comments, String videoId) {
+        List<Comment> toRemove = new ArrayList<>();
+        for(Comment c : comments) {
+            if(!Objects.equals(c.getVideoId(), videoId))
+                toRemove.add(c);
+        }
+        comments.removeAll(toRemove);
+        return comments;
     }
 
     public void decreaseReplyCount(String commentId) {

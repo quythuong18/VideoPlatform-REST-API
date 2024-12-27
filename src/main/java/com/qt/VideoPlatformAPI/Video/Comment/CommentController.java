@@ -87,17 +87,18 @@ public class CommentController {
     public ResponseEntity<APIResponseWithData<List<Comment>>> getMyVideosComments(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(defaultValue = "all") String repliedFilter
+            @RequestParam(defaultValue = "all") String repliedFilter,
+            @RequestParam(required = false) String videoId
     ) {
         if(repliedFilter.equals("replied"))
             return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get all my videos's comments(replied) successfully", HttpStatus.OK,
-                    commentService.getAllCommentFromMyVideosThatCurrentUserReplied()));
+                    commentService.getAllCommentFromMyVideosThatCurrentUserReplied(videoId)));
         else if(repliedFilter.equals("not-replied"))
             return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get all my videos's comments(not replied) successfully", HttpStatus.OK,
-                    commentService.getAllCommentFromMyVideosThatCurrentUserNotReplied()));
+                    commentService.getAllCommentFromMyVideosThatCurrentUserNotReplied(videoId)));
 
         return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get all my videos's comments successfully", HttpStatus.OK,
-        commentService.getAllCommentFromMyVideos(page, size)));
+        commentService.getAllCommentFromMyVideos(videoId, page, size)));
     }
 
     @PutMapping()
