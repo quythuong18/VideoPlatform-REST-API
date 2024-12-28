@@ -190,7 +190,7 @@ public class CommentService {
             }
         }
         // temporary solution
-        if(videoId != null) videoIdFilter(result, videoId);
+        if(videoId != null) return videoIdFilter(result, videoId);
         return result;
     }
 
@@ -200,6 +200,7 @@ public class CommentService {
         Pageable pageable = PageRequest.of(0, 999999, Sort.by(Sort.Direction.DESC, "createdAt"));
         Slice<Comment> pageComments = iCommentRepository.findAllCommentForAllVideosByUserId(user.getId(), pageable);
 
+        // Implicit error right HERE
         List<Comment> comments = new ArrayList<>(pageComments.getContent());
         List<Comment> toRemove = new ArrayList<>();
         for(Comment c : comments) {
@@ -213,7 +214,7 @@ public class CommentService {
         }
         if(!toRemove.isEmpty()) comments.removeAll(toRemove);
         // temporary solution
-        if(videoId != null) videoIdFilter(comments, videoId);
+        if(videoId != null) return videoIdFilter(comments, videoId);
         return comments;
     }
 
@@ -221,13 +222,12 @@ public class CommentService {
     // I will refactor the Mongo database to get better performance of filter feature
     List<Comment> videoIdFilter(List<Comment> comments, String videoId) {
         videoService.getVideoById(videoId);
-        List<Comment> toRemove = new ArrayList<>();
+        List<Comment> theFuckingRightComments = new ArrayList<>();
         for(Comment c : comments) {
-            if(!Objects.equals(c.getVideoId(), videoId))
-                toRemove.add(c);
+            if(Objects.equals(c.getVideoId(), videoId))
+                theFuckingRightComments.add(c);
         }
-        if(!toRemove.isEmpty()) comments.removeAll(toRemove);
-        return comments;
+        return theFuckingRightComments;
     }
 
     public void decreaseReplyCount(String commentId) {
