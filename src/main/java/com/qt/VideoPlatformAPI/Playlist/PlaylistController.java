@@ -3,6 +3,8 @@ package com.qt.VideoPlatformAPI.Playlist;
 import com.qt.VideoPlatformAPI.Config.VideoEnv;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
+import com.qt.VideoPlatformAPI.Video.IVideosRepository;
+import com.qt.VideoPlatformAPI.Video.Video;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,12 +13,31 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/playlists")
 @AllArgsConstructor
 public class PlaylistController {
     private final PlaylistService playlistService;
+    private final IPlaylistRepository iPlaylistRepository;
+    private final IVideosRepository iVideosRepository;
+
+    @PostMapping("/SetThePlayListIdField")
+    public String setThePlaylistIdField() {
+        List<Playlist> playlists = iPlaylistRepository.findAll();
+        for(Playlist p : playlists) {
+            List<String> videoIdList = p.getVideoIdsList();
+            for(String videoId : videoIdList) {
+                Optional<Video> videoOptional = iVideosRepository.findById(videoId);
+                if(videoOptional.isPresent()) {
+                    Video video = videoOptional.get();
+                    video.setPlaylistId(p.getId());
+                }
+            }
+        }
+        return "Ok";
+    }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<APIResponseWithData<List<Playlist>>> getAllPlaylistsByUserId(@PathVariable Long userId) {
