@@ -220,7 +220,7 @@ public class CommentService {
                     }
                 }
             }
-            comments.removeAll(toRemove);
+            if(!toRemove.isEmpty()) comments.removeAll(toRemove);
             // temporary solution
             if(videoId != null) videoIdFilter(comments, videoId);
             return comments;
@@ -237,7 +237,7 @@ public class CommentService {
             if(!Objects.equals(c.getVideoId(), videoId))
                 toRemove.add(c);
         }
-        comments.removeAll(toRemove);
+        if(!toRemove.isEmpty()) comments.removeAll(toRemove);
         return comments;
     }
 
