@@ -47,6 +47,7 @@ public class LikeService {
                 userService.getCurrentUser().getId());
         return videoIdOptional.isPresent();
     }
+
     public List<String> getAllLikedVideoIds(Long userId, Integer page, Integer size) {
         List<String> videoIds = new ArrayList<>();
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -56,5 +57,9 @@ public class LikeService {
             videoIds.add(vl.getVideoId());
         }
         return videoIds;
+    }
+
+    public void removeAllLikeOfAVideo(String videoId) {
+        iLikeRepository.deleteAllByVideoId(videoId);
     }
 }

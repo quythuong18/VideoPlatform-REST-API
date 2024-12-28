@@ -3,6 +3,7 @@ package com.qt.VideoPlatformAPI.Video;
 import com.qt.VideoPlatformAPI.Utils.TimeAudit;
 import jakarta.persistence.Id;
 import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
@@ -17,6 +18,7 @@ public class Video extends TimeAudit {
     @Id
     private String id;
     private Long userId;
+    private String playlistId;
     private String title;
     private String description;
     private List<String> tags;

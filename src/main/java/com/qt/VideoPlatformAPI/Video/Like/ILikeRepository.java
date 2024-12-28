@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface ILikeRepository extends MongoRepository<VideoLike, String> {
     public Optional<VideoLike> findByVideoIdAndUserId(String videoId, Long userId);
     public List<VideoLike> findByUserId(Long userId, Pageable pageable);
+    public void deleteAllByVideoId(String videoId);
 }

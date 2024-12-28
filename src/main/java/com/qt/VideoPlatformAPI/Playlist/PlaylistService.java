@@ -59,7 +59,7 @@ public class PlaylistService {
 
         Playlist playlist = getPlaylistById(playlistId);
         playlist.getVideoIdsList().add(videoId);
-
+        videoService.updatePlaylistId(videoId, playlistId);
         iPlaylistRepository.save(playlist);
     }
 
@@ -74,6 +74,7 @@ public class PlaylistService {
 
         Playlist playlist = getPlaylistById(playlistId);
         playlist.getVideoIdsList().remove(videoId);
+        videoService.updatePlaylistId(videoId, null);
 
         iPlaylistRepository.save(playlist);
     }

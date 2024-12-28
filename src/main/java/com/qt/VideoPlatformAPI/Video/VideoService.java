@@ -2,11 +2,14 @@ package com.qt.VideoPlatformAPI.Video;
 
 import com.qt.VideoPlatformAPI.File.CloudinaryService;
 import com.qt.VideoPlatformAPI.File.VideoFileProcessingService;
+import com.qt.VideoPlatformAPI.Playlist.Playlist;
+import com.qt.VideoPlatformAPI.Playlist.PlaylistService;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.Comment.ICommentRepository;
 import com.qt.VideoPlatformAPI.Video.Like.LikeService;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,6 +35,7 @@ public class VideoService {
     private final CustomVideoRepository customVideoRepository;
     private final VideoFileProcessingService videoFileProcessingService;
     @Lazy private final LikeService likeService;
+    @Lazy private final PlaylistService playlistService;
 
     public Video addVideo(Video video) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -140,6 +144,12 @@ public class VideoService {
         return videoList;
     }
 
+    public void updatePlaylistId(String videoId, String playlistId) {
+        Video video = getVideoById(videoId);
+        video.setPlaylistId(playlistId);
+        iVideoRepository.save(video);
+    }
+
     public String uploadThumbnailVideo(String videoId, MultipartFile file) throws IOException {
         Video video = getVideoById(videoId);
         String url;
@@ -187,6 +197,20 @@ public class VideoService {
             videoFileProcessingService.deleteVideoFiles(videoId);
         }).thenAccept((res) -> {
             logger.info("Deleted files of video " + videoId);
+        });
+
+        // delete the likes
+        CompletableFuture.runAsync(() -> {
+            likeService.removeAllLikeOfAVideo(videoId);
+        }).thenAccept((res) -> {
+            logger.info("Deleted all likes of video " + videoId);
+        });
+
+        //delete from the playlist
+        CompletableFuture.runAsync(() -> {
+            playlistService.deleteVideoFromPlaylist(video.getPlaylistId(), videoId);
+        }).thenAccept((res) -> {
+            logger.info("Deleted video from the playlist" + videoId);
         });
 
         //delete the video data
