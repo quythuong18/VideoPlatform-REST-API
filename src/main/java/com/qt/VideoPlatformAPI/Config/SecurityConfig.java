@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "**/videos/user/{userId}").permitAll()
                         .requestMatchers(HttpMethod.GET, "**/videos/random").permitAll()
                         .requestMatchers(HttpMethod.GET, "**/videos/search").permitAll()
+                        .requestMatchers(HttpMethod.GET, "**/videos/liked").authenticated()
 
                         // video like
                         .requestMatchers(HttpMethod.POST, "**/videos/likes/{videoId}").authenticated()

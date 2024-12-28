@@ -3,8 +3,13 @@ package com.qt.VideoPlatformAPI.Video.Like;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -41,5 +46,15 @@ public class LikeService {
         Optional<VideoLike> videoIdOptional = iLikeRepository.findByVideoIdAndUserId(videoId,
                 userService.getCurrentUser().getId());
         return videoIdOptional.isPresent();
+    }
+    public List<String> getAllLikedVideoIds(Long userId, Integer page, Integer size) {
+        List<String> videoIds = new ArrayList<>();
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        List<VideoLike> videoLikes = iLikeRepository.findByUserId(userId, pageable);
+        for(VideoLike vl : videoLikes) {
+            videoIds.add(vl.getVideoId());
+        }
+        return videoIds;
     }
 }

@@ -5,13 +5,16 @@ import com.qt.VideoPlatformAPI.File.VideoFileProcessingService;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.Comment.ICommentRepository;
+import com.qt.VideoPlatformAPI.Video.Like.LikeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,6 +31,7 @@ public class VideoService {
     private final CloudinaryService cloudinaryService;
     private final CustomVideoRepository customVideoRepository;
     private final VideoFileProcessingService videoFileProcessingService;
+    @Lazy private final LikeService likeService;
 
     public Video addVideo(Video video) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -119,9 +123,20 @@ public class VideoService {
         return iVideoRepository.existsById(videoId);
     }
 
+    // authenticate video owner and guests
     public List<Video> getAllVideosByUserId(Long userId) {
         List<Video> videoList = iVideoRepository.findAllByUserId(userId);
         videoList.removeIf(v -> !v.getIsUploaded() && !v.getIsProcessed() && v.getIsPrivate());
+        return videoList;
+    }
+
+    public List<Video> getAllLikedVideos(Integer page, Integer size) {
+        UserProfile user = userService.getCurrentUser();
+        List<String> videoIds = likeService.getAllLikedVideoIds(user.getId(), page, size);
+        List<Video> videoList = new ArrayList<>();
+        for(String id : videoIds) {
+            videoList.add(getVideoById(id));
+        }
         return videoList;
     }
 

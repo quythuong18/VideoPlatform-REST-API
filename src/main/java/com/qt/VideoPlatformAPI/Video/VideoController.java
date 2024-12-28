@@ -62,6 +62,14 @@ public class VideoController {
                 videoService.searchByVideoTitle(pattern, count)));
     }
 
+    @GetMapping("/liked")
+    public ResponseEntity<APIResponseWithData<List<Video>>> getAllLikedVideos(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get liked videos successfully", HttpStatus.OK,
+                videoService.getAllLikedVideos(page, size)));
+    }
+
     @PostMapping("/{videoId}/thumbnail")
     public ResponseEntity<APIResponseWithData<String>> updateThumbnail(@PathVariable String videoId, @RequestBody MultipartFile file) throws IOException {
         if(file.isEmpty())
