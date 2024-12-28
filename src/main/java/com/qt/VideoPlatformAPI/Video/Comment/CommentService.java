@@ -161,77 +161,66 @@ public class CommentService {
 
     // Manage comments for current user
     public List<Comment> getAllCommentFromMyVideos(String videoId, Integer page, Integer size) {
-        try {
-            UserProfile user = userService.getCurrentUser();
+        UserProfile user = userService.getCurrentUser();
 
-            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-            Slice<Comment> pageComments = iCommentRepository.findAllCommentForAllVideosByUserId(user.getId(), pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Slice<Comment> pageComments = iCommentRepository.findAllCommentForAllVideosByUserId(user.getId(), pageable);
 
-            // temporary solution
-            List<Comment> comments = pageComments.getContent();
-            if(videoId != null) return videoIdFilter(comments, videoId);
-            return comments;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // temporary solution
+        List<Comment> comments = pageComments.getContent();
+        if(videoId != null) return videoIdFilter(comments, videoId);
+        return comments;
     }
 
     public List<Comment> getAllCommentFromMyVideosThatCurrentUserReplied(String videoId) {
-        try {
-            UserProfile user = userService.getCurrentUser();
+        UserProfile user = userService.getCurrentUser();
 
-            Pageable pageable = PageRequest.of(0, 999999, Sort.by(Sort.Direction.DESC, "createdAt"));
-            Slice<Comment> pageComments = iCommentRepository.findAllCommentForAllVideosByUserId(user.getId(), pageable);
+        Pageable pageable = PageRequest.of(0, 999999, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Slice<Comment> pageComments = iCommentRepository.findAllCommentForAllVideosByUserId(user.getId(), pageable);
 
-            List<Comment> comments = pageComments.getContent();
-            List<Comment> result = new ArrayList<Comment>();
-            for(Comment c : comments) {
-                List<String> replies = c.getReplies();
-                for(String r : replies) {
-                    if(checkReplied(r, user.getId())) {
-                        result.add(c);
-                        break;
-                    }
+        List<Comment> comments = pageComments.getContent();
+        List<Comment> result = new ArrayList<Comment>();
+        for(Comment c : comments) {
+            List<String> replies = c.getReplies();
+            for(String r : replies) {
+                if(checkReplied(r, user.getId())) {
+                    result.add(c);
+                    break;
                 }
             }
-            // temporary solution
-            if(videoId != null) videoIdFilter(result, videoId);
-            return result;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
+        // temporary solution
+        if(videoId != null) videoIdFilter(result, videoId);
+        return result;
     }
 
     public List<Comment> getAllCommentFromMyVideosThatCurrentUserNotReplied(String videoId) {
-        try {
-            UserProfile user = userService.getCurrentUser();
+        UserProfile user = userService.getCurrentUser();
 
-            Pageable pageable = PageRequest.of(0, 999999, Sort.by(Sort.Direction.DESC, "createdAt"));
-            Slice<Comment> pageComments = iCommentRepository.findAllCommentForAllVideosByUserId(user.getId(), pageable);
+        Pageable pageable = PageRequest.of(0, 999999, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Slice<Comment> pageComments = iCommentRepository.findAllCommentForAllVideosByUserId(user.getId(), pageable);
 
-            List<Comment> comments = new ArrayList<>(pageComments.getContent());
-            List<Comment> toRemove = new ArrayList<>();
-            for(Comment c : comments) {
-                List<String> replies = c.getReplies();
-                for(String r : replies) {
-                    if(checkReplied(r, user.getId())) {
-                        toRemove.add(c);
-                        break;
-                    }
+        List<Comment> comments = new ArrayList<>(pageComments.getContent());
+        List<Comment> toRemove = new ArrayList<>();
+        for(Comment c : comments) {
+            List<String> replies = c.getReplies();
+            for(String r : replies) {
+                if(checkReplied(r, user.getId())) {
+                    toRemove.add(c);
+                    break;
                 }
             }
-            if(!toRemove.isEmpty()) comments.removeAll(toRemove);
-            // temporary solution
-            if(videoId != null) videoIdFilter(comments, videoId);
-            return comments;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
+        if(!toRemove.isEmpty()) comments.removeAll(toRemove);
+        // temporary solution
+        if(videoId != null) videoIdFilter(comments, videoId);
+        return comments;
     }
 
     // It's just a temporary solution I do in the backend for the 3 above methods,
     // I will refactor the Mongo database to get better performance of filter feature
     List<Comment> videoIdFilter(List<Comment> comments, String videoId) {
+        videoService.getVideoById(videoId);
         List<Comment> toRemove = new ArrayList<>();
         for(Comment c : comments) {
             if(!Objects.equals(c.getVideoId(), videoId))
