@@ -18,7 +18,7 @@ public class Video extends TimeAudit {
     @Id
     private String id;
     private Long userId;
-    private String playlistId;
+    private ObjectId playlistId;
     private String title;
     private String description;
     private List<String> tags;
@@ -31,4 +31,13 @@ public class Video extends TimeAudit {
     private Boolean isCommentOff;
     private Boolean isUploaded;
     private Boolean isProcessed;
+
+    public void setPlaylistId(String playlistId) {
+        if(ObjectId.isValid(playlistId)) {
+            this.playlistId = new ObjectId(playlistId);
+        } else throw new IllegalArgumentException("Invalid playlist id format");
+    }
+    public String getPlaylistId() {
+        return this.playlistId != null ? playlistId.toHexString() : null;
+    }
 }

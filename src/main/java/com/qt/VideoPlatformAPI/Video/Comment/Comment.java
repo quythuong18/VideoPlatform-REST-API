@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class Comment extends TimeAudit {
     @Id
     private String id;
     @NotBlank(message = "Video id is required")
-    private String videoId;
+    private ObjectId videoId;
     private Long userId;
     @NotBlank(message = "Content is required")
     private String content;
@@ -28,4 +29,13 @@ public class Comment extends TimeAudit {
     private Long likeCount;
     private Long replyCount;
     private Boolean isEdited;
+
+    public void setVideoId(String videoId) {
+        if(ObjectId.isValid(videoId)) {
+            this.videoId = new ObjectId(videoId);
+        } else throw new IllegalArgumentException("Invalid video id format");
+    }
+    public String getVideoId() {
+        return this.videoId != null ? videoId.toHexString() : null;
+    }
 }
