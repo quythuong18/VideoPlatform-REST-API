@@ -7,6 +7,10 @@ import com.qt.VideoPlatformAPI.Responses.AvailabilityResponse;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -130,9 +134,11 @@ public class UserService implements UserDetailsService {
         userRepository.save(following);
     }
 
-    public Set<String> getAllFollowings() {
+    public Set<String> getAllFollowings(Integer page, Integer size) {
         UserProfile userProfile = getCurrentUser();
-        List<UserConnection> userConnectionList = userConnectionRepository.findByFollower(userProfile);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Slice<UserConnection> userConnectionList = userConnectionRepository.findByFollower(userProfile, pageable);
 
         Set<String> usernameList = new HashSet<>();
 
@@ -143,9 +149,11 @@ public class UserService implements UserDetailsService {
         return usernameList;
     }
 
-    public Set<String> getAllFollowers() {
+    public Set<String> getAllFollowers(Integer page, Integer size) {
         UserProfile userProfile = getCurrentUser();
-        List<UserConnection> userConnectionList = userConnectionRepository.findByFollowing(userProfile);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Slice<UserConnection> userConnectionList = userConnectionRepository.findByFollowing(userProfile, pageable);
 
         Set<String> usernameList = new HashSet<>();
 

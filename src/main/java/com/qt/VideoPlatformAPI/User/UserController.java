@@ -83,15 +83,21 @@ public class UserController {
     }
 
     @GetMapping("/followings")
-    public ResponseEntity<APIResponseWithData<Set<String>>> getAllFollowings() {
+    public ResponseEntity<APIResponseWithData<Set<String>>> getAllFollowings(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
         return ResponseEntity.ok(new APIResponseWithData<Set<String>>(Boolean.TRUE,
-                "Get all followings successfully", HttpStatus.OK, userService.getAllFollowings()));
+                "Get all followings successfully", HttpStatus.OK, userService.getAllFollowings(page, size)));
     }
 
     @GetMapping("/followers")
-    public ResponseEntity<APIResponseWithData<Set<String>>> getAllFollowers() {
+    public ResponseEntity<APIResponseWithData<Set<String>>> getAllFollowers(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
         return ResponseEntity.ok(new APIResponseWithData<Set<String>>(Boolean.TRUE,
-                "Get all followers successfully", HttpStatus.OK, userService.getAllFollowers()));
+                "Get all followers successfully", HttpStatus.OK, userService.getAllFollowers(page, size)));
     }
 
     @GetMapping("/search")
