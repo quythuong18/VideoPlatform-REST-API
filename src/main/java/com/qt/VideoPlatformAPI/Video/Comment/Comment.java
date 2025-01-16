@@ -24,8 +24,8 @@ public class Comment extends TimeAudit {
     private Long userId;
     @NotBlank(message = "Content is required")
     private String content;
-    private String replyTo;
-    private List<String> replies;
+    private ObjectId replyTo;
+    private List<ObjectId> replies;
     private Long likeCount;
     private Long replyCount;
     private Boolean isEdited;
@@ -37,5 +37,14 @@ public class Comment extends TimeAudit {
     }
     public String getVideoId() {
         return this.videoId != null ? videoId.toHexString() : null;
+    }
+
+    public void setReplyTo(String replyTo) {
+        if(ObjectId.isValid(replyTo)) {
+            this.replyTo = new ObjectId(replyTo);
+        } else throw new IllegalArgumentException("Invalid comment(replyTo) id format");
+    }
+    public String getReplyTo() {
+        return this.replyTo != null ? replyTo.toHexString() : null;
     }
 }

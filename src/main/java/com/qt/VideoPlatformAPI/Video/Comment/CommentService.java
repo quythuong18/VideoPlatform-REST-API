@@ -2,16 +2,15 @@ package com.qt.VideoPlatformAPI.Video.Comment;
 
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
+import com.qt.VideoPlatformAPI.Utils.TimeAudit;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -23,6 +22,7 @@ public class CommentService {
     private final ICommentLikeRepository iCommentLikeRepository;
     private final VideoService videoService;
     private final UserService userService;
+    private final CustomCommentRepository customCommentRepository;
 
     public Comment addAComment(Comment comment) {
         // check if video exist
@@ -53,7 +53,7 @@ public class CommentService {
             // replyCount + 1
             parentComment.setReplyCount(parentComment.getReplyCount() + 1);
             // add child to list
-            parentComment.getReplies().add(savedComment.getId());
+            parentComment.getReplies().add(new ObjectId(savedComment.getId()));
             iCommentRepository.save(parentComment);
             return savedComment;
         }
@@ -86,9 +86,9 @@ public class CommentService {
 
         // delete all the child comment(recursion async)
         CompletableFuture.runAsync(() -> {
-            List<String> childrenComment = comment.getReplies();
-            for(String child : childrenComment) {
-                iCommentRepository.deleteById(child);
+            List<ObjectId> childrenComment = comment.getReplies();
+            for(ObjectId child : childrenComment) {
+                iCommentRepository.deleteById(child.toHexString());
             }
         }).thenAccept((res) -> {
             logger.info("Deleted all children comment");
@@ -118,31 +118,16 @@ public class CommentService {
         return iCommentRepository.save(updatedComment);
     }
 
-    public List<Comment> getAllCommentByVideoIdByTimestamp(String videoId, boolean ascending) {
-        List<Comment> commentList;
-        if(ascending)
-            commentList = iCommentRepository.findAllByVideoIdOrderByCreatedAtAsc(videoId);
-        else
-            commentList = iCommentRepository.findAllByVideoIdOrderByCreatedAtDesc(videoId);
+    public List<Comment> getAllParentCommentByVideoId(String videoId, Integer page, Integer size, boolean ascending) {
+        List<Comment> commentList = customCommentRepository.getAllParentComment(videoId, page, size);
+
+        if(!ascending) commentList.sort(Comparator.comparing(TimeAudit::getCreatedAt));
+        else commentList.sort((c1, c2) -> c2.getCreatedAt().compareTo(c1.getCreatedAt()));
+
         return commentList;
     }
 
-    public List<Comment> getAllParentCommentByVideoIdByTimestamp(String videoId, boolean acesding) {
-        List<Comment> commentList;
-        if(acesding)
-            commentList = iCommentRepository.findAllByVideoIdOrderByCreatedAtAsc(videoId);
-        else
-            commentList = iCommentRepository.findAllByVideoIdOrderByCreatedAtDesc(videoId);
-
-        List<Comment> returnList = new ArrayList<>();
-        for(Comment c : commentList) {
-            if(c.getReplyTo() == null) {
-                returnList.add(c);
-            }
-        }
-        return returnList;
-    }
-
+    // remove
     public List<Comment> getAllChildrenCommentByTimestamp(String commentId, boolean ascending) {
         List<Comment> commentChildList;
         if(ascending)
@@ -150,6 +135,15 @@ public class CommentService {
         else
             commentChildList = iCommentRepository.findAllByReplyToOrderByCreatedAtDesc(commentId);
         return commentChildList;
+    }
+
+    public List<Comment> getAllChildrenComment(String commentId, Integer page, Integer size, boolean ascending) {
+        List<Comment> commentList = customCommentRepository.getAllChildrenComment(commentId, page, size);
+
+        if(!ascending) commentList.sort(Comparator.comparing(TimeAudit::getCreatedAt));
+        else commentList.sort((c1, c2) -> c2.getCreatedAt().compareTo(c1.getCreatedAt()));
+
+        return commentList;
     }
 
     public void deleteAllCommentsByVideoId(String videoId) {
@@ -181,9 +175,9 @@ public class CommentService {
         List<Comment> comments = pageComments.getContent();
         List<Comment> result = new ArrayList<Comment>();
         for(Comment c : comments) {
-            List<String> replies = c.getReplies();
-            for(String r : replies) {
-                if(checkReplied(r, user.getId())) {
+            List<ObjectId> replies = c.getReplies();
+            for(ObjectId r : replies) {
+                if(checkReplied(r.toHexString(), user.getId())) {
                     result.add(c);
                     break;
                 }
@@ -204,9 +198,9 @@ public class CommentService {
         List<Comment> comments = new ArrayList<>(pageComments.getContent());
         List<Comment> toRemove = new ArrayList<>();
         for(Comment c : comments) {
-            List<String> replies = c.getReplies();
-            for(String r : replies) {
-                if(checkReplied(r, user.getId())) {
+            List<ObjectId> replies = c.getReplies();
+            for(ObjectId r : replies) {
+                if(checkReplied(r.toHexString(), user.getId())) {
                     toRemove.add(c);
                     break;
                 }
