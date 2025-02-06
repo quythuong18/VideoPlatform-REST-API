@@ -36,4 +36,5 @@ public class CustomCommentRepository {
 
         return mongoTemplate.find(query, Comment.class, "comment");
     }
+
 }
