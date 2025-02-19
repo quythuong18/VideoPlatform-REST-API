@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-@Document("comment")
+@Document("comments")
 @Getter
 @Setter
 @AllArgsConstructor

@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document("comment_like")
+@Document("comment_likes")
 @AllArgsConstructor
 @Getter
 @Setter
