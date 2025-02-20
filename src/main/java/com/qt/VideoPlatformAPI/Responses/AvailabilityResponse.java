@@ -9,11 +9,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @Setter
 @AllArgsConstructor
-public class AvailabilityResponse extends APIResponse {
+public class AvailabilityResponse {
     @JsonProperty("isExisted")
     private Boolean isExisted;
-    public AvailabilityResponse(Boolean success, String message, HttpStatus httpStatus, Boolean isExisted) {
-        super(success, message, httpStatus);
-        this.isExisted = isExisted;
-    }
 }

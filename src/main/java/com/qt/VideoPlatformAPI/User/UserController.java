@@ -49,13 +49,21 @@ public class UserController {
     }
 
     @GetMapping("/checkUsernameAvailability")
-    ResponseEntity<AvailabilityResponse> checkUsernameAvailability(@RequestParam(value = "username") String username) {
-        return userService.checkUsernameAvailability(username);
+    ResponseEntity<APIResponseWithData<AvailabilityResponse>> checkUsernameAvailability(@RequestParam(value = "username") String username) {
+        if(userService.checkUsernameAvailability(username))
+            return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Username " + username + " exists",
+                    HttpStatus.OK, new AvailabilityResponse(true)));
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Username " + username + " does not exist",
+                HttpStatus.OK, new AvailabilityResponse(false)));
     }
 
     @GetMapping("/checkEmailAvailability")
-    ResponseEntity<AvailabilityResponse> checkEmailAvailability(@RequestParam(value = "email") String email) {
-        return userService.checkEmailAvailability(email);
+    ResponseEntity<APIResponseWithData<AvailabilityResponse>> checkEmailAvailability(@RequestParam(value = "email") String email) {
+        if(userService.checkEmailAvailability(email))
+            return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Email " + email + " exists",
+                    HttpStatus.OK, new AvailabilityResponse(true)));
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Email " + email + " does not exist",
+                HttpStatus.OK, new AvailabilityResponse(false)));
     }
 
     @PostMapping("/{username}/follow")

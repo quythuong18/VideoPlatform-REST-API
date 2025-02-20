@@ -73,18 +73,12 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public ResponseEntity<AvailabilityResponse> checkUsernameAvailability(String username) {
-         Boolean isExisted = userRepository.existByUsername(username);
-         if(isExisted)
-             return ResponseEntity.ok(new AvailabilityResponse(Boolean.TRUE, "username " + username + " exists", HttpStatus.OK,Boolean.TRUE));
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AvailabilityResponse(Boolean.FALSE, "username " + username + " does not exist", HttpStatus.NOT_FOUND, Boolean.FALSE));
+    public Boolean checkUsernameAvailability(String username) {
+         return userRepository.existByUsername(username);
     }
 
-    public ResponseEntity<AvailabilityResponse> checkEmailAvailability(String email) {
-        Boolean isExisted = userRepository.existByEmail(email);
-        if(isExisted)
-            return ResponseEntity.ok(new AvailabilityResponse(Boolean.TRUE, "email " + email + " exists", HttpStatus.OK,Boolean.TRUE));
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AvailabilityResponse(Boolean.FALSE, "email " + email + " does not exist", HttpStatus.NOT_FOUND,Boolean.FALSE));
+    public Boolean checkEmailAvailability(String email) {
+        return userRepository.existByEmail(email);
     }
 
     public APIResponse followAUser(String username) {
