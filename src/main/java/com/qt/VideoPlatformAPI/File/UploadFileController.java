@@ -2,12 +2,11 @@ package com.qt.VideoPlatformAPI.File;
 
 import com.qt.VideoPlatformAPI.File.storage.FileSystemStorageService;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
-import com.qt.VideoPlatformAPI.Config.VideoEnv;
+import com.qt.VideoPlatformAPI.Utils.VideoConstants;
 import com.qt.VideoPlatformAPI.Video.Video;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
 import org.apache.commons.fileupload.FileUploadException;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +34,7 @@ public class UploadFileController {
             throw new IllegalArgumentException("Please upload a video file");
 
         String contentType = file.getContentType();
-        if(contentType == null || !VideoEnv.VIDEO_MIME_TYPES.contains(contentType)) {
+        if(contentType == null || !VideoConstants.VIDEO_MIME_TYPES.contains(contentType)) {
             return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(new APIResponse(false, "Invalid video file type", HttpStatus.UNSUPPORTED_MEDIA_TYPE));
         }
 

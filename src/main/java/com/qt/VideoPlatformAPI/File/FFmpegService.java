@@ -1,7 +1,7 @@
 package com.qt.VideoPlatformAPI.File;
 
 import com.qt.VideoPlatformAPI.File.storage.FileSystemStorageService;
-import com.qt.VideoPlatformAPI.Config.VideoEnv;
+import com.qt.VideoPlatformAPI.Utils.VideoConstants;
 import com.qt.VideoPlatformAPI.Video.Video;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class FFmpegService {
 
     public VideoFileMetadata getVideoFileMetadata(String videoId) throws IOException {
         String videoFileName = getVideoFileName(videoId);
-        FFmpegProbeResult probeResult = ffprobe.probe(VideoEnv.ROOT_LOCATION.toString() + "/"
+        FFmpegProbeResult probeResult = ffprobe.probe(VideoConstants.ROOT_LOCATION.toString() + "/"
                         + videoId + "/" + videoFileName);
         FFmpegStream firstVideoStream = null;
         FFmpegStream firstAudioStream = null;
@@ -51,7 +51,7 @@ public class FFmpegService {
         VideoFileMetadata videoFileMetadata = new VideoFileMetadata();
         // video
         videoFileMetadata.setId(videoId);
-        videoFileMetadata.setPathName(VideoEnv.ROOT_LOCATION.toString() + "/" + videoId + "/" + videoFileName);
+        videoFileMetadata.setPathName(VideoConstants.ROOT_LOCATION.toString() + "/" + videoId + "/" + videoFileName);
         videoFileMetadata.setWidth(firstVideoStream.width);
         videoFileMetadata.setHeight(firstVideoStream.height);
         videoFileMetadata.setFps(firstVideoStream.r_frame_rate.floatValue());
@@ -70,7 +70,7 @@ public class FFmpegService {
 
     public VideoFileMetadata transcodeVideo(VideoFileMetadata v) throws IOException {
         FFmpegBuilder builder = new FFmpegBuilder();
-        for(Integer quality : VideoEnv.VIDEO_QUALITY) {
+        for(Integer quality : VideoConstants.VIDEO_QUALITY) {
             if(v.getHeight() >= quality) {
                 v.getQualities().add(quality);
                 int newHeight = quality;
@@ -80,10 +80,10 @@ public class FFmpegService {
                 long newAudioBitrate = 0;
                 // check if Audio exists on that video
                 if(v.getAudioBitrate() != null)
-                    newAudioBitrate = (v.getAudioBitrate() > VideoEnv.AUDIO_BITRATE)? VideoEnv.AUDIO_BITRATE : v.getAudioBitrate();
+                    newAudioBitrate = (v.getAudioBitrate() > VideoConstants.AUDIO_BITRATE)? VideoConstants.AUDIO_BITRATE : v.getAudioBitrate();
 
                 // create dir for each quality
-                String VideoDir = VideoEnv.ROOT_LOCATION.toString() + "/" + v.getId();
+                String VideoDir = VideoConstants.ROOT_LOCATION.toString() + "/" + v.getId();
 
                 // get the file extension
                 v.setFileExtension(FileSystemStorageService.getFileExtensionFromOriginalName(v.getPathName()));
@@ -122,7 +122,7 @@ public class FFmpegService {
         List<String> command = new ArrayList<>();
         command.add(ffmpeg.getPath());
 
-        String videoDir = VideoEnv.ROOT_LOCATION + "/" + v.getId();
+        String videoDir = VideoConstants.ROOT_LOCATION + "/" + v.getId();
         command.add("-re");
         command.add("-hwaccel");
         command.add("cuda");
@@ -154,7 +154,7 @@ public class FFmpegService {
     }
     // this function will return file extension within ".", e.g: ".mp4"
     public String getVideoFileName(String videoId) {
-        File dir =  new File(VideoEnv.ROOT_LOCATION.toString() + "/" + videoId);
+        File dir =  new File(VideoConstants.ROOT_LOCATION.toString() + "/" + videoId);
         if (!dir.isDirectory()) {
             throw new IllegalArgumentException("File is not a directory");
         }
@@ -176,8 +176,8 @@ public class FFmpegService {
 
         FFmpegBuilder builder = new FFmpegBuilder();
         try {
-            builder.setInput(VideoEnv.ROOT_LOCATION.toString() + "/" + videoId + "/" + getVideoFileName(v.getId()))
-                    .addOutput(VideoEnv.ROOT_LOCATION.toString() + "/" + videoId + "/" + "thumbnail.jpg")
+            builder.setInput(VideoConstants.ROOT_LOCATION.toString() + "/" + videoId + "/" + getVideoFileName(v.getId()))
+                    .addOutput(VideoConstants.ROOT_LOCATION.toString() + "/" + videoId + "/" + "thumbnail.jpg")
                     .addExtraArgs("-ss", "00:00:01")
                     .addExtraArgs("-vframes", "1")
                     .done();

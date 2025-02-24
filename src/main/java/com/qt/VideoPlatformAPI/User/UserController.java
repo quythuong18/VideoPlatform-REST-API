@@ -1,6 +1,6 @@
 package com.qt.VideoPlatformAPI.User;
 
-import com.qt.VideoPlatformAPI.Config.VideoEnv;
+import com.qt.VideoPlatformAPI.Utils.VideoConstants;
 import com.qt.VideoPlatformAPI.DTO.UserPublicDTO;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
@@ -130,7 +130,7 @@ public class UserController {
     ResponseEntity<APIResponseWithData<String>> updateProfilePic(@RequestBody MultipartFile img) throws IOException {
         if(img == null)
             throw new IllegalArgumentException("Please upload a image file");
-        if(!VideoEnv.IMAGE_MIME_TYPES.contains(img.getContentType()))
+        if(!VideoConstants.IMAGE_MIME_TYPES.contains(img.getContentType()))
             throw new IllegalArgumentException("The image format is not supported");
 
         String profilePicUrl = userService.updateProfilePic(img);

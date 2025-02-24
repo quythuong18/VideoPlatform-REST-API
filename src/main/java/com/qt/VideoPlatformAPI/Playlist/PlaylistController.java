@@ -1,6 +1,6 @@
 package com.qt.VideoPlatformAPI.Playlist;
 
-import com.qt.VideoPlatformAPI.Config.VideoEnv;
+import com.qt.VideoPlatformAPI.Utils.VideoConstants;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
 import com.qt.VideoPlatformAPI.Video.IVideosRepository;
@@ -64,7 +64,7 @@ public class PlaylistController {
     @PathVariable String playlistId) throws IOException {
         if(img == null)
             throw new IllegalArgumentException("Please upload a image file");
-        if(!VideoEnv.IMAGE_MIME_TYPES.contains(img.getContentType()))
+        if(!VideoConstants.IMAGE_MIME_TYPES.contains(img.getContentType()))
             throw new IllegalArgumentException("The image format is not supported");
 
         String profilePicUrl = playlistService.uploadPlaylistThumbnail(img, playlistId);

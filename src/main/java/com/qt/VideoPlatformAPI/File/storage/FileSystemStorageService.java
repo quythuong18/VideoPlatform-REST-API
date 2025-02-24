@@ -1,7 +1,7 @@
 package com.qt.VideoPlatformAPI.File.storage;
 
 import com.qt.VideoPlatformAPI.Exception.StorageException;
-import com.qt.VideoPlatformAPI.Config.VideoEnv;
+import com.qt.VideoPlatformAPI.Utils.VideoConstants;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,7 +22,7 @@ public class FileSystemStorageService {
                 throw new StorageException("failed to store empty file.");
             }
             // create a sub dir to save file name
-            Path videoSubDir = VideoEnv.ROOT_LOCATION.resolve(id);
+            Path videoSubDir = VideoConstants.ROOT_LOCATION.resolve(id);
             Files.createDirectories(videoSubDir);
 
             Path destinationFile = videoSubDir.resolve(Paths.get
