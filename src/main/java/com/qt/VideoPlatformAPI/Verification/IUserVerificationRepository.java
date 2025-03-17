@@ -9,4 +9,6 @@ public interface IUserVerificationRepository extends JpaRepository<UserVerificat
 
     @Query("SELECT u FROM UserVerification u WHERE u.user.email = ?1 ORDER BY u.id DESC LIMIT 1")
     Optional<UserVerification> findByEmail(String email);
+    @Query("SELECT u FROM UserVerification u WHERE u.user.username = ?1 ORDER BY u.id DESC LIMIT 1")
+    Optional<UserVerification> findByUsername(String username);
 }
