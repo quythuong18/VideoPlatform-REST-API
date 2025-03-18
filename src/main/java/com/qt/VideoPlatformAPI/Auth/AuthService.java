@@ -4,7 +4,6 @@ import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
 import com.qt.VideoPlatformAPI.User.IUserRepository;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
-import com.qt.VideoPlatformAPI.Responses.AuthenticationResponse;
 import com.qt.VideoPlatformAPI.Utils.EmailService;
 import com.qt.VideoPlatformAPI.Verification.IUserVerificationRepository;
 import com.qt.VideoPlatformAPI.Verification.OTPGenerator;
@@ -83,7 +82,7 @@ public class AuthService {
         return new APIResponse(Boolean.FALSE,"Account activated failed", HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<AuthenticationResponse> authenticate(UserProfile userReq) {
+    public ResponseEntity<APIResponseWithData<String>> authenticate(UserProfile userReq) {
         // find the user in db
         Optional<UserProfile> user = userRepository.findByUsername(userReq.getUsername());
         if(user.isEmpty()) {
@@ -108,7 +107,7 @@ public class AuthService {
 
         // generate toke to send
         String token = jwtService.generateToken(user.get());
-        return ResponseEntity.ok(new AuthenticationResponse(Boolean.TRUE, "authenticated", HttpStatus.OK, token));
+        return ResponseEntity.ok(new APIResponseWithData<String>(Boolean.TRUE, "authenticated", HttpStatus.OK, token));
     }
 
     public APIResponse resetPassword(String email) {

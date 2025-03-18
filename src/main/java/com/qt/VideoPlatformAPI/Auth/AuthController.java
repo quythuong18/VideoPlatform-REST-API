@@ -3,7 +3,6 @@ package com.qt.VideoPlatformAPI.Auth;
 import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
-import com.qt.VideoPlatformAPI.Responses.AuthenticationResponse;
 import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ public class AuthController {
     }
 
     @PostMapping("/signIn")
-    public ResponseEntity<AuthenticationResponse> signIn(@RequestBody UserProfile userReq) {
+    public ResponseEntity<APIResponseWithData<String>> signIn(@RequestBody UserProfile userReq) {
         return authService.authenticate(userReq);
     }
 
