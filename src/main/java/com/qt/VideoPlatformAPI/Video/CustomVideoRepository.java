@@ -20,7 +20,7 @@ public class CustomVideoRepository {
         Aggregation aggregation = Aggregation.newAggregation(Aggregation.sample(count));
 
         // Execute the aggregation query on the "video" collection
-        AggregationResults<Video> results = mongoTemplate.aggregate(aggregation, "video", Video.class);
+        AggregationResults<Video> results = mongoTemplate.aggregate(aggregation, "videos", Video.class);
 
         return results.getMappedResults();
     }
@@ -37,7 +37,7 @@ public class CustomVideoRepository {
         query.limit(count);
 
         // Use count() to get the number of matching documents
-        return mongoTemplate.find(query, Video.class, "video");
+        return mongoTemplate.find(query, Video.class, "videos");
     }
     public List<Video> searchByTag(String tag, Integer count) {
         Query query = new Query();
@@ -52,6 +52,6 @@ public class CustomVideoRepository {
         query.limit(count);
 
         // Execute the query and return the results
-        return mongoTemplate.find(query, Video.class, "video");
+        return mongoTemplate.find(query, Video.class, "videos");
     }
 }

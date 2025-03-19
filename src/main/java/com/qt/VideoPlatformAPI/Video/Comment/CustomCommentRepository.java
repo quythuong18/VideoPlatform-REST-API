@@ -23,7 +23,7 @@ public class CustomCommentRepository {
         query.skip((long) page * size);
         query.limit(size);
 
-        return mongoTemplate.find(query, Comment.class, "comment");
+        return mongoTemplate.find(query, Comment.class, "comments");
     }
 
     public List<Comment> getAllChildrenComment(String commentId, Integer page, Integer size) {
@@ -34,7 +34,7 @@ public class CustomCommentRepository {
         query.skip((long) page * size);
         query.limit(size);
 
-        return mongoTemplate.find(query, Comment.class, "comment");
+        return mongoTemplate.find(query, Comment.class, "comments");
     }
 
 }

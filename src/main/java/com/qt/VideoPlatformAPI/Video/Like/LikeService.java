@@ -3,6 +3,7 @@ package com.qt.VideoPlatformAPI.Video.Like;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Component
 @AllArgsConstructor
@@ -35,7 +37,7 @@ public class LikeService {
     public void removeLikeVideo(String videoId) {
         if(!checkLikeVideo(videoId))
             throw new IllegalArgumentException("You have not liked this video before");
-        Optional<VideoLike> videoIdOptional = iLikeRepository.findByVideoIdAndUserId(videoId,
+        Optional<VideoLike> videoIdOptional = iLikeRepository.findByVideoIdAndUserId(new ObjectId(videoId),
                 userService.getCurrentUser().getId());
 
         videoIdOptional.ifPresent(iLikeRepository::delete);
@@ -43,8 +45,9 @@ public class LikeService {
     }
 
     public Boolean checkLikeVideo(String videoId) {
-        Optional<VideoLike> videoIdOptional = iLikeRepository.findByVideoIdAndUserId(videoId,
+        Optional<VideoLike> videoIdOptional = iLikeRepository.findByVideoIdAndUserId(new ObjectId(videoId),
                 userService.getCurrentUser().getId());
+        System.out.println(videoId + " " + userService.getCurrentUser().getId());
         return videoIdOptional.isPresent();
     }
 
