@@ -1,0 +1,17 @@
+services:
+  videoplatform:
+    image: quythuong18/videoplatformapi:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_URL=${POSTGRES_URL}
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+      - MONGODB_URI=${POSTGRES_USERNAME}
+
+      - FFMPEG_PATH=${FFMPEG_PATH}
+      - FFPROBE_PATH=${FFPROBE_PATH}
+    ports:
+      - "8080:8080"
