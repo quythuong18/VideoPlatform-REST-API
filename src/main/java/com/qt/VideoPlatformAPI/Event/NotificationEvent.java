@@ -11,6 +11,6 @@ public class NotificationEvent {
     private String fromUsername;
     private List<String> toUsernames;
     private NotificationTypes type;
-    private String VideoTitle;
+    private String videoTitle;
 }
 
