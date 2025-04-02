@@ -1,52 +1,66 @@
 package com.qt.VideoPlatformAPI.File;
 
+import com.qt.VideoPlatformAPI.Event.NotiMetadata;
+import com.qt.VideoPlatformAPI.Event.NotificationEvent;
+import com.qt.VideoPlatformAPI.Event.NotificationProducer;
+import com.qt.VideoPlatformAPI.User.*;
+import com.qt.VideoPlatformAPI.Utils.NotificationTypes;
 import com.qt.VideoPlatformAPI.Utils.VideoConstants;
 import com.qt.VideoPlatformAPI.Video.Video;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
 public class VideoFileProcessingService {
     private final FFmpegService fFmpegService;
+    private final IUserConnectionRepository iUserConnectionRepository;
     @Lazy private final VideoService videoService;
+    private final UserService userService;
     private final CloudinaryService cloudinaryService;
+    private final NotificationProducer notificationProducer;
+
+    @Async
     public void processVideoAsync(String videoId) {
-        CompletableFuture.runAsync(() -> {
+        Video v = videoService.getVideoById(videoId);
+        // process video: transcoding and creating manifest file
+        try {
+            VideoFileMetadata videoFileMetadata =
+                    fFmpegService.createManifestFile(fFmpegService.transcodeVideo(fFmpegService.getVideoFileMetadata(videoId)));
+            fFmpegService.createVideoThumbnailFrame(videoId);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // create and update thumbnail
+        videoService.updateVideoProcessedStatus(videoId);
+        if(v.getThumbnailUrl() == null || v.getThumbnailUrl().isBlank()) {
+            String filePath = VideoConstants.ROOT_LOCATION + "/" + videoId + "/thumbnail.jpg";
+            File file = new File(filePath); // Locate the thumbnail file
+            if (!file.exists()) {
+                throw new IllegalArgumentException("File not found at path: " + filePath);
+            }
+
             try {
-                VideoFileMetadata videoFileMetadata =
-                fFmpegService.createManifestFile(fFmpegService.transcodeVideo(fFmpegService.getVideoFileMetadata(videoId)));
-                fFmpegService.createVideoThumbnailFrame(videoId);
+                videoService.updateThumbnailUrl(videoId, cloudinaryService.uploadThumbnailFromVideo(file, videoId));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }).thenAccept((res) -> {
-            videoService.updateVideoProcessedStatus(videoId);
-            Video v = videoService.getVideoById(videoId);
-            if(v.getThumbnailUrl() == null || v.getThumbnailUrl().isBlank()) {
-                String filePath = VideoConstants.ROOT_LOCATION + "/" + videoId + "/thumbnail.jpg";
-                File file = new File(filePath); // Locate the thumbnail file
-                if (!file.exists()) {
-                    throw new IllegalArgumentException("File not found at path: " + filePath);
-                }
+        }
 
-                try {
-                    videoService.updateThumbnailUrl(videoId, cloudinaryService.uploadThumbnailFromVideo(file, videoId));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
     }
+
     public void deleteVideoFiles(String videoId) {
         deleteFile(new File(VideoConstants.ROOT_LOCATION.toString() + "/" + videoId));
     }
+
     public boolean deleteFile(File file) {
         if(file.isDirectory()) {
             File[] files = file.listFiles();

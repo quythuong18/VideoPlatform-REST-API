@@ -3,16 +3,16 @@ package com.qt.VideoPlatformAPI.User;
 import com.qt.VideoPlatformAPI.DTO.UserPublicDTO;
 import com.qt.VideoPlatformAPI.File.CloudinaryService;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
-import com.qt.VideoPlatformAPI.Responses.AvailabilityResponse;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +27,7 @@ import java.util.*;
 @Component
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     private final IUserRepository userRepository;
     private final IUserConnectionRepository userConnectionRepository;
     private final CloudinaryService cloudinaryService;
@@ -128,7 +129,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(following);
     }
 
-    public Set<String> getAllFollowings(Integer page, Integer size) {
+    public Set<String> getAllMyFollowings(Integer page, Integer size) {
         UserProfile userProfile = getCurrentUser();
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -143,7 +144,7 @@ public class UserService implements UserDetailsService {
         return usernameList;
     }
 
-    public Set<String> getAllFollowers(Integer page, Integer size) {
+    public Set<String> getAllMyFollowers(Integer page, Integer size) {
         UserProfile userProfile = getCurrentUser();
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));

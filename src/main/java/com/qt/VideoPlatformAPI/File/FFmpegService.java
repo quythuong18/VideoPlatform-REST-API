@@ -83,7 +83,7 @@ public class FFmpegService {
                     newAudioBitrate = (v.getAudioBitrate() > VideoConstants.AUDIO_BITRATE)? VideoConstants.AUDIO_BITRATE : v.getAudioBitrate();
 
                 // create dir for each quality
-                String VideoDir = VideoConstants.ROOT_LOCATION.toString() + "/" + v.getId();
+                String videoDir = VideoConstants.ROOT_LOCATION.toString() + "/" + v.getId();
 
                 // get the file extension
                 v.setFileExtension(FileSystemStorageService.getFileExtensionFromOriginalName(v.getPathName()));
@@ -92,7 +92,8 @@ public class FFmpegService {
                     builder
                             .addExtraArgs("-hwaccel", "cuda")
                             . setInput(v.getPathName())
-                            .addOutput(VideoDir + "/" + quality.toString() + v.getFileExtension())
+//                            .addOutput(videoDir + "/" + quality.toString() + v.getFileExtension())
+                            .addOutput(videoDir + "/" + quality.toString() + ".mpd")
                             // video
                             .addExtraArgs("-map", "0:v:0")
                             .setVideoCodec("h264_nvenc")
@@ -128,12 +129,12 @@ public class FFmpegService {
         command.add("cuda");
         for(Integer quality : v.getQualities()) {
             command.add("-i");
-            command.add(quality.toString() + v.getFileExtension());
+            command.add(quality.toString() + ".mpd");
         }
         StringBuilder stream = new StringBuilder("0");
         for(int i = 0; i < v.getQualities().size(); i++) {
             command.add("-map");
-            command.add(String.valueOf(String.valueOf(i)));
+            command.add(String.valueOf(i));
             stream.append(",").append(Integer.toString(i));
         }
         command.add("-f");

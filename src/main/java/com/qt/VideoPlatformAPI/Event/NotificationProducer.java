@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-class NotificationProducer {
+public class NotificationProducer {
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
 
@@ -20,5 +20,6 @@ class NotificationProducer {
 
     public void sendMsg(NotificationEvent eventMessage) {
         rabbitTemplate.convertAndSend(exchangeName, notificationRoutingKey, eventMessage);
+        System.out.println(eventMessage.toString());
     }
 }
