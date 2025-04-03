@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.util.*;
 
@@ -146,9 +147,19 @@ public class UserService implements UserDetailsService {
 
     public Set<String> getAllMyFollowers(Integer page, Integer size) {
         UserProfile userProfile = getCurrentUser();
+        return getAllFollowersByUserProfile(userProfile, page, size);
+    }
 
+    public Set<String> getAllFollowersByUsername(String username, Integer page, Integer size) {
+        Optional<UserProfile> userProfileOptional = userRepository.findByUsername(username);
+        if(userProfileOptional.isEmpty()) throw new IllegalArgumentException("Username does not exist");
+
+        return getAllFollowersByUserProfile(userProfileOptional.get(), page, size);
+    }
+
+    public Set<String> getAllFollowersByUserProfile(UserProfile user, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Slice<UserConnection> userConnectionList = userConnectionRepository.findByFollowing(userProfile, pageable);
+        Slice<UserConnection> userConnectionList = userConnectionRepository.findByFollowing(user, pageable);
 
         Set<String> usernameList = new HashSet<>();
 
