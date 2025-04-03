@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 @Component
@@ -55,6 +56,8 @@ public class VideoFileProcessingService {
             }
         }
 
+        // sending notification event to rabbitmq
+        sendingCompletionToRabbitMQ(v);
     }
 
     public void deleteVideoFiles(String videoId) {
@@ -71,5 +74,22 @@ public class VideoFileProcessingService {
             }
         }
         return file.delete();
+    }
+
+    public void sendingCompletionToRabbitMQ(Video v) {
+        String ownerUsername = userService.getUserByUserId(v.getUserId()).getUsername();
+        NotificationEvent notificationEvent = NotificationEvent.builder()
+                .type(NotificationTypes.NEW_VIDEO)
+                .fromUsername(ownerUsername)
+                .notiMetadata(new NotiMetadata(v.getId(), v.getTitle()))
+                .build();
+        Integer page = 0;
+        Set<String> usernameList = new HashSet<>();
+        do {
+            usernameList = userService.getAllFollowersByUsername(ownerUsername, page, 10);
+            notificationEvent.setToUsernames(usernameList.stream().toList());
+            notificationProducer.sendMsg(notificationEvent);
+            page++;
+        } while(usernameList.size() >= 10);
     }
 }
