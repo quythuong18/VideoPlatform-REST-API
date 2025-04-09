@@ -1,8 +1,11 @@
 package com.qt.VideoPlatformAPI.User;
 
 import com.qt.VideoPlatformAPI.DTO.UserPublicDTO;
+import com.qt.VideoPlatformAPI.Event.NotificationEvent;
+import com.qt.VideoPlatformAPI.Event.NotificationProducer;
 import com.qt.VideoPlatformAPI.File.CloudinaryService;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
+import com.qt.VideoPlatformAPI.Utils.NotificationTypes;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +37,7 @@ public class UserService implements UserDetailsService {
     private final IUserConnectionRepository userConnectionRepository;
     private final CloudinaryService cloudinaryService;
     private final ModelMapper mapper;
+    private final NotificationProducer notificationProducer;
 
     public UserPublicDTO getAPublicUserByUsername(String username) {
         Optional<UserProfile> userProfileOptional = userRepository.findByUsername(username);
@@ -97,6 +102,9 @@ public class UserService implements UserDetailsService {
 
         increaseFollowsCount(follower, following);
         userConnectionRepository.save(userConnection);
+        // send notification
+        sendFollowingEvent(follower.getUsername(), following.getUsername());
+
         return new APIResponse(Boolean.TRUE, "Follow " + following.getUsername() + " successfully", HttpStatus.OK);
     }
 
@@ -228,5 +236,15 @@ public class UserService implements UserDetailsService {
             userPublicDTOList.add(mapper.map(u, UserPublicDTO.class));
         }
         return userPublicDTOList;
+    }
+
+    @Async
+    public void sendFollowingEvent(String followerUsername, String followingUsername) {
+        NotificationEvent notificationEvent = NotificationEvent.builder()
+                .type(NotificationTypes.FOLLOW)
+                .fromUsername(followerUsername)
+                .toUsernames(List.of(followingUsername))
+                .build();
+        notificationProducer.sendMsg(notificationEvent);
     }
 }
