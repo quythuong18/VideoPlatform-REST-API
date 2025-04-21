@@ -1,8 +1,10 @@
 package com.qt.VideoPlatformAPI.Video.Like;
 
+import com.qt.VideoPlatformAPI.Event.NotificationProducer;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,6 +20,7 @@ public class LikeService {
     private final ILikeRepository iLikeRepository;
     private final UserService userService;
     private final VideoService videoService;
+    private final NotificationProducer notificationProducer;
 
     public void LikeVideo(String videoId) {
         if(checkLikeVideo(videoId))
@@ -29,13 +32,14 @@ public class LikeService {
 
         iLikeRepository.save(videoLike);
         videoService.increaseLikeCount(videoId);
-
+        notificationProducer.likeVideoEvent(userService.getCurrentUser().getUsername(),
+            videoService.getUsernameByVideoId(videoId), videoId);
     }
 
     public void removeLikeVideo(String videoId) {
         if(!checkLikeVideo(videoId))
             throw new IllegalArgumentException("You have not liked this video before");
-        Optional<VideoLike> videoIdOptional = iLikeRepository.findByVideoIdAndUserId(videoId,
+        Optional<VideoLike> videoIdOptional = iLikeRepository.findByVideoIdAndUserId(new ObjectId(videoId),
                 userService.getCurrentUser().getId());
 
         videoIdOptional.ifPresent(iLikeRepository::delete);
@@ -43,8 +47,9 @@ public class LikeService {
     }
 
     public Boolean checkLikeVideo(String videoId) {
-        Optional<VideoLike> videoIdOptional = iLikeRepository.findByVideoIdAndUserId(videoId,
+        Optional<VideoLike> videoIdOptional = iLikeRepository.findByVideoIdAndUserId(new ObjectId(videoId),
                 userService.getCurrentUser().getId());
+        System.out.println(userService.getCurrentUser().getId());
         return videoIdOptional.isPresent();
     }
 
