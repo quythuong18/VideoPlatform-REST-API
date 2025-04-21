@@ -243,7 +243,7 @@ public class CommentService {
     }
 
     public void removeALikeComment(String commentId) {
-        Optional<CommentLike> commentLike = iCommentLikeRepository.findByCommentIdAndUserId(commentId,
+        Optional<CommentLike> commentLike = iCommentLikeRepository.findByCommentIdAndUserId(new ObjectId(commentId),
                 userService.getCurrentUser().getId());
         if(commentLike.isEmpty())
             throw new IllegalArgumentException("You've not liked this comment before");
@@ -265,7 +265,7 @@ public class CommentService {
     }
 
     public boolean checkLikeComment(String commentId) {
-        Optional<CommentLike> commentLike = iCommentLikeRepository.findByCommentIdAndUserId(commentId,
+        Optional<CommentLike> commentLike = iCommentLikeRepository.findByCommentIdAndUserId(new ObjectId(commentId),
                 userService.getCurrentUser().getId());
         return commentLike.isPresent();
     }
