@@ -18,6 +18,7 @@ public class Video extends TimeAudit {
     @Id
     private String id;
     private Long userId;
+    private String username;
     private ObjectId playlistId;
     private String title;
     private String description;

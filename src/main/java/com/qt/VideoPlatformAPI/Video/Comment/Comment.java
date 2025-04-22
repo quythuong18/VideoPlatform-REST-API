@@ -22,6 +22,7 @@ public class Comment extends TimeAudit {
     @NotBlank(message = "Video id is required")
     private ObjectId videoId;
     private Long userId;
+    private String username;
     @NotBlank(message = "Content is required")
     private String content;
     private ObjectId replyTo;

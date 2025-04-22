@@ -43,6 +43,7 @@ public class VideoService {
 
         // set more information for the video
         video.setUserId(user.getId());
+        video.setUsername(user.getUsername());
 
         video.setLikesCount(0L);
         video.setViewsCount(0L);
@@ -117,6 +118,10 @@ public class VideoService {
             throw new IllegalArgumentException("Video data with id: " + videoId + " does not exist");
 
         return video.get();
+    }
+
+    public String getUsernameByVideoId(String videoId) {
+        return userService.getUserByUserId(getVideoById(videoId).getUserId()).getUsername();
     }
 
     public List<Video> getRandomVideos(Integer count) {

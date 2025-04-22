@@ -36,7 +36,10 @@ public class CommentService {
 
         if(comment.getContent() == null || comment.getContent().isEmpty())
             throw new IllegalArgumentException("Comment content is null or empty");
-        comment.setUserId(userService.getCurrentUser().getId());
+
+        UserProfile currentUser = userService.getCurrentUser();
+        comment.setUserId(currentUser.getId());
+        comment.setUsername(currentUser.getUsername());
         comment.setLikeCount(0L);
         comment.setReplyCount(0L);
         comment.setReplies(new ArrayList<>());
