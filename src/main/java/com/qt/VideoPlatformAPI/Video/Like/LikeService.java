@@ -1,6 +1,7 @@
 package com.qt.VideoPlatformAPI.Video.Like;
 
 import com.qt.VideoPlatformAPI.Event.NotificationProducer;
+import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
@@ -22,7 +23,7 @@ public class LikeService {
     private final VideoService videoService;
     private final NotificationProducer notificationProducer;
 
-    public void LikeVideo(String videoId) {
+    public void likeVideo(String videoId) {
         if(checkLikeVideo(videoId))
             throw new IllegalArgumentException("You've already liked this video");
 
@@ -49,7 +50,6 @@ public class LikeService {
     public Boolean checkLikeVideo(String videoId) {
         Optional<VideoLike> videoIdOptional = iLikeRepository.findByVideoIdAndUserId(new ObjectId(videoId),
                 userService.getCurrentUser().getId());
-        System.out.println(userService.getCurrentUser().getId());
         return videoIdOptional.isPresent();
     }
 
