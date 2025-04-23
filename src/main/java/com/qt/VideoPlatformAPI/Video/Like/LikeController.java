@@ -16,7 +16,7 @@ public class LikeController {
         if(videoId == null || videoId.isBlank())
             return ResponseEntity.status(400).body(
                     new APIResponse(Boolean.FALSE, "Video id is null or blank", HttpStatus.BAD_REQUEST));
-        likeService.LikeVideo(videoId);
+        likeService.likeVideo(videoId);
         return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Like video successfully", HttpStatus.OK));
     }
 

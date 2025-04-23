@@ -1,18 +1,22 @@
 package com.qt.VideoPlatformAPI.User;
 
 import com.qt.VideoPlatformAPI.DTO.UserPublicDTO;
+import com.qt.VideoPlatformAPI.Event.NotificationEvent;
+import com.qt.VideoPlatformAPI.Event.NotificationProducer;
 import com.qt.VideoPlatformAPI.File.CloudinaryService;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
-import com.qt.VideoPlatformAPI.Responses.AvailabilityResponse;
+import com.qt.VideoPlatformAPI.Utils.NotificationTypes;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,16 +25,19 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.util.*;
 
 @Component
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     private final IUserRepository userRepository;
     private final IUserConnectionRepository userConnectionRepository;
     private final CloudinaryService cloudinaryService;
     private final ModelMapper mapper;
+    private final NotificationProducer notificationProducer;
 
     public UserPublicDTO getAPublicUserByUsername(String username) {
         Optional<UserProfile> userProfileOptional = userRepository.findByUsername(username);
@@ -95,6 +102,9 @@ public class UserService implements UserDetailsService {
 
         increaseFollowsCount(follower, following);
         userConnectionRepository.save(userConnection);
+        // send notification
+        notificationProducer.followingEvent(follower.getUsername(), following.getUsername());
+
         return new APIResponse(Boolean.TRUE, "Follow " + following.getUsername() + " successfully", HttpStatus.OK);
     }
 
@@ -128,7 +138,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(following);
     }
 
-    public Set<String> getAllFollowings(Integer page, Integer size) {
+    public Set<String> getAllMyFollowings(Integer page, Integer size) {
         UserProfile userProfile = getCurrentUser();
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -143,11 +153,21 @@ public class UserService implements UserDetailsService {
         return usernameList;
     }
 
-    public Set<String> getAllFollowers(Integer page, Integer size) {
+    public Set<String> getAllMyFollowers(Integer page, Integer size) {
         UserProfile userProfile = getCurrentUser();
+        return getAllFollowersByUserProfile(userProfile, page, size);
+    }
 
+    public Set<String> getAllFollowersByUsername(String username, Integer page, Integer size) {
+        Optional<UserProfile> userProfileOptional = userRepository.findByUsername(username);
+        if(userProfileOptional.isEmpty()) throw new IllegalArgumentException("Username does not exist");
+
+        return getAllFollowersByUserProfile(userProfileOptional.get(), page, size);
+    }
+
+    public Set<String> getAllFollowersByUserProfile(UserProfile user, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Slice<UserConnection> userConnectionList = userConnectionRepository.findByFollowing(userProfile, pageable);
+        Slice<UserConnection> userConnectionList = userConnectionRepository.findByFollowing(user, pageable);
 
         Set<String> usernameList = new HashSet<>();
 

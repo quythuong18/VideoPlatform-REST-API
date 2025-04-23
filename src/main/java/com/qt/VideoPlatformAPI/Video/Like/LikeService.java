@@ -1,5 +1,7 @@
 package com.qt.VideoPlatformAPI.Video.Like;
 
+import com.qt.VideoPlatformAPI.Event.NotificationProducer;
+import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.AllArgsConstructor;
@@ -20,8 +22,9 @@ public class LikeService {
     private final ILikeRepository iLikeRepository;
     private final UserService userService;
     private final VideoService videoService;
+    private final NotificationProducer notificationProducer;
 
-    public void LikeVideo(String videoId) {
+    public void likeVideo(String videoId) {
         if(checkLikeVideo(videoId))
             throw new IllegalArgumentException("You've already liked this video");
 
@@ -31,7 +34,8 @@ public class LikeService {
 
         iLikeRepository.save(videoLike);
         videoService.increaseLikeCount(videoId);
-
+        notificationProducer.likeVideoEvent(userService.getCurrentUser().getUsername(),
+            videoService.getUsernameByVideoId(videoId), videoId);
     }
 
     public void removeLikeVideo(String videoId) {

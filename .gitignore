@@ -36,7 +36,4 @@ build/
 videos-dir/*
 
 ### others
-src/main/java/com/qt/VideoPlatformAPI/Config/VideoEnv.java
-src/main/resources/application.properties
-src/main/resources/application.yml
-
+.env

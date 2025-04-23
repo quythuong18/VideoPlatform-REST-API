@@ -1,8 +1,10 @@
 package com.qt.VideoPlatformAPI.Video.Comment;
 
+import com.qt.VideoPlatformAPI.Event.NotificationProducer;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Utils.TimeAudit;
+import com.qt.VideoPlatformAPI.Video.Video;
 import com.qt.VideoPlatformAPI.Video.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -23,6 +25,7 @@ public class CommentService {
     private final VideoService videoService;
     private final UserService userService;
     private final CustomCommentRepository customCommentRepository;
+    private final NotificationProducer notificationProducer;
 
     public Comment addAComment(Comment comment) {
         // check if video exist
@@ -30,13 +33,17 @@ public class CommentService {
             throw new IllegalArgumentException("Video with that id does not exist");
 
         //check if video comment on or off
-        Boolean isCommentOff = videoService.getVideoById(comment.getVideoId()).getIsCommentOff();
+        Video video = videoService.getVideoById(comment.getVideoId());
+        Boolean isCommentOff = video.getIsCommentOff();
         if(isCommentOff == null || isCommentOff)
             throw new IllegalArgumentException("Video with that id has comment off");
 
         if(comment.getContent() == null || comment.getContent().isEmpty())
             throw new IllegalArgumentException("Comment content is null or empty");
-        comment.setUserId(userService.getCurrentUser().getId());
+
+        UserProfile currentUser = userService.getCurrentUser();
+        comment.setUserId(currentUser.getId());
+        comment.setUsername(currentUser.getUsername());
         comment.setLikeCount(0L);
         comment.setReplyCount(0L);
         comment.setReplies(new ArrayList<>());
@@ -55,17 +62,22 @@ public class CommentService {
             // add child to list
             parentComment.getReplies().add(new ObjectId(savedComment.getId()));
             iCommentRepository.save(parentComment);
+            // send event
+            notificationProducer.commentEvent(comment, video, parentComment);
+
             return savedComment;
         }
 
         videoService.increaseCommentCount(comment.getVideoId());
+        // send event
+        notificationProducer.commentEvent(comment, video, null);
         return iCommentRepository.save(comment);
     }
 
     public Comment getCommentById(String commentId) {
         Optional<Comment> commentOptional = iCommentRepository.findById(commentId);
         if(commentOptional.isEmpty())
-            throw new IllegalArgumentException("Comment with id: " + commentId + "does not exist");
+            throw new IllegalArgumentException("Comment with id: " + commentId + " does not exist");
         return commentOptional.get();
     }
 
@@ -194,7 +206,6 @@ public class CommentService {
         Pageable pageable = PageRequest.of(0, 999999, Sort.by(Sort.Direction.DESC, "createdAt"));
         Slice<Comment> pageComments = iCommentRepository.findAllCommentForAllVideosByUserId(user.getId(), pageable);
 
-        // Implicit error right HERE
         List<Comment> comments = new ArrayList<>(pageComments.getContent());
         List<Comment> toRemove = new ArrayList<>();
         for(Comment c : comments) {
@@ -230,32 +241,40 @@ public class CommentService {
         iCommentRepository.save(comment);
     }
 
-    // like comment
     public CommentLike likeAComment(String commentId) {
-        if(checkLikeComment(commentId))
+//        if(checkLikeComment(commentId))
+//            throw new IllegalArgumentException("You've already liked this comment");
+        UserProfile user = userService.getCurrentUser();
+        Optional<CommentLike> commentLikeOptional = iCommentLikeRepository.findByCommentIdAndUserId(new
+                ObjectId(commentId), user.getId());
+        if(commentLikeOptional.isPresent())
             throw new IllegalArgumentException("You've already liked this comment");
+
         CommentLike commentLike = new CommentLike();
         commentLike.setCommentId(commentId);
         commentLike.setUserId(userService.getCurrentUser().getId());
 
-        increaseCommentLikeCount(commentId);
+        //increaseCommentLikeCount(commentId);
+        Comment comment = getCommentById(commentId);
+        comment.setLikeCount(comment.getLikeCount() + 1);
+        iCommentRepository.save(comment);
+
+        // send notification
+        if(!user.getUsername().equals(comment.getUsername()))
+            notificationProducer.likeCommentEvent(user.getUsername(),
+                    comment, videoService.getVideoById(comment.getVideoId()));
+
         return iCommentLikeRepository.save(commentLike);
     }
 
     public void removeALikeComment(String commentId) {
-        Optional<CommentLike> commentLike = iCommentLikeRepository.findByCommentIdAndUserId(commentId,
+        Optional<CommentLike> commentLike = iCommentLikeRepository.findByCommentIdAndUserId(new ObjectId(commentId),
                 userService.getCurrentUser().getId());
         if(commentLike.isEmpty())
             throw new IllegalArgumentException("You've not liked this comment before");
 
         iCommentLikeRepository.delete(commentLike.get());
         decreaseCommentLikeCount(commentId);
-    }
-
-    public void increaseCommentLikeCount(String commentId) {
-        Comment comment = getCommentById(commentId);
-        comment.setLikeCount(comment.getLikeCount() + 1);
-        iCommentRepository.save(comment);
     }
 
     public void decreaseCommentLikeCount(String commentId) {
@@ -265,7 +284,7 @@ public class CommentService {
     }
 
     public boolean checkLikeComment(String commentId) {
-        Optional<CommentLike> commentLike = iCommentLikeRepository.findByCommentIdAndUserId(commentId,
+        Optional<CommentLike> commentLike = iCommentLikeRepository.findByCommentIdAndUserId(new ObjectId(commentId),
                 userService.getCurrentUser().getId());
         return commentLike.isPresent();
     }

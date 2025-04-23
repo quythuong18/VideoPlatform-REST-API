@@ -96,7 +96,7 @@ public class UserController {
             @RequestParam(defaultValue = "10") Integer size
     ) {
         return ResponseEntity.ok(new APIResponseWithData<Set<String>>(Boolean.TRUE,
-                "Get all followings successfully", HttpStatus.OK, userService.getAllFollowings(page, size)));
+                "Get all followings successfully", HttpStatus.OK, userService.getAllMyFollowings(page, size)));
     }
 
     @GetMapping("/followers")
@@ -105,7 +105,7 @@ public class UserController {
             @RequestParam(defaultValue = "10") Integer size
     ) {
         return ResponseEntity.ok(new APIResponseWithData<Set<String>>(Boolean.TRUE,
-                "Get all followers successfully", HttpStatus.OK, userService.getAllFollowers(page, size)));
+                "Get all followers successfully", HttpStatus.OK, userService.getAllMyFollowers(page, size)));
     }
 
     @GetMapping("/search")

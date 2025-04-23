@@ -98,6 +98,8 @@ public class SecurityConfig {
 
                         // serve video manifest file
                         .requestMatchers(HttpMethod.GET, "/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "**/rabbitmq/sendMsg").permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
