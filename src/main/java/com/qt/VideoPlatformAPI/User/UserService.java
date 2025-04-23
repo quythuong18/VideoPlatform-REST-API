@@ -103,7 +103,7 @@ public class UserService implements UserDetailsService {
         increaseFollowsCount(follower, following);
         userConnectionRepository.save(userConnection);
         // send notification
-        sendFollowingEvent(follower.getUsername(), following.getUsername());
+        notificationProducer.followingEvent(follower.getUsername(), following.getUsername());
 
         return new APIResponse(Boolean.TRUE, "Follow " + following.getUsername() + " successfully", HttpStatus.OK);
     }
@@ -236,15 +236,5 @@ public class UserService implements UserDetailsService {
             userPublicDTOList.add(mapper.map(u, UserPublicDTO.class));
         }
         return userPublicDTOList;
-    }
-
-    @Async
-    public void sendFollowingEvent(String followerUsername, String followingUsername) {
-        NotificationEvent notificationEvent = NotificationEvent.builder()
-                .type(NotificationTypes.FOLLOW)
-                .fromUsername(followerUsername)
-                .toUsernames(List.of(followingUsername))
-                .build();
-        notificationProducer.sendMsg(notificationEvent);
     }
 }

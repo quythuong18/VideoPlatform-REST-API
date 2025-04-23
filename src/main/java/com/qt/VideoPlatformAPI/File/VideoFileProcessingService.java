@@ -1,10 +1,7 @@
 package com.qt.VideoPlatformAPI.File;
 
-import com.qt.VideoPlatformAPI.Event.NotiMetadata;
-import com.qt.VideoPlatformAPI.Event.NotificationEvent;
 import com.qt.VideoPlatformAPI.Event.NotificationProducer;
 import com.qt.VideoPlatformAPI.User.*;
-import com.qt.VideoPlatformAPI.Utils.NotificationTypes;
 import com.qt.VideoPlatformAPI.Utils.VideoConstants;
 import com.qt.VideoPlatformAPI.Video.Video;
 import com.qt.VideoPlatformAPI.Video.VideoService;
@@ -15,8 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -57,7 +52,7 @@ public class VideoFileProcessingService {
         }
 
         // sending notification event to rabbitmq
-        sendingCompletionToRabbitMQ(v);
+        notificationProducer.newVideoEvent(v);
     }
 
     public void deleteVideoFiles(String videoId) {
@@ -74,22 +69,5 @@ public class VideoFileProcessingService {
             }
         }
         return file.delete();
-    }
-
-    public void sendingCompletionToRabbitMQ(Video v) {
-        String ownerUsername = userService.getUserByUserId(v.getUserId()).getUsername();
-        NotificationEvent notificationEvent = NotificationEvent.builder()
-                .type(NotificationTypes.NEW_VIDEO)
-                .fromUsername(ownerUsername)
-                .notiMetadata(new NotiMetadata(v.getId(), v.getTitle()))
-                .build();
-        Integer page = 0;
-        Set<String> usernameList = new HashSet<>();
-        do {
-            usernameList = userService.getAllFollowersByUsername(ownerUsername, page, 10);
-            notificationEvent.setToUsernames(usernameList.stream().toList());
-            notificationProducer.sendMsg(notificationEvent);
-            page++;
-        } while(usernameList.size() >= 10);
     }
 }

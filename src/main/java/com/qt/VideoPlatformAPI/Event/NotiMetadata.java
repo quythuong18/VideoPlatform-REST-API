@@ -1,10 +1,12 @@
 package com.qt.VideoPlatformAPI.Event;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class NotiMetadata {
     private String videoId;
     private String videoTitle;
