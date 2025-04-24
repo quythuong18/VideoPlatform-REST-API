@@ -1,6 +1,10 @@
 package com.qt.VideoPlatformAPI.Auth;
 
 import com.qt.VideoPlatformAPI.User.UserProfile;
+import com.qt.VideoPlatformAPI.Utils.HashService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 
@@ -8,15 +12,18 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Component
+@RequiredArgsConstructor
 public class JWTService {
     private final String SECRET_KEY = "5a300b56b760542ab15acd225fe8dabe88abeb678dfa3d4c9691d0983fde83f7";
+    private final IRefreshTokenRepository iRefreshTokenRepository;
+    private final HashService hashService;
 
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
@@ -26,13 +33,35 @@ public class JWTService {
         return extractExpiration(token).before(new Date());
     }
 
-    public boolean isValid(String token, UserProfile user) {
+    public boolean isValidAccess(String token, UserProfile user) {
         String userName = extractUsername(token);
-        return userName.equals(user.getUsername()) && !isTokenExpired(token);
+        String type = extractType(token);
+
+        return userName.equals(user.getUsername()) && !isTokenExpired(token) &&
+                type.equals("access");
     }
+
+    public boolean isValidRefresh(String token, String username) throws AuthenticationException {
+        String userName = extractUsername(token);
+        String type = extractType(token);
+
+        Optional<RefreshToken> refreshTokenOptional = iRefreshTokenRepository.findByUsername(userName);
+
+        if(refreshTokenOptional.isEmpty())
+            throw new BadCredentialsException("User's refresh token was not in DB");
+
+        return userName.equals(username) && type.equals("refresh")
+            && hashService.hash(token).equals(refreshTokenOptional.get().getToken());
+    }
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public String extractType(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.get("type", String.class);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> resolver) {
@@ -49,15 +78,26 @@ public class JWTService {
                 .getPayload();
     }
 
-    public String generateToken(UserProfile user) {
-        String token = Jwts
+    public String generateAccessToken(UserProfile user) {
+        // 15 mins
+        return Jwts
                 .builder()
                 .subject(user.getUsername())
+                .claim("type", "access")
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 12*60*60*1000))
+                .expiration(new Date(System.currentTimeMillis() + 15*60*1000)) // 15 mins
                 .signWith(getSigninKey())
                 .compact();
-        return token;
+    }
+
+    public String generateRefreshToken(UserProfile user) {
+        return Jwts
+                .builder()
+                .subject(user.getUsername())
+                .claim("type", "refresh")
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .signWith(getSigninKey())
+                .compact();
     }
 
     private SecretKey getSigninKey() {

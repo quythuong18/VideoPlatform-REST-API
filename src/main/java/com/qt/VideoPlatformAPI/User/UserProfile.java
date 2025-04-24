@@ -2,6 +2,8 @@ package com.qt.VideoPlatformAPI.User;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.qt.VideoPlatformAPI.Auth.RefreshToken;
 import com.qt.VideoPlatformAPI.Utils.TimeAudit;
 import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import jakarta.persistence.*;
@@ -21,6 +23,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserProfile extends TimeAudit implements UserDetails {
 
     @Id
@@ -34,7 +37,7 @@ public class UserProfile extends TimeAudit implements UserDetails {
     private Long id;
 
     @NotBlank(message = "username is required")
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     private String username;
 
     @Column(name = "full_name")

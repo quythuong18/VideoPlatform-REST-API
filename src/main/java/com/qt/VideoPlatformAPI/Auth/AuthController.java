@@ -5,6 +5,7 @@ import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,12 +17,26 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<APIResponseWithData<UserProfile>>  register(@RequestBody UserProfile userReq) {
-        return authService.register(userReq);
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE,
+        "Register successfully", HttpStatus.OK, authService.register(userReq)));
     }
 
-    @PostMapping("/signIn")
-    public ResponseEntity<APIResponseWithData<String>> signIn(@RequestBody UserProfile userReq) {
-        return authService.authenticate(userReq);
+    @PostMapping("/sign-in")
+    public ResponseEntity<APIResponseWithData<SignInTokens>> signIn(@RequestBody UserProfile userReq) {
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE,
+                "authenticated", HttpStatus.OK, authService.authenticate(userReq)));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<APIResponseWithData<SignInTokens>> refresh(@RequestBody UserProfile userReq,
+            @RequestHeader String rt) {
+
+        if(rt == null || rt.isBlank())
+            throw new IllegalArgumentException("Bad tokens");
+        SignInTokens tokens = new SignInTokens();
+        tokens.setAccessToken(authService.getNewAccessToken(userReq, rt));
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE,
+                "authenticated", HttpStatus.OK, tokens));
     }
 
     @PostMapping("/reset-password")

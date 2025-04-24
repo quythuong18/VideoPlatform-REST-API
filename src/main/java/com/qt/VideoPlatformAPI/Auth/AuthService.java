@@ -1,21 +1,23 @@
 package com.qt.VideoPlatformAPI.Auth;
 
-import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
 import com.qt.VideoPlatformAPI.User.IUserRepository;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Utils.EmailService;
+import com.qt.VideoPlatformAPI.Utils.HashService;
 import com.qt.VideoPlatformAPI.Verification.IUserVerificationRepository;
 import com.qt.VideoPlatformAPI.Verification.OTPGenerator;
 import com.qt.VideoPlatformAPI.Verification.UserVerification;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.modelmapper.internal.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -30,11 +32,13 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final IUserRepository userRepository;
     private final IUserVerificationRepository userVerificationRepository;
+    private final IRefreshTokenRepository iRefreshTokenRepository;
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
+    private final HashService hashService;
 
-    public ResponseEntity<APIResponseWithData<UserProfile>> register(UserProfile userReq) {
+    public UserProfile register(UserProfile userReq) {
 
         //hashing password
         userReq.setPassword(passwordEncoder.encode(userReq.getPassword()));
@@ -63,7 +67,8 @@ public class AuthService {
         // call the verify account function here
         verifyAccountAsync(userReq);
 
-        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Register successfully", HttpStatus.OK, user));
+        user.setPassword(null);
+        return user;
     }
 
     @Transactional
@@ -82,7 +87,7 @@ public class AuthService {
         return new APIResponse(Boolean.FALSE,"Account activated failed", HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<APIResponseWithData<String>> authenticate(UserProfile userReq) {
+    public SignInTokens authenticate(UserProfile userReq) {
         // find the user in db
         Optional<UserProfile> user = userRepository.findByUsername(userReq.getUsername());
         if(user.isEmpty()) {
@@ -105,9 +110,29 @@ public class AuthService {
             throw new UsernameNotFoundException("Verifying you account, please check you email inbox!");
         }
 
-        // generate toke to send
-        String token = jwtService.generateToken(user.get());
-        return ResponseEntity.ok(new APIResponseWithData<String>(Boolean.TRUE, "authenticated", HttpStatus.OK, token));
+        // generate tokens to send
+        String refreshToken = jwtService.generateRefreshToken(user.get());
+        String accessToken = jwtService.generateAccessToken(user.get());
+
+        // delete the old token
+        Optional<RefreshToken> oldRefreshTokenOptional =
+                iRefreshTokenRepository.findByUsername(user.get().getUsername());
+        oldRefreshTokenOptional.ifPresent(iRefreshTokenRepository::delete);
+
+        // save that refresh token to DB
+        RefreshToken rf_token = new RefreshToken();
+        rf_token.setToken(hashService.hash(refreshToken)); // hashing before save to db
+        rf_token.setUserProfile(user.get());
+        rf_token.setUsername(user.get().getUsername());
+        iRefreshTokenRepository.save(rf_token);
+
+        return new SignInTokens(refreshToken, accessToken);
+    }
+
+    public String getNewAccessToken(UserProfile user, String refreshToken) throws AuthenticationException {
+        if(!jwtService.isValidRefresh(refreshToken, user.getUsername()))
+            throw new IllegalArgumentException("Invalid Refresh token");
+        return jwtService.generateAccessToken(user);
     }
 
     public APIResponse resetPassword(String email) {
