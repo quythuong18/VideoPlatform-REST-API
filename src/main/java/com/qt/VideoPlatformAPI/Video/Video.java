@@ -1,5 +1,6 @@
 package com.qt.VideoPlatformAPI.Video;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.qt.VideoPlatformAPI.Utils.TimeAudit;
 import jakarta.persistence.Id;
 import lombok.*;
@@ -14,11 +15,16 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Video extends TimeAudit {
     @Id
     private String id;
+
     private Long userId;
     private String username;
+    private String userFullname;
+    private String userProfilePic;
+
     private ObjectId playlistId;
     private String title;
     private String description;

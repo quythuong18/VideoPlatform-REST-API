@@ -1,5 +1,6 @@
 package com.qt.VideoPlatformAPI.Video.Comment;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.qt.VideoPlatformAPI.Utils.TimeAudit;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
@@ -16,13 +17,18 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Comment extends TimeAudit {
     @Id
     private String id;
     @NotBlank(message = "Video id is required")
     private ObjectId videoId;
+
     private Long userId;
     private String username;
+    private String userFullname;
+    private String userProfilePic;
+
     @NotBlank(message = "Content is required")
     private String content;
     private ObjectId replyTo;
