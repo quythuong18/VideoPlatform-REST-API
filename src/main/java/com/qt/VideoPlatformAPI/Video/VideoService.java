@@ -82,12 +82,6 @@ public class VideoService {
         iVideoRepository.save(video);
     }
 
-    public void updateVideoProcessedStatus(String videoId) {
-        Video video = getVideoById(videoId);
-        video.setIsProcessed(true);
-        iVideoRepository.save(video);
-    }
-
     public void increaseLikeCount(String videoId) {
         Video video = getVideoById(videoId);
         video.setLikesCount(video.getLikesCount() + 1);
@@ -165,12 +159,6 @@ public class VideoService {
         video.setThumbnailUrl(url);
         iVideoRepository.save(video);
         return url;
-    }
-
-    public void updateThumbnailUrl(String videoId, String url) {
-        Video video = getVideoById(videoId);
-        video.setThumbnailUrl(url);
-        iVideoRepository.save(video);
     }
 
     public List<Video> searchByVideoTitle(String pattern, Integer count) {

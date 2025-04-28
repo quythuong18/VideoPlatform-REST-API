@@ -57,6 +57,7 @@ public class FFmpegService {
         videoFileMetadata.setFps(firstVideoStream.r_frame_rate.floatValue());
         videoFileMetadata.setVideoBitrate(firstVideoStream.bit_rate);
         videoFileMetadata.setVideoCodec(firstVideoStream.codec_name);
+        videoFileMetadata.setDuration(firstVideoStream.duration);
 
         // audio
         if(firstAudioStream != null) {

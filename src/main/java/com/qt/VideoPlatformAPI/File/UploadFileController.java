@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 @RestController
@@ -24,7 +25,7 @@ public class UploadFileController {
     private final VideoFileProcessingService videoFileProcessingService;
 
     @PostMapping("/video/{id}")
-    public ResponseEntity<APIResponse> handleVideoUpload(@RequestBody MultipartFile file, @PathVariable(name = "id") String id) throws FileUploadException {
+    public ResponseEntity<APIResponse> handleVideoUpload(@RequestBody MultipartFile file, @PathVariable(name = "id") String id) throws FileUploadException, IOException {
 
         Video video = videoService.getVideoById(id);
         if(video.getIsUploaded())

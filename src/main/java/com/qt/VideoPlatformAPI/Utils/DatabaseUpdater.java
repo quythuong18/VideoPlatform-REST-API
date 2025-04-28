@@ -24,8 +24,6 @@ public class DatabaseUpdater implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        update3NewfieldsInCommentModel();
-        update3NewfieldsInVideoModel();
     }
 
     public void update3NewfieldsInVideoModel() {

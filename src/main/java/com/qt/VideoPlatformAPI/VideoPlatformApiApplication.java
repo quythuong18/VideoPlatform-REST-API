@@ -11,9 +11,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableMongoAuditing
 @EnableAsync
 public class VideoPlatformApiApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(VideoPlatformApiApplication.class, args);
 	}
-
 }

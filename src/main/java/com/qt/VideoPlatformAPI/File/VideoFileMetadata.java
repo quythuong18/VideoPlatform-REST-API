@@ -17,6 +17,7 @@ public class VideoFileMetadata {
     private Float fps;
     private Long videoBitrate;
     private String videoCodec;
+    private double duration;
 
     // audio
     private Long audioBitrate;
