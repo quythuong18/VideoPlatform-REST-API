@@ -93,9 +93,18 @@ public class VideoController {
 
     @DeleteMapping("/{videoId}")
     public ResponseEntity<APIResponse> deleteVideo(@PathVariable String videoId) {
-        if(videoId == null)
-            throw new IllegalArgumentException("Video id is null");
+        if(videoId == null || videoId.isBlank())
+            throw new IllegalArgumentException("Video id is null or blank");
         videoService.deleteVideo(videoId);
         return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Delete video successfully", HttpStatus.OK));
+    }
+
+    @PostMapping("/{videoId}")
+    public ResponseEntity<APIResponse> increaseView(@PathVariable String videoId) {
+        if(videoId == null || videoId.isBlank()) {
+            throw new IllegalArgumentException("Video id is null or blank");
+        }
+        return ResponseEntity.ok(new APIResponse(Boolean.TRUE, videoService.increaseView(videoId).toString(),
+                HttpStatus.OK));
     }
 }

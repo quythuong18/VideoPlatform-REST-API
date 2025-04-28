@@ -11,6 +11,7 @@ import com.qt.VideoPlatformAPI.Video.Like.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -209,5 +210,13 @@ public class VideoService {
         //delete the video data
         iVideoRepository.deleteById(videoId);
 
+    }
+
+    @Async
+    public Long increaseView(String videoId) {
+        Video video = getVideoById(videoId);
+        video.setViewsCount(video.getViewsCount() + 1);
+        iVideoRepository.save(video);
+        return video.getViewsCount();
     }
 }
