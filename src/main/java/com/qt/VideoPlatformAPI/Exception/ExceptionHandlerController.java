@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,6 +77,14 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(new APIResponseWithData<Map<String, String>>(
                 Boolean.FALSE, "Missing field", HttpStatus.BAD_REQUEST, errors
         ), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
+    public ResponseEntity<APIResponse> handleNotfound(NoHandlerFoundException exception) {
+        APIResponse response = new APIResponse(Boolean.FALSE, "Resource not found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(RuntimeException.class)
