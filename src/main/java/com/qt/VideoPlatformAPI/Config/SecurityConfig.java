@@ -83,6 +83,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "**/comments/{commentId}").authenticated()
                         .requestMatchers(HttpMethod.PUT, "**/comments").authenticated()
                         .requestMatchers(HttpMethod.GET, "**/comments/video/parent/{videoId}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "**/comments/video/parent/authenticated/{videoId}").authenticated()
                         .requestMatchers(HttpMethod.POST, "**/comments/like/{commentId}").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "**/comments/like/{commentId}").authenticated()
                         .requestMatchers(HttpMethod.GET, "**/comments/like/{commentId}").permitAll()

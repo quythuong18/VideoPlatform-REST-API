@@ -8,6 +8,8 @@ import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.Comment.ICommentRepository;
 import com.qt.VideoPlatformAPI.Video.Like.LikeService;
+import com.qt.VideoPlatformAPI.Video.View.IViewHistoryRepository;
+import com.qt.VideoPlatformAPI.Video.View.ViewHistory;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Lazy;
@@ -35,6 +37,7 @@ public class VideoService {
     private final CloudinaryService cloudinaryService;
     private final CustomVideoRepository customVideoRepository;
     private final VideoFileProcessingService videoFileProcessingService;
+    private final IViewHistoryRepository iViewHistoryRepository;
     @Lazy private final LikeService likeService;
     @Lazy private final PlaylistService playlistService;
 
@@ -212,11 +215,15 @@ public class VideoService {
 
     }
 
-    @Async
     public Long increaseView(String videoId) {
         Video video = getVideoById(videoId);
         video.setViewsCount(video.getViewsCount() + 1);
         iVideoRepository.save(video);
         return video.getViewsCount();
     }
+
+    public ViewHistory addHistory(ViewHistory vh) {
+        return iViewHistoryRepository.save(vh);
+    }
+
 }

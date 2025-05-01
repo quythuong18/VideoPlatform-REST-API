@@ -50,7 +50,7 @@ public class CommentController {
     }
 
     @GetMapping("/video/parent/{videoId}")
-    public ResponseEntity<APIResponseWithData<List<Comment>>> getAllParentCommentByVideoIdByTimestampOrder(
+    public ResponseEntity<APIResponseWithData<List<Comment>>> getAllParentCommentByVideoId(
             @PathVariable String videoId,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
@@ -59,6 +59,20 @@ public class CommentController {
         if(videoId == null || videoId.isBlank())
             throw new IllegalArgumentException("Video id is null or blank");
         List<Comment> commentList = commentService.getAllParentCommentByVideoId(videoId, page, size, "oldest".equalsIgnoreCase(order));
+        return ResponseEntity.ok(new APIResponseWithData<List<Comment>>(Boolean.TRUE, "Get all parent comment in a video successfully", HttpStatus.OK,
+                commentList));
+    }
+
+    @GetMapping("/video/parent/authenticated/{videoId}")
+    public ResponseEntity<APIResponseWithData<List<Comment>>> getAllParentCommentByVideoIdAuthenticated(
+            @PathVariable String videoId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "newest") String order
+    ) {
+        if(videoId == null || videoId.isBlank())
+            throw new IllegalArgumentException("Video id is null or blank");
+        List<Comment> commentList = commentService.getAllParentCommentByVideoIdAuthenticated(videoId, page, size, "oldest".equalsIgnoreCase(order));
         return ResponseEntity.ok(new APIResponseWithData<List<Comment>>(Boolean.TRUE, "Get all parent comment in a video successfully", HttpStatus.OK,
                 commentList));
     }

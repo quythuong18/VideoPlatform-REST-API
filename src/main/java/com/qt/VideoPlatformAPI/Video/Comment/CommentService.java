@@ -44,6 +44,7 @@ public class CommentService {
         UserProfile currentUser = userService.getCurrentUser();
         comment.setUserId(currentUser.getId());
         comment.setUsername(currentUser.getUsername());
+        comment.setUserFullname(currentUser.getFullName());
         comment.setLikeCount(0L);
         comment.setReplyCount(0L);
         comment.setReplies(new ArrayList<>());
@@ -63,15 +64,16 @@ public class CommentService {
             parentComment.getReplies().add(new ObjectId(savedComment.getId()));
             iCommentRepository.save(parentComment);
             // send event
-            notificationProducer.commentEvent(comment, video, parentComment);
+            notificationProducer.commentEvent(savedComment, video);
 
             return savedComment;
         }
 
         videoService.increaseCommentCount(comment.getVideoId());
         // send event
-        notificationProducer.commentEvent(comment, video, null);
-        return iCommentRepository.save(comment);
+        comment = iCommentRepository.save(comment);
+        notificationProducer.commentEvent(comment, video);
+        return comment;
     }
 
     public Comment getCommentById(String commentId) {
@@ -139,14 +141,13 @@ public class CommentService {
         return commentList;
     }
 
-    // remove
-    public List<Comment> getAllChildrenCommentByTimestamp(String commentId, boolean ascending) {
-        List<Comment> commentChildList;
-        if(ascending)
-            commentChildList = iCommentRepository.findAllByReplyToOrderByCreatedAtAsc(commentId);
-        else
-            commentChildList = iCommentRepository.findAllByReplyToOrderByCreatedAtDesc(commentId);
-        return commentChildList;
+    public List<Comment> getAllParentCommentByVideoIdAuthenticated(String videoId, Integer page, Integer size, boolean ascending) {
+        List<Comment> allComment = getAllParentCommentByVideoId(videoId, page, size, ascending);
+        for(Comment c : allComment) {
+            if(checkLikeComment(c.getId())) c.setLiked(Boolean.TRUE);
+            else c.setLiked(Boolean.FALSE);
+        }
+        return allComment;
     }
 
     public List<Comment> getAllChildrenComment(String commentId, Integer page, Integer size, boolean ascending) {

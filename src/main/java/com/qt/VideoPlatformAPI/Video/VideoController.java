@@ -2,6 +2,7 @@ package com.qt.VideoPlatformAPI.Video;
 
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
+import com.qt.VideoPlatformAPI.Video.View.ViewHistory;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -99,12 +100,22 @@ public class VideoController {
         return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Delete video successfully", HttpStatus.OK));
     }
 
-    @PostMapping("/{videoId}")
+    @PostMapping("/{videoId}/view")
     public ResponseEntity<APIResponse> increaseView(@PathVariable String videoId) {
         if(videoId == null || videoId.isBlank()) {
             throw new IllegalArgumentException("Video id is null or blank");
         }
         return ResponseEntity.ok(new APIResponse(Boolean.TRUE, videoService.increaseView(videoId).toString(),
+                HttpStatus.OK));
+    }
+
+    @PostMapping("/history")
+    public ResponseEntity<APIResponse> viewHistoryupdate(@RequestBody ViewHistory vh) {
+        if(vh == null) {
+            throw new IllegalArgumentException("View history is null");
+        }
+        videoService.addHistory(vh);
+        return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "View history saved",
                 HttpStatus.OK));
     }
 }

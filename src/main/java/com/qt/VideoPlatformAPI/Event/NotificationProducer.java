@@ -82,7 +82,7 @@ public class NotificationProducer {
     }
 
     @Async
-    public void commentEvent(Comment comment, Video video, Comment parentComment) {
+    public void commentEvent(Comment comment, Video video) {
         NotificationEvent notificationEvent = NotificationEvent.builder()
                 .type(NotificationTypes.COMMENT_ON_VIDEO)
                 .fromUsername(comment.getUsername())
@@ -90,14 +90,8 @@ public class NotificationProducer {
                 .notiMetadata(new NotiMetadata(video.getId(), video.getTitle()))
                 .build();
 
-        if(parentComment != null) {
-            List<String> toUsernames = new ArrayList<>(notificationEvent.getToUsernames());
-            toUsernames.add(parentComment.getUsername());
-            notificationEvent.setToUsernames(toUsernames); // add parentComment username
-
-            notificationEvent.getNotiMetadata().setCommentId(parentComment.getId());
-            notificationEvent.getNotiMetadata().setComment(parentComment.getContent());
-        }
+        notificationEvent.getNotiMetadata().setCommentId(comment.getId());
+        notificationEvent.getNotiMetadata().setComment(comment.getContent());
         sendMsg(notificationEvent);
     }
 

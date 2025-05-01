@@ -37,6 +37,8 @@ public class Comment extends TimeAudit {
     private Long replyCount;
     private Boolean isEdited;
 
+    private Boolean liked;
+
     public void setVideoId(String videoId) {
         if(ObjectId.isValid(videoId)) {
             this.videoId = new ObjectId(videoId);
