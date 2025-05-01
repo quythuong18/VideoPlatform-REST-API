@@ -159,6 +159,15 @@ public class CommentService {
         return commentList;
     }
 
+    public List<Comment> getAllChildrenCommentAuthenticated(String commentId, Integer page, Integer size, boolean ascending) {
+        List<Comment> allComment = getAllChildrenComment(commentId, page, size, ascending);
+        for(Comment c : allComment) {
+            if(checkLikeComment(c.getId())) c.setLiked(Boolean.TRUE);
+            else c.setLiked(Boolean.FALSE);
+        }
+        return allComment;
+    }
+
     public void deleteAllCommentsByVideoId(String videoId) {
         List<Comment> commentList = iCommentRepository.findAllByVideoIdOrderByCreatedAtAsc(videoId);
         for(Comment c : commentList) {

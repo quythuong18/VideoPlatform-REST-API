@@ -92,6 +92,21 @@ public class CommentController {
         HttpStatus.OK, childCommentList));
     }
 
+    @GetMapping("/{commentId}/children/authenticated")
+    public ResponseEntity<APIResponseWithData<List<Comment>>> getAllChildrenCommentAuthenticated(
+            @PathVariable String commentId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "newest") String order
+    ) {
+        if(commentId == null || commentId.isBlank())
+            throw new IllegalArgumentException("Video id is null or blank");
+
+        List<Comment> childCommentList = commentService.getAllChildrenCommentAuthenticated(commentId, page, size, "oldest".equalsIgnoreCase(order));
+        return ResponseEntity.ok(new APIResponseWithData<List<Comment>>(Boolean.TRUE, "Get all children comments of a comment successfully",
+                HttpStatus.OK, childCommentList));
+    }
+
     @GetMapping("/myVideosComments")
     public ResponseEntity<APIResponseWithData<List<Comment>>> getMyVideosComments(
             @RequestParam(defaultValue = "0") Integer page,
