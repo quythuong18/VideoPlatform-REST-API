@@ -1,11 +1,10 @@
 package com.qt.VideoPlatformAPI.User;
 
+import com.qt.VideoPlatformAPI.DTO.UserInfoDTO;
 import com.qt.VideoPlatformAPI.DTO.UserPublicDTO;
-import com.qt.VideoPlatformAPI.Event.NotificationEvent;
 import com.qt.VideoPlatformAPI.Event.NotificationProducer;
 import com.qt.VideoPlatformAPI.File.CloudinaryService;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
-import com.qt.VideoPlatformAPI.Utils.NotificationTypes;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,7 +23,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.util.*;
 
@@ -138,22 +135,24 @@ public class UserService implements UserDetailsService {
         userRepository.save(following);
     }
 
-    public Set<String> getAllMyFollowings(Integer page, Integer size) {
+    public Set<UserInfoDTO> getAllMyFollowings(Integer page, Integer size) {
         UserProfile userProfile = getCurrentUser();
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Slice<UserConnection> userConnectionList = userConnectionRepository.findByFollower(userProfile, pageable);
 
-        Set<String> usernameList = new HashSet<>();
+        Set<UserInfoDTO> userDTOlist = new HashSet<>();
 
         userConnectionList.forEach(userConnection -> {
-            System.out.println(userConnection);
-            usernameList.add(userConnection.getFollowing().getUsername());
+            LOGGER.info(userConnection.toString());
+            String username = userConnection.getFollowing().getUsername();
+            UserInfoDTO userInfoDTO = mapper.map(getAPublicUserByUsername(username), UserInfoDTO.class);
+            userDTOlist.add(userInfoDTO);
         });
-        return usernameList;
+        return userDTOlist;
     }
 
-    public Set<String> getAllMyFollowers(Integer page, Integer size) {
+    public Set<UserInfoDTO> getAllMyFollowers(Integer page, Integer size) {
         UserProfile userProfile = getCurrentUser();
         return getAllFollowersByUserProfile(userProfile, page, size);
     }
@@ -161,28 +160,45 @@ public class UserService implements UserDetailsService {
     public Set<String> getAllFollowersByUsername(String username, Integer page, Integer size) {
         Optional<UserProfile> userProfileOptional = userRepository.findByUsername(username);
         if(userProfileOptional.isEmpty()) throw new IllegalArgumentException("Username does not exist");
-
-        return getAllFollowersByUserProfile(userProfileOptional.get(), page, size);
+        Set<String> usernameList = new HashSet<>();
+        Set<UserInfoDTO> userInfoDTOList =
+                getAllFollowersByUserProfile(userProfileOptional.get(), page, size) ;
+        for(UserInfoDTO uInfo : userInfoDTOList) {
+            usernameList.add(uInfo.getUsername());
+        }
+        return usernameList;
     }
 
-    public Set<String> getAllFollowersByUserProfile(UserProfile user, Integer page, Integer size) {
+    public Set<UserInfoDTO> getAllFollowersByUserProfile(UserProfile user, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Slice<UserConnection> userConnectionList = userConnectionRepository.findByFollowing(user, pageable);
 
-        Set<String> usernameList = new HashSet<>();
+        Set<UserInfoDTO> userInfoDTOList = new HashSet<>();
 
         userConnectionList.forEach(userConnection -> {
-            System.out.println(userConnection);
-            usernameList.add(userConnection.getFollower().getUsername());
+            LOGGER.info(userConnection.toString());
+            String username = userConnection.getFollower().getUsername();
+
+            UserInfoDTO userInfoDTO = mapper.map(getAPublicUserByUsername(username), UserInfoDTO.class);
+            userInfoDTO.setIsFollowing(
+                    userConnectionRepository.existsByFollowerUsernameAndFollowingUsername(
+                            user.getUsername(), username
+                    )
+            );
+
+            userInfoDTOList.add(userInfoDTO);
         });
-        return usernameList;
+        return userInfoDTOList;
     }
 
     public UserProfile getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(auth == null) {
-            throw new AuthenticationServiceException("Not authenticated");
+            throw new AuthenticationServiceException("Authentication null");
         }
+        LOGGER.info(auth.getPrincipal().toString());
+        if(auth.getPrincipal().toString().equals("anonymousUser")) return null;
+
         return (UserProfile) auth.getPrincipal();
     }
 
@@ -229,12 +245,22 @@ public class UserService implements UserDetailsService {
         return url;
     }
 
-    public List<UserPublicDTO> searchByUsername(String searchPattern) {
+    public List<UserInfoDTO> searchByUsername(String searchPattern) {
         List<UserProfile> userProfileList = userRepository.findByUsernameContaining(searchPattern);
-        List<UserPublicDTO> userPublicDTOList = new ArrayList<>();
+        List<UserInfoDTO> userInfoDTOList = new ArrayList<>();
+
+
         for(UserProfile u : userProfileList) {
-            userPublicDTOList.add(mapper.map(u, UserPublicDTO.class));
+            userInfoDTOList.add(mapper.map(u, UserInfoDTO.class));
         }
-        return userPublicDTOList;
+
+        UserProfile currentUser = getCurrentUser();
+        if(currentUser == null) return userInfoDTOList;
+
+        for(UserInfoDTO uInfoDTO : userInfoDTOList) {
+            uInfoDTO.setIsFollowing(userConnectionRepository.existsByFollowerUsernameAndFollowingUsername
+                            (currentUser.getUsername(), uInfoDTO.getUsername()));
+        }
+        return userInfoDTOList;
     }
 }

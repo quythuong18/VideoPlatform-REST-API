@@ -91,8 +91,7 @@ public class ExceptionHandlerController {
     @ResponseBody
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<APIResponse> resolveInternalServerError(FileUploadException exception) {
-        String message = exception.getMessage();
-        APIResponse response = new APIResponse(Boolean.FALSE, message, HttpStatus.BAD_REQUEST);
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        APIResponse response = new APIResponse(Boolean.FALSE, null, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface IUserConnectionRepository extends JpaRepository<UserConnection, Long> {
     boolean existsByFollowerAndFollowing(UserProfile follower, UserProfile following);
+    boolean existsByFollowerUsernameAndFollowingUsername(String follower, String following);
     Optional<UserConnection> findByFollowerAndFollowing(UserProfile follower, UserProfile following);
     Slice<UserConnection> findByFollower(UserProfile follower, Pageable pageable);
     Slice<UserConnection> findByFollowing(UserProfile following, Pageable pageable);

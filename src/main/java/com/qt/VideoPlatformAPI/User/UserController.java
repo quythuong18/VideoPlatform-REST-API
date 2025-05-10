@@ -1,5 +1,6 @@
 package com.qt.VideoPlatformAPI.User;
 
+import com.qt.VideoPlatformAPI.DTO.UserInfoDTO;
 import com.qt.VideoPlatformAPI.Utils.VideoConstants;
 import com.qt.VideoPlatformAPI.DTO.UserPublicDTO;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
@@ -91,25 +92,25 @@ public class UserController {
     }
 
     @GetMapping("/followings")
-    public ResponseEntity<APIResponseWithData<Set<String>>> getAllFollowings(
+    public ResponseEntity<APIResponseWithData<Set<UserInfoDTO>>> getAllFollowings(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size
     ) {
-        return ResponseEntity.ok(new APIResponseWithData<Set<String>>(Boolean.TRUE,
+        return ResponseEntity.ok(new APIResponseWithData<Set<UserInfoDTO>>(Boolean.TRUE,
                 "Get all followings successfully", HttpStatus.OK, userService.getAllMyFollowings(page, size)));
     }
 
     @GetMapping("/followers")
-    public ResponseEntity<APIResponseWithData<Set<String>>> getAllFollowers(
+    public ResponseEntity<APIResponseWithData<Set<UserInfoDTO>>> getAllFollowers(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size
     ) {
-        return ResponseEntity.ok(new APIResponseWithData<Set<String>>(Boolean.TRUE,
+        return ResponseEntity.ok(new APIResponseWithData<Set<UserInfoDTO>>(Boolean.TRUE,
                 "Get all followers successfully", HttpStatus.OK, userService.getAllMyFollowers(page, size)));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<APIResponseWithData<List<UserPublicDTO>>> searchByUsername(@RequestParam String pattern) {
+    public ResponseEntity<APIResponseWithData<List<UserInfoDTO>>> searchByUsername(@RequestParam String pattern) {
         if(pattern == null || pattern.isBlank()) {
             return ResponseEntity.status(400).body(new APIResponseWithData<>(Boolean.FALSE, "Search pattern is blank or null",
                     HttpStatus.BAD_REQUEST, null));
