@@ -48,6 +48,8 @@ public class VideoService {
         // set more information for the video
         video.setUserId(user.getId());
         video.setUsername(user.getUsername());
+        video.setUserFullname(user.getFullName());
+        video.setUserProfilePic(user.getProfilePic());
 
         video.setLikesCount(0L);
         video.setViewsCount(0L);
