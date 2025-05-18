@@ -16,8 +16,14 @@ public class CustomVideoRepository {
   private MongoTemplate mongoTemplate;
 
     public List<Video> getRandomVideos(Integer count) {
+        // Criteria
+        Criteria criteria = Criteria.where("isUploaded").is(true).and("isProcessed").is(true);
+
         // Create an aggregation pipeline with $sample stage
-        Aggregation aggregation = Aggregation.newAggregation(Aggregation.sample(count));
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(criteria),
+                Aggregation.sample(count)
+        );
 
         // Execute the aggregation query on the "video" collection
         AggregationResults<Video> results = mongoTemplate.aggregate(aggregation, "videos", Video.class);
