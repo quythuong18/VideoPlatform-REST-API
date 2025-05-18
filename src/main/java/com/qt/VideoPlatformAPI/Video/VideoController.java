@@ -49,6 +49,15 @@ public class VideoController {
                 HttpStatus.OK, videoService.getRandomVideos(count)));
     }
 
+    @GetMapping("/following/random")
+    public ResponseEntity<APIResponseWithData<List<Video>>> getRandomVideosOfFollowings(@RequestParam Integer count) {
+        if(count == null || count <= 0)
+            return ResponseEntity.status(400).body(new APIResponseWithData<>(Boolean.FALSE, "Count value is invalid",
+                    HttpStatus.BAD_REQUEST, null));
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get random videos of your followings successfully",
+                HttpStatus.OK, videoService.getRandomVideosOfFollowings(count)));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<APIResponseWithData<?>> getSearchResult(
             @RequestParam(defaultValue = "title") String type,

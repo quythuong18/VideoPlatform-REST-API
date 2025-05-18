@@ -1,5 +1,6 @@
 package com.qt.VideoPlatformAPI.Video;
 
+import com.qt.VideoPlatformAPI.DTO.UserInfoDTO;
 import com.qt.VideoPlatformAPI.File.CloudinaryService;
 import com.qt.VideoPlatformAPI.File.VideoFileProcessingService;
 import com.qt.VideoPlatformAPI.Playlist.Playlist;
@@ -20,10 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -126,6 +124,14 @@ public class VideoService {
 
     public List<Video> getRandomVideos(Integer count) {
         return customVideoRepository.getRandomVideos(count);
+    }
+
+    public List<Video> getRandomVideosOfFollowings(Integer count) {
+        Set<UserInfoDTO> followings = userService.getAllMyFollowings(0, Integer.MAX_VALUE);
+        List<String> followingUsernameList = new ArrayList<>();
+        for(UserInfoDTO u : followings) { followingUsernameList.add(u.getUsername()); }
+
+        return customVideoRepository.getFollowingsVideos(followingUsernameList, count);
     }
 
     public Boolean isVideoExistent(String videoId) {

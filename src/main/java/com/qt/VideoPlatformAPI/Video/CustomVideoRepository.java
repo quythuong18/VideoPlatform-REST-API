@@ -1,5 +1,6 @@
 package com.qt.VideoPlatformAPI.Video;
 
+import com.qt.VideoPlatformAPI.DTO.UserInfoDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -9,6 +10,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 @Repository
 @AllArgsConstructor
@@ -28,6 +31,19 @@ public class CustomVideoRepository {
         // Execute the aggregation query on the "video" collection
         AggregationResults<Video> results = mongoTemplate.aggregate(aggregation, "videos", Video.class);
 
+        return results.getMappedResults();
+    }
+
+    public List<Video> getFollowingsVideos(List<String> followingList, Integer count) {
+        Criteria criteria = Criteria.where("isUploaded").is(true)
+                .and("isProcessed").is(true)
+                .and("username").in(followingList);
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(criteria),
+                Aggregation.sample(count)
+        );
+
+        AggregationResults<Video> results = mongoTemplate.aggregate(aggregation, "videos", Video.class);
         return results.getMappedResults();
     }
 
