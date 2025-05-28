@@ -47,8 +47,9 @@ public class NotificationProducer {
         String ownerUsername = userService.getUserByUserId(v.getUserId()).getUsername();
         NotificationEvent notificationEvent = NotificationEvent.builder()
                 .type(NotificationTypes.NEW_VIDEO)
+                .fromUserProfilePic(v.getUserProfilePic())
                 .fromUsername(ownerUsername)
-                .notiMetadata(new NotiMetadata(v.getId(), v.getTitle()))
+                .notiMetadata(new NotiMetadata(v.getId(), v.getTitle(), v.getThumbnailUrl()))
                 .build();
         Integer page = 0;
         Set<String> usernameList;
@@ -64,6 +65,7 @@ public class NotificationProducer {
     public void followingEvent(String followerUsername, String followingUsername) {
         NotificationEvent notificationEvent = NotificationEvent.builder()
                 .type(NotificationTypes.FOLLOW)
+                .fromUserProfilePic(userService.getProfilePicByUsername(followerUsername))
                 .fromUsername(followerUsername)
                 .toUsernames(List.of(followingUsername))
                 .build();
@@ -72,11 +74,14 @@ public class NotificationProducer {
 
     @Async
     public void likeVideoEvent(String fromUsername, String toOwner, String videoId) {
+        Video v = videoService.getVideoById(videoId);
+
         NotificationEvent notificationEvent = NotificationEvent.builder()
                 .type(NotificationTypes.LIKE_VIDEO)
+                .fromUserProfilePic(userService.getProfilePicByUsername(fromUsername))
                 .fromUsername(fromUsername)
                 .toUsernames(List.of(toOwner))
-                .notiMetadata(new NotiMetadata(videoId, videoService.getVideoById(videoId).getTitle()))
+                .notiMetadata(new NotiMetadata(videoId, v.getTitle(), v.getThumbnailUrl()))
                 .build();
         sendMsg(notificationEvent);
     }
@@ -85,9 +90,10 @@ public class NotificationProducer {
     public void commentEvent(Comment comment, Video video) {
         NotificationEvent notificationEvent = NotificationEvent.builder()
                 .type(NotificationTypes.COMMENT_ON_VIDEO)
+                .fromUserProfilePic(comment.getUserProfilePic())
                 .fromUsername(comment.getUsername())
                 .toUsernames(List.of(video.getUsername()))
-                .notiMetadata(new NotiMetadata(video.getId(), video.getTitle()))
+                .notiMetadata(new NotiMetadata(video.getId(), video.getTitle(), video.getThumbnailUrl()))
                 .build();
 
         notificationEvent.getNotiMetadata().setCommentId(comment.getId());
@@ -99,9 +105,11 @@ public class NotificationProducer {
     public void likeCommentEvent(String fromUsername, Comment comment, Video video) {
         NotificationEvent notificationEvent = NotificationEvent.builder()
                 .type(NotificationTypes.LIKE_COMMENT)
+                .fromUserProfilePic(userService.getProfilePicByUsername(fromUsername))
                 .fromUsername(fromUsername)
                 .toUsernames(List.of(comment.getUsername()))
-                .notiMetadata(new NotiMetadata(video.getId(), video.getTitle(), comment.getId(), comment.getContent()))
+                .notiMetadata(new NotiMetadata(video.getId(), video.getTitle(),
+                        video.getThumbnailUrl(),comment.getId(), comment.getContent()))
                 .build();
         sendMsg(notificationEvent);
     }

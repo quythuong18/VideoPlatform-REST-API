@@ -26,4 +26,7 @@ public interface IUserRepository extends JpaRepository<UserProfile, Long> {
     @Query("SELECT COUNT(u) > 0 FROM UserProfile u WHERE u.username = ?1")
     Boolean existByUsername(String username);
 
+    @Query("SELECT u.profilePic FROM UserProfile u WHERE u.username = ?1")
+    Optional<String> findUserProfilePicByUsername(String username);
+
 }

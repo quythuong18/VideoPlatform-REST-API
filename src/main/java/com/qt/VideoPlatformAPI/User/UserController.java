@@ -127,6 +127,16 @@ public class UserController {
                 "Update user successfully", HttpStatus.OK, userService.updateUser(user)));
     }
 
+    @GetMapping("/{username}/profilePic")
+    ResponseEntity<APIResponseWithData<String>> getProfilePic(@PathVariable String username) throws IllegalArgumentException {
+        if(username == null || username.isBlank())
+            throw new IllegalArgumentException("Username is null or blank");
+
+        return ResponseEntity.ok(new APIResponseWithData<String>(Boolean.TRUE,
+                "Get profile picture successfully", HttpStatus.OK,
+                userService.getProfilePicByUsername(username)));
+    }
+
     @PostMapping("/profilePic")
     ResponseEntity<APIResponseWithData<String>> updateProfilePic(@RequestBody MultipartFile img) throws IOException {
         if(img == null)

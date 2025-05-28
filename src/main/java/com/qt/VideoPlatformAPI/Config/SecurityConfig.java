@@ -54,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "**/users/followings").authenticated()
                         .requestMatchers(HttpMethod.GET, "**/users/followers").authenticated()
                         .requestMatchers(HttpMethod.POST, "**/users/profilePic").authenticated()
+                        .requestMatchers(HttpMethod.GET, "**/users/{username}/profilePic").permitAll()
                         .requestMatchers(HttpMethod.PUT, "**/users/").authenticated()
 
                         // video

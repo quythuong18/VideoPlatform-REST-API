@@ -245,6 +245,15 @@ public class UserService implements UserDetailsService {
         return url;
     }
 
+    public String getProfilePicByUsername(String username) {
+        Optional<String> userProfilePicOptional =
+                userRepository.findUserProfilePicByUsername(username);
+        if(userProfilePicOptional.isEmpty())
+            throw new IllegalArgumentException("Username is not found or profile picture url is null");
+
+        return userProfilePicOptional.get();
+    }
+
     public List<UserInfoDTO> searchByUsername(String searchPattern) {
         List<UserProfile> userProfileList = userRepository.findByUsernameContaining(searchPattern);
         List<UserInfoDTO> userInfoDTOList = new ArrayList<>();

@@ -9,6 +9,8 @@ import lombok.Data;
 @Builder
 public class NotificationEvent {
     private String fromUsername;
+    private String fromUserProfilePic;
+    private String fromUser;
     private List<String> toUsernames;
     private NotificationTypes type;
     private NotiMetadata notiMetadata;
