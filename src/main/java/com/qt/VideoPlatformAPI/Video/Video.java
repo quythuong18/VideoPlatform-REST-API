@@ -8,7 +8,10 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Document("videos")
 @AllArgsConstructor
@@ -25,10 +28,11 @@ public class Video extends TimeAudit {
     private String userFullname;
     private String userProfilePic;
 
-    private ObjectId playlistId;
+    private ObjectId playlistId; // deprecated
+    private Set<ObjectId> playlistIds = new HashSet<>();
     private String title;
     private String description;
-    private List<String> tags;
+    private List<String> tags = new ArrayList<>();
     private String thumbnailUrl;
     private Long duration;
     private Long viewsCount;
@@ -39,12 +43,20 @@ public class Video extends TimeAudit {
     private Boolean isUploaded;
     private Boolean isProcessed;
 
-    public void setPlaylistId(String playlistId) {
-        if(ObjectId.isValid(playlistId)) {
-            this.playlistId = new ObjectId(playlistId);
-        } else throw new IllegalArgumentException("Invalid playlist id format");
+    public void setPlaylistIds(Set<String> playlistIds) {
+        for(String id : playlistIds) {
+            if(ObjectId.isValid(id)) {
+                this.playlistIds.add(new ObjectId(id));
+            } else throw new IllegalArgumentException("Invalid playlist id format");
+        }
     }
-    public String getPlaylistId() {
-        return this.playlistId != null ? playlistId.toHexString() : null;
+    public Set<String> getPlaylistIds() {
+        Set<String> playlistStringIds = new HashSet<>();
+
+        for(ObjectId id : this.playlistIds) {
+            if(id != null) playlistStringIds.add(id.toHexString());
+            else playlistStringIds.add(null);
+        }
+        return playlistStringIds;
     }
 }

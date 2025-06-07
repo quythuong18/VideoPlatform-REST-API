@@ -23,22 +23,6 @@ public class PlaylistController {
     private final IPlaylistRepository iPlaylistRepository;
     private final IVideosRepository iVideosRepository;
 
-    @PostMapping("/SetThePlayListIdField")
-    public String setThePlaylistIdField() {
-        List<Playlist> playlists = iPlaylistRepository.findAll();
-        for(Playlist p : playlists) {
-            List<String> videoIdList = p.getVideoIdsList();
-            for(String videoId : videoIdList) {
-                Optional<Video> videoOptional = iVideosRepository.findById(videoId);
-                if(videoOptional.isPresent()) {
-                    Video video = videoOptional.get();
-                    video.setPlaylistId(p.getId());
-                }
-            }
-        }
-        return "Ok";
-    }
-
     @GetMapping("/user/{userId}")
     public ResponseEntity<APIResponseWithData<List<Playlist>>> getAllPlaylistsByUserId(@PathVariable Long userId) {
         if(userId == null)
@@ -99,7 +83,7 @@ public class PlaylistController {
         if(videoId == null || videoId.isBlank())
             return ResponseEntity.status(400).body(new APIResponse(Boolean.FALSE, "Video id is null or blank", HttpStatus.BAD_REQUEST));
 
-        playlistService.deleteVideoFromPlaylist(playlistId, videoId);
+        playlistService.deleteVideoFromPlaylist(playlistId, videoId, Boolean.FALSE);
         return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Remove video from playlist successfully", HttpStatus.OK));
     }
 

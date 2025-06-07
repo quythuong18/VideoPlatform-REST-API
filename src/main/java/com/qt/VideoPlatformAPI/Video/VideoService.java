@@ -3,7 +3,6 @@ package com.qt.VideoPlatformAPI.Video;
 import com.qt.VideoPlatformAPI.DTO.UserInfoDTO;
 import com.qt.VideoPlatformAPI.File.CloudinaryService;
 import com.qt.VideoPlatformAPI.File.VideoFileProcessingService;
-import com.qt.VideoPlatformAPI.Playlist.Playlist;
 import com.qt.VideoPlatformAPI.Playlist.PlaylistService;
 import com.qt.VideoPlatformAPI.User.UserProfile;
 import com.qt.VideoPlatformAPI.User.UserService;
@@ -11,10 +10,9 @@ import com.qt.VideoPlatformAPI.Video.Comment.ICommentRepository;
 import com.qt.VideoPlatformAPI.Video.Like.LikeService;
 import com.qt.VideoPlatformAPI.Video.View.IViewHistoryRepository;
 import com.qt.VideoPlatformAPI.Video.View.ViewHistory;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -155,9 +153,18 @@ public class VideoService {
         return videoList;
     }
 
-    public void updatePlaylistId(String videoId, String playlistId) {
+    public void addVideoToPlaylist(String videoId, String playlistId) {
         Video video = getVideoById(videoId);
-        video.setPlaylistId(playlistId);
+
+        Set<String> playlistIds = video.getPlaylistIds();
+        playlistIds.add(playlistId);
+
+        video.setPlaylistIds(playlistIds);
+        iVideoRepository.save(video);
+    }
+    public void removeVideoFromPlaylist(String videoId, String playlistId) {
+        Video video = getVideoById(videoId);
+        video.getPlaylistIds().remove(playlistId);
         iVideoRepository.save(video);
     }
 
@@ -213,7 +220,10 @@ public class VideoService {
 
         //delete from the playlist
         CompletableFuture.runAsync(() -> {
-            playlistService.deleteVideoFromPlaylist(video.getPlaylistId(), videoId);
+            for(String playlistId : video.getPlaylistIds()) {
+                playlistService.deleteVideoFromPlaylist(playlistId, videoId, Boolean.TRUE);
+            }
+
         }).thenAccept((res) -> {
             logger.info("Deleted video from the playlist" + videoId);
         });
@@ -234,4 +244,12 @@ public class VideoService {
         return iViewHistoryRepository.save(vh);
     }
 
+    @PostConstruct
+    public void addEmptyArrayToVideoCollection() {
+        List<Video> allVideos = iVideoRepository.findAll();
+        for(Video v : allVideos) {
+            v.setPlaylistIds(new HashSet<>());
+        }
+        iVideoRepository.saveAll(allVideos);
+    }
 }

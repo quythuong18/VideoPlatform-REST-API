@@ -1,5 +1,6 @@
 package com.qt.VideoPlatformAPI.Video;
 
+import com.qt.VideoPlatformAPI.Playlist.PlaylistService;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
 import com.qt.VideoPlatformAPI.Video.View.ViewHistory;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,6 +21,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class VideoController {
     private final VideoService videoService;
+    private final PlaylistService playlistService;
 
     @PostMapping("/new/")
     public ResponseEntity<APIResponseWithData<Video>> addVideo(@RequestBody Video video) {
@@ -125,6 +129,21 @@ public class VideoController {
         }
         videoService.addHistory(vh);
         return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "View history saved",
+                HttpStatus.OK));
+    }
+
+    @PatchMapping("/{videoId}/playlists")
+    public ResponseEntity<APIResponse> addVideoToMultiplePlaylists(@RequestBody List<String> playlistIds,
+        @PathVariable String videoId) {
+        if (playlistIds == null || playlistIds.isEmpty())
+            throw new IllegalArgumentException("Playlist id list is null or empty");
+
+        // remove duplicated
+        playlistIds = new ArrayList<>(new LinkedHashSet<>(playlistIds));
+        // loop to add video to playlist
+        for (String playlistId : playlistIds) playlistService.addVideoToPlaylist(playlistId, videoId);
+
+        return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "Add video to multiple playlists successfully",
                 HttpStatus.OK));
     }
 }

@@ -54,16 +54,15 @@ public class PlaylistService {
         if(!videoService.isVideoExistent(videoId))
             throw new IllegalArgumentException("Video id does not exist");
 
-        if(checkVideoExistsInAPlaylist(playlistId, videoId))
-            throw new IllegalArgumentException("The video is already added to playlist");
+//        if(checkVideoExistsInAPlaylist(playlistId, videoId)) return;
 
         Playlist playlist = getPlaylistById(playlistId);
         playlist.getVideoIdsList().add(videoId);
-        videoService.updatePlaylistId(videoId, playlistId);
+        videoService.addVideoToPlaylist(videoId, playlistId);
         iPlaylistRepository.save(playlist);
     }
 
-    public void deleteVideoFromPlaylist(String playlistId, String videoId) {
+    public void deleteVideoFromPlaylist(String playlistId, String videoId, Boolean deletedVideo) {
         if(!iPlaylistRepository.existsById(playlistId))
             throw new IllegalArgumentException("Playlist id does not exist");
         if(!videoService.isVideoExistent(videoId))
@@ -74,7 +73,9 @@ public class PlaylistService {
 
         Playlist playlist = getPlaylistById(playlistId);
         playlist.getVideoIdsList().remove(videoId);
-        videoService.updatePlaylistId(videoId, null);
+
+        if(!deletedVideo)
+            videoService.removeVideoFromPlaylist(videoId, playlistId);
 
         iPlaylistRepository.save(playlist);
     }
