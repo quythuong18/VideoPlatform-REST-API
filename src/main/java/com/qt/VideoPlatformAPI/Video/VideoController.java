@@ -3,6 +3,8 @@ package com.qt.VideoPlatformAPI.Video;
 import com.qt.VideoPlatformAPI.Playlist.PlaylistService;
 import com.qt.VideoPlatformAPI.Responses.APIResponse;
 import com.qt.VideoPlatformAPI.Responses.APIResponseWithData;
+import com.qt.VideoPlatformAPI.User.UserProfile;
+import com.qt.VideoPlatformAPI.User.UserService;
 import com.qt.VideoPlatformAPI.Video.View.ViewHistory;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ import java.util.Objects;
 public class VideoController {
     private final VideoService videoService;
     private final PlaylistService playlistService;
+    private final UserService userService;
 
     @PostMapping("/new/")
     public ResponseEntity<APIResponseWithData<Video>> addVideo(@RequestBody Video video) {
@@ -130,6 +133,15 @@ public class VideoController {
         videoService.addHistory(vh);
         return ResponseEntity.ok(new APIResponse(Boolean.TRUE, "View history saved",
                 HttpStatus.OK));
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<APIResponseWithData<List<ViewHistory>>> getViewHistories(@RequestParam(defaultValue = "0") Integer page,
+                                                              @RequestParam(defaultValue = "10") Integer size) {
+        UserProfile user = userService.getCurrentUser();
+        List<ViewHistory> viewHistories = videoService.getViewHistories(user, page, size);
+        return ResponseEntity.ok(new APIResponseWithData<>(Boolean.TRUE, "Get view histories successfully", HttpStatus.OK,
+                viewHistories));
     }
 
     @PatchMapping("/{videoId}/playlists")

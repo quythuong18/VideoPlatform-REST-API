@@ -13,6 +13,10 @@ import com.qt.VideoPlatformAPI.Video.View.ViewHistory;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -242,6 +246,12 @@ public class VideoService {
 
     public ViewHistory addHistory(ViewHistory vh) {
         return iViewHistoryRepository.save(vh);
+    }
+
+    public List<ViewHistory> getViewHistories(UserProfile user, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Slice<ViewHistory> pageViewHistories = iViewHistoryRepository.findByViewerUsername(user.getUsername(), pageable);
+        return pageViewHistories.getContent();
     }
 
     @PostConstruct
