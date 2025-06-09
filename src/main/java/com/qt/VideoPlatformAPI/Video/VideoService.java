@@ -129,7 +129,7 @@ public class VideoService {
     }
 
     public List<Video> getRandomVideosOfFollowings(Integer count) {
-        Set<UserInfoDTO> followings = userService.getAllMyFollowings(0, Integer.MAX_VALUE);
+        Set<UserInfoDTO> followings = userService.getAllMyFollowings(0, 99999);
         List<String> followingUsernameList = new ArrayList<>();
         for(UserInfoDTO u : followings) { followingUsernameList.add(u.getUsername()); }
 
