@@ -6,8 +6,8 @@ import jakarta.persistence.Id;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Unwrapped;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,10 +28,11 @@ public class Video extends TimeAudit {
     private String userFullname;
     private String userProfilePic;
 
-    private ObjectId playlistId; // deprecated
+    @Unwrapped.Nullable
     private Set<ObjectId> playlistIds = new HashSet<>();
     private String title;
     private String description;
+    @Unwrapped.Nullable
     private List<String> tags = new ArrayList<>();
     private String thumbnailUrl;
     private Long duration;

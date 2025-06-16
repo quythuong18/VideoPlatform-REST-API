@@ -12,6 +12,7 @@ import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 @Component
+@RequestScope
 @RequiredArgsConstructor
 public class FFmpegService {
     private final Logger logger;
