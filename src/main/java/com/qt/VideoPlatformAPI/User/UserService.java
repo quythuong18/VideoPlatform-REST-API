@@ -85,6 +85,13 @@ public class UserService implements UserDetailsService {
         return userRepository.existByEmail(email);
     }
 
+    public Boolean isPrivateUserByUsername(String username) {
+        Optional<UserProfile> userProfileOptional = userRepository.findByUsername(username);
+        if(userProfileOptional.isEmpty())
+            throw new IllegalArgumentException("Username does not exist");
+        return userProfileOptional.get().getIsPrivate();
+    }
+
     public APIResponse followAUser(String username) {
         UserProfile following = loadUserByUsername(username);
         UserProfile follower = getCurrentUser();

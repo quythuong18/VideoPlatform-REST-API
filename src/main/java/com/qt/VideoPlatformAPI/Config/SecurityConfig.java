@@ -119,18 +119,18 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*"); // Cho phép tất cả các domain (có thể thay bằng domain cụ thể nếu cần)
-        config.addAllowedHeader("*"); // Cho phép tất cả các headers
-        config.addAllowedMethod("*"); // Cho phép tất cả các phương thức HTTP
-        config.setMaxAge(3600L); // Cache CORS trong 1 giờ
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config); // Áp dụng CORS cho tất cả endpoints
-        return source;
-    }
+//    @Bean
+//    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration config = new CorsConfiguration();
+//        config.setAllowCredentials(true);
+//        config.addAllowedOriginPattern("*"); // Cho phép tất cả các domain (có thể thay bằng domain cụ thể nếu cần)
+//        config.addAllowedHeader("*"); // Cho phép tất cả các headers
+//        config.addAllowedMethod("*"); // Cho phép tất cả các phương thức HTTP
+//        config.setMaxAge(3600L); // Cache CORS trong 1 giờ
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", config); // Áp dụng CORS cho tất cả endpoints
+//        return source;
+//    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
