@@ -228,13 +228,19 @@ public class UserService implements UserDetailsService {
         UserProfile currentUser = getCurrentUser();
 
         //currentUser.setUsername(newUserInfo.getUsername());
-        currentUser.setFullName(newUserInfo.getFullName());
+        if(newUserInfo.getFullName() != null)
+            currentUser.setFullName(newUserInfo.getFullName());
         //currentUser.setEmail(newUserInfo.getFullName());
-        currentUser.setBio(newUserInfo.getBio());
-        currentUser.setProfilePic(newUserInfo.getProfilePic());
-        currentUser.setIsPrivate(newUserInfo.getIsPrivate());
-        currentUser.setDateOfBirth(newUserInfo.getDateOfBirth());
-        currentUser.setPhone(newUserInfo.getPhone());
+        if(newUserInfo.getBio() != null)
+            currentUser.setBio(newUserInfo.getBio());
+        if(newUserInfo.getProfilePic() != null)
+            currentUser.setProfilePic(newUserInfo.getProfilePic());
+        if(newUserInfo.getIsPrivate() != null)
+            currentUser.setIsPrivate(newUserInfo.getIsPrivate());
+        if(newUserInfo.getDateOfBirth() != null)
+            currentUser.setDateOfBirth(newUserInfo.getDateOfBirth());
+        if(newUserInfo.getPhone() != null)
+            currentUser.setPhone(newUserInfo.getPhone());
 
         return userRepository.save(currentUser);
     }
